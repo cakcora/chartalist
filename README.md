@@ -8,6 +8,23 @@ The Chartalist package contains:
 
 ## Installation
 
+### Requirements
+Chartalist depends on the following:
+
+-	numpy>=1.19.1
+-	ogb>=1.2.6
+-	outdated>=0.2.0
+-	pandas>=1.1.0
+-	pillow>=7.2.0
+-	ogb>=1.2.6
+-	pytz>=2020.4
+-	torch>=1.7.0
+-	torchvision>=0.8.2
+-	tqdm>=4.53.0
+-	scikit-learn>=0.20.0
+-	scipy>=1.5.4
+
+
 ## Datasets
 
 ### Bitcoin ML-Ready Datasets
