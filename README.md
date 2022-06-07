@@ -76,12 +76,12 @@ For example:
 ```py
 data = chartalist.get_dataset(dataset='ethereum', version='trans_net', download=True, data_frame=True)
 ```
-There are three options for the dataset argument:
+There are currently three options for the dataset argument:
 - ethereum
 - bitcoin  
 - dashcoin
 
-Depending on the choice of the dataset argument, please refer to [#Datasets](datasets) for the appropriate version argument.
+Depending on the choice of the dataset argument, please refer to [#Datasets](#datasets) for the appropriate version argument.
 
 4. The corresponding dataset will be downloaded under the `data` folder in the working directory if not already when the script is ran and the Panda DataFrame can be used directly for processing.
 
