@@ -83,7 +83,9 @@ There are currently three options for the dataset argument:
 
 Depending on the choice of the dataset argument, please refer to [#Datasets](#datasets) for the appropriate version argument.
 
-4. The corresponding dataset will be downloaded under the `data` folder in the working directory if not already when the script is ran and the Panda DataFrame can be used directly for processing.
+4. The corresponding dataset will be downloaded under the `data` folder in the working directory if not already when the script is ran and the Pandas DataFrame containing the dataset can be used directly for processing.
+
+> **_NOTE:_**  Due the large nature of certain datasets, only sample data will be downloaded by the dataloader. If the complete dataset is required, click on the link corresponding to the dataset of interest and manually download the data from our website.  Replace the complete dataset with the sample dataset file under `data` and proceed as normal.
 
 ## Using Example Scripts
 
