@@ -31,37 +31,37 @@ Chartalist depends on the following:
 The following is a summary of the available datasets and their related tasks.  Use the corresponding version argument when using Chartalist to retrieve the correct dataset of interest.  Click on the dataset for more information. 
 
 ### Bitcoin ML-Ready Datasets
-| Dataset                                      | Labels                                                         | Version Argument                                |
+| Dataset                                      | Labels                                                         | Version Constant                                |
 | -------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------|
-| [Ransomware Family: Bitcoinheist](https://chartalist.org/btc/TaskTypePrediction.html)              | address, year, day, length, weight, count, looped, neighbors, income, label                      | type_prediction                                 |       
-| [Bitcoin Transaction Network Input](https://chartalist.org/BitcoinData.html)            | trans | trans_net_in                   |
-| [Bitcoin Transaction Network Output](https://chartalist.org/BitcoinData.html)           | trans | trans_net_out                                   |
-| [Bitcoin Block Times](https://chartalist.org/BitcoinData.html)      | unix_time | block_time                                   |
-| [Bitcoin Price Data](https://chartalist.org/btc/TaskPriceAnalytics.html)                           | date, price, year, day, totaltx                                      | price_prediction                  |
+| [Ransomware Family: Bitcoinheist](https://chartalist.org/btc/TaskTypePrediction.html)              | address, year, day, length, weight, count, looped, neighbors, income, label                      | TYPE_PREDICTION                                 |       
+| [Bitcoin Transaction Network Input](https://chartalist.org/BitcoinData.html)            | trans | TRANSACTION_NETWORK_INPUT_SAMPLE                   |
+| [Bitcoin Transaction Network Output](https://chartalist.org/BitcoinData.html)           | trans | TRANSACTION_NETWORK_OUTPUT_SAMPLE                                   |
+| [Bitcoin Block Times](https://chartalist.org/BitcoinData.html)      | unix_time | BLOCK_TIME                                   |
+| [Bitcoin Price Data](https://chartalist.org/btc/TaskPriceAnalytics.html)                           | date, price, year, day, totaltx                                      | PRICE_PREDICTION                  |
 
 ### Ethereum ML-Ready Datasets
-| Dataset                                      | Labels                                                         | Version Argument                                |
+| Dataset                                      | Labels                                                         | Version Constant                                |
 | -------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------|
-| [Ethereum Token Networks](https://chartalist.org/eth/TaskTypePrediction.html)                      | token_address, from_address, to_address, value, transaction_hash, log_index, block_number      |     type_prediction_trans                                            |     
-| [Ethereum Token Network Labels](https://chartalist.org/eth/TaskTypePrediction.html)                      | type, address, name     |     type_prediction_labels  |  
-| [EtherDelta Ether-to-Token Transactions](https://chartalist.org/eth/TaskPatternDetection.html)                  | transaction_hash, block_number, timestamp,	tokenGet,	amountGet,	tokenGive,	amountGive,	get,	give                      |            anomaly_detection_ether_delta_trades            |
-| [IDEX Ether-to-Token Transactions](https://chartalist.org/eth/TaskPatternDetection.html)       | transaction_hash, status, block_number, gas, gas_price, timestamp, amountBuy, amountSell, expires, nonce, amount, tradeNonce, feeMake, feeTake, tokenBuy, tokenSell, maker, taker  |        anomaly_detection_idex       |
-| [Ether-to-Token Ether-Dollar Price](https://chartalist.org/eth/TaskPatternDetection.html)            | Date(UTC), UnixTimeStamp, Value   |            anomaly_detection_ether_dollar_price                                     |
-| [Bytom Network](https://chartalist.org/eth/TaskMultilayer.html)                                | fromAddress, toAddress, time, amount                                          | multilayer_bytom                                |
-| [Cybermiles Network](https://chartalist.org/eth/TaskMultilayer.html)                           | fromAddress, toAddress, time, amount                                          | multilayer_cybermiles                           |
-| [Decentraland Network](https://chartalist.org/eth/TaskMultilayer.html)                         | fromAddress, toAddress, time, amount                                          | multilayer_decentraland                         |
-| [Tierion Network](https://chartalist.org/eth/TaskMultilayer.html)                              | fromAddress, toAddress, time, amount                                          | multilayer_tierion                              |
-| [Vechain Network](https://chartalist.org/eth/TaskMultilayer.html)                              | fromAddress, toAddress, time, amount                                          | multilayer_vechain                              |
-| [ZRX Network](https://chartalist.org/eth/TaskMultilayer.html)                                  | fromAddress, toAddress, time, amount                                          | multilayer_zrx                                  |
-| [Ethereum VeChain Token Transactions](https://chartalist.org/eth/TaskPriceAnalytics.html)                   | fromAddress, toAddress, time, amount                            |                   price_prediction_vechain                              |
-| [Ethereum ZRX Token Transactions](https://chartalist.org/eth/TaskPriceAnalytics.html)                   | fromAddress, toAddress, time, amount                              |              price_prediction_zrx                                   |
-| [Stablecoin ERC20 Transactions](https://chartalist.org/eth/StablecoinAnalysis.html)                | fromAddress, toAddress, time, amount                                         |   stablecoin_erc20                                              |
+| [Ethereum Token Networks](https://chartalist.org/eth/TaskTypePrediction.html)                      | token_address, from_address, to_address, value, transaction_hash, log_index, block_number      |     TYPE_PREDICTION_TRANSACTIONS                                            |     
+| [Ethereum Token Network Labels](https://chartalist.org/eth/TaskTypePrediction.html)                      | type, address, name     |     TYPE_PREDICTION_LABELS  |  
+| [EtherDelta Ether-to-Token Transactions](https://chartalist.org/eth/TaskPatternDetection.html)                  | transaction_hash, block_number, timestamp,	tokenGet,	amountGet,	tokenGive,	amountGive,	get,	give                      |            ANOMALY_DETECTION_ETHER_DELTA_TRADES            |
+| [IDEX Ether-to-Token Transactions](https://chartalist.org/eth/TaskPatternDetection.html)       | transaction_hash, status, block_number, gas, gas_price, timestamp, amountBuy, amountSell, expires, nonce, amount, tradeNonce, feeMake, feeTake, tokenBuy, tokenSell, maker, taker  |        ANOMALY_DETECTION_IDEX       |
+| [Ether-to-Token Ether-Dollar Price](https://chartalist.org/eth/TaskPatternDetection.html)            | Date(UTC), UnixTimeStamp, Value   |            ANOMALY_DETECTION_ETHER_DOLLAR_PRICE                                     |
+| [Bytom Network](https://chartalist.org/eth/TaskMultilayer.html)                                | fromAddress, toAddress, time, amount                                          | MULTILAYER_BYTOM                                |
+| [Cybermiles Network](https://chartalist.org/eth/TaskMultilayer.html)                           | fromAddress, toAddress, time, amount                                          | MULTILAYER_CYBERMILES                           |
+| [Decentraland Network](https://chartalist.org/eth/TaskMultilayer.html)                         | fromAddress, toAddress, time, amount                                          | MULTILAYER_DECENTRALAND                         |
+| [Tierion Network](https://chartalist.org/eth/TaskMultilayer.html)                              | fromAddress, toAddress, time, amount                                          | MULTILAYER_TIERION                              |
+| [Vechain Network](https://chartalist.org/eth/TaskMultilayer.html)                              | fromAddress, toAddress, time, amount                                          | MULTILAYER_VECHAIN                              |
+| [ZRX Network](https://chartalist.org/eth/TaskMultilayer.html)                                  | fromAddress, toAddress, time, amount                                          | MULTILAYER_ZRX                                  |
+| [Ethereum VeChain Token Transactions](https://chartalist.org/eth/TaskPriceAnalytics.html)                   | fromAddress, toAddress, time, amount                            |                   PRICE_PREDICTION_VECHAIN                              |
+| [Ethereum ZRX Token Transactions](https://chartalist.org/eth/TaskPriceAnalytics.html)                   | fromAddress, toAddress, time, amount                              |              PRICE_PREDICTION_ZRX                                   |
+| [Stablecoin ERC20 Transactions](https://chartalist.org/eth/StablecoinAnalysis.html)                | fromAddress, toAddress, time, amount                                         |   STABLECOIN_ERC20                                              |
 
 ### Dashcoin ML-Ready Datasets
-| Dataset                                      | Labels                                                         | Version Argument                                |
+| Dataset                                      | Labels                                                         | Version Constant                                |
 | -------------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------|     
-| [Dashcoin Transaction Network Input](https://chartalist.org/dash/DashData.html)      | trans                     | trans_net_in                                                          |
-| [Dashcoin Transaction Network Output](https://chartalist.org/dash/DashData.html)      | trans                     | trans_net_out                                                        |
+| [Dashcoin Transaction Network Input](https://chartalist.org/dash/DashData.html)      | trans                     | TRANSACTION_NETWORK_INPUT_SAMPLE                                                          |
+| [Dashcoin Transaction Network Output](https://chartalist.org/dash/DashData.html)      | trans                     | TRANSACTION_NETWORK_OUTPUT_SAMPLE                                                        |
 
 ## Using Chartalist
 1. Navigate to the folder `chartalist_loader-main` and create a new `.py` script or add one which will serve as the working environment.
@@ -74,16 +74,31 @@ import chartalist
 For example:
 
 ```py
-data = chartalist.get_dataset(dataset='ethereum', version='trans_net', download=True, data_frame=True)
+data = chartalist.get_dataset(dataset='dashcoin', version='chartalist.DashcoinLoader.TRANSACTION_NETWORK_OUTPUT_SAMPLE', download=True, data_frame=True)
 ```
 There are currently three options for the dataset argument:
 - ethereum
 - bitcoin  
 - dashcoin
 
-Depending on the choice of the dataset argument, please refer to [#Datasets](#datasets) for the appropriate version argument.
+Depending on the choice of the dataset argument, the version argument will take the following format:
 
-4. The corresponding dataset will be downloaded under the `data` folder in the working directory if not already when the script is ran and the Pandas DataFrame containing the dataset can be used directly for processing.
+For ethereum:
+```py
+version=chartalist.EthereumLoader.
+```
+For bitcoin:
+```py
+version=chartalist.BitcoinLoaders.
+```
+For dashcoin:
+```py
+version=chartalist.DashcoinLoader.
+```
+
+Refer to [#Datasets](#datasets) for the appropriate constant to append to the end of the version above and then the function is now ready to be used.
+
+4. Upon execution of the function, the corresponding dataset will be downloaded under the `data` folder in the working directory, if not already downloaded, when the script is executed and the Pandas DataFrame containing the dataset can be used directly for processing.
 
 > **_NOTE:_**  Due the large nature of certain datasets, only sample data will be downloaded by the dataloader. If the complete dataset is required, click on the link corresponding to the dataset of interest and manually download the data from our website.  Replace the contents of the sample dataset with the contents of the complete dataset under the `data` folder and proceed as normal.
 
