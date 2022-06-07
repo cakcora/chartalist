@@ -1,5 +1,5 @@
 # Chartalist
-https://www.chartalist.org
+Please visit https://www.chartalist.org for more information.
 
 ## Overview
 Chartalist is the first blockchain machine learning ready dataset platform from unspent transaction output and account-based blockchains.
@@ -7,7 +7,7 @@ Chartalist is the first blockchain machine learning ready dataset platform from 
 The Chartalist package contains:
 
 ## Installation
-1. Download this repository and extract the contents to the a desired location.
+1. Download this repository and extract the contents to a desired location.
 2. Inside the `chartalist_loader-main` folder will serve as the working directory.
 
 ### Requirements
@@ -29,22 +29,28 @@ Chartalist depends on the following:
 
 ## Datasets
 
-The following is a summary of the available datasets.  Use the corresponding version argument when using Chartalist to retrieve the correct dataset.
+The following is a summary of the available datasets and their related tasks.  Use the corresponding version argument when using Chartalist to retrieve the correct dataset of interest.  Network datasets with multiple version arguments 
 
 ### Bitcoin ML-Ready Datasets
 | Dataset                                      | Task                                                         | Version Argument                                |
 | -------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------|
-| Ransomware Classification: Bitcoinheist      | Address and transaction type prediction                      | type_prediction                                 |       
-| Bitcoin Transaction Network                  | Anomalous transaction pattern detection & Address clustering | trans_net_in & trans_net_out                    |
+| Ransomware Family: Bitcoinheist              | Address and transaction type prediction                      | type_prediction                                 |       
+| Bitcoin Transaction Network Input            | Anomalous transaction pattern detection & Address clustering | trans_net_in & trans_net_out                    |
+| Bitcoin Transaction Network Output           | Anomalous transaction pattern detection & Address clustering | trans_net_out                                   |
 | Bitcoin Price Data                           | Bitcoin Price Analytics                                      | price_prediction                                |
 
 ### Ethereum ML-Ready Datasets
 | Dataset                                      | Task                                                         | Version Argument                                |
 | -------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------|
-| Decentralized Exchange Network Data          | Address and transaction type prediction                      |                          |       
-| Wash-Trading Transaction Identification      | Anomalous transaction pattern detection                      |                                                 |
-| Topological Analysis For Event Detection     | Multilayer analysis                                          | multilayer_bytom & multilayer_cybermiles & multilayer_decentraland & multilayer_tierion & multilayer_vechain & multilayer_zrx                                                |
-| Token Price Prediction                       | Ethereum price prediction                                    |                                                 |
+| Ethereum Token Networks                      | Address and transaction type prediction                      |                                                 |       
+| Ether-to-Token Transactions                  | Anomalous transaction pattern detection                      |                                                 |
+| Bytom Network                                | Multilayer analysis                                          | multilayer_bytom                                |
+| Cybermiles Network                           | Multilayer analysis                                          | multilayer_cybermiles                           |
+| Decentraland Network                         | Multilayer analysis                                          | multilayer_decentraland                         |
+| Tierion Network                              | Multilayer analysis                                          | multilayer_tierion                              |
+| Vechain Network                              | Multilayer analysis                                          | multilayer_vechain                              |
+| ZRX Network                                  | Multilayer analysis                                          | multilayer_zrx                                  |
+| Ethereum Token Tansactions                   | Ethereum token price prediction                              |                                                 |
 | Stablecoin ERC20 Transactions                | Stable coin analysis                                         |                                                 |
 
 ## Using Chartalist
@@ -84,3 +90,6 @@ Bitcoin:
 
 4. The corresponding dataset will be downloaded if not already when the script is ran and the Panda DataFrame can be used directly for processing.
 
+## Using Example Scripts
+
+The included example scripts are provided as a starting point for processing the data in the datasets and meant to help familiarize the new user with the data format.
