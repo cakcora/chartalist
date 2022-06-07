@@ -5,6 +5,8 @@ Please visit https://www.chartalist.org for more information.
 Chartalist is the first blockchain machine learning ready dataset platform from unspent transaction output and account-based blockchains.
 
 The Chartalist package contains:
+1. Dataloaders which automate and handle the download of datasets from a single package import and a simple two-argument function call.
+2. Ability to reference and use the downloaded dataset directly after download as a Pandas DataFrame.
 
 ## Installation
 1. Download this repository and extract the contents to a desired location.
@@ -29,29 +31,29 @@ Chartalist depends on the following:
 
 ## Datasets
 
-The following is a summary of the available datasets and their related tasks.  Use the corresponding version argument when using Chartalist to retrieve the correct dataset of interest.  Network datasets with multiple version arguments 
+The following is a summary of the available datasets and their related tasks.  Use the corresponding version argument when using Chartalist to retrieve the correct dataset of interest.  Click on the dataset for more information. 
 
 ### Bitcoin ML-Ready Datasets
 | Dataset                                      | Task                                                         | Version Argument                                |
 | -------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------|
-| Ransomware Family: Bitcoinheist              | Address and transaction type prediction                      | type_prediction                                 |       
-| Bitcoin Transaction Network Input            | Anomalous transaction pattern detection & Address clustering | trans_net_in & trans_net_out                    |
-| Bitcoin Transaction Network Output           | Anomalous transaction pattern detection & Address clustering | trans_net_out                                   |
-| Bitcoin Price Data                           | Bitcoin Price Analytics                                      | price_prediction                                |
+| [Ransomware Family: Bitcoinheist](https://chartalist.org/btc/TaskTypePrediction.html)              | Address and transaction type prediction                      | type_prediction                                 |       
+| [Bitcoin Transaction Network Input](https://chartalist.org/BitcoinData.html)            | Anomalous transaction pattern detection & Address clustering | trans_net_in & trans_net_out                    |
+| [Bitcoin Transaction Network Output](https://chartalist.org/BitcoinData.html)           | Anomalous transaction pattern detection & Address clustering | trans_net_out                                   |
+| [Bitcoin Price Data](https://chartalist.org/btc/TaskPriceAnalytics.html)                           | Bitcoin Price Analytics                                      | price_prediction                                |
 
 ### Ethereum ML-Ready Datasets
 | Dataset                                      | Task                                                         | Version Argument                                |
 | -------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------|
-| Ethereum Token Networks                      | Address and transaction type prediction                      |                                                 |       
-| Ether-to-Token Transactions                  | Anomalous transaction pattern detection                      |                                                 |
-| Bytom Network                                | Multilayer analysis                                          | multilayer_bytom                                |
-| Cybermiles Network                           | Multilayer analysis                                          | multilayer_cybermiles                           |
-| Decentraland Network                         | Multilayer analysis                                          | multilayer_decentraland                         |
-| Tierion Network                              | Multilayer analysis                                          | multilayer_tierion                              |
-| Vechain Network                              | Multilayer analysis                                          | multilayer_vechain                              |
-| ZRX Network                                  | Multilayer analysis                                          | multilayer_zrx                                  |
-| Ethereum Token Tansactions                   | Ethereum token price prediction                              |                                                 |
-| Stablecoin ERC20 Transactions                | Stable coin analysis                                         |                                                 |
+| [Ethereum Token Networks](https://chartalist.org/eth/TaskTypePrediction.html)                      | Address and transaction type prediction                      |                                                 |       
+| [Ether-to-Token Transactions](https://chartalist.org/eth/TaskPatternDetection.html)                  | Anomalous transaction pattern detection                      |                                                 |
+| [Bytom Network](https://chartalist.org/eth/TaskMultilayer.html)                                | Multilayer analysis                                          | multilayer_bytom                                |
+| [Cybermiles Network](https://chartalist.org/eth/TaskMultilayer.html)                           | Multilayer analysis                                          | multilayer_cybermiles                           |
+| [Decentraland Network](https://chartalist.org/eth/TaskMultilayer.html)                         | Multilayer analysis                                          | multilayer_decentraland                         |
+| [Tierion Network](https://chartalist.org/eth/TaskMultilayer.html)                              | Multilayer analysis                                          | multilayer_tierion                              |
+| [Vechain Network](https://chartalist.org/eth/TaskMultilayer.html)                              | Multilayer analysis                                          | multilayer_vechain                              |
+| [ZRX Network](https://chartalist.org/eth/TaskMultilayer.html)                                  | Multilayer analysis                                          | multilayer_zrx                                  |
+| [Ethereum Token Transactions](https://chartalist.org/eth/TaskPriceAnalytics.html)                   | Ethereum token price prediction                              |                                                 |
+| [Stablecoin ERC20 Transactions](https://chartalist.org/eth/StablecoinAnalysis.html)                | Stable coin analysis                                         |                                                 |
 
 ## Using Chartalist
 1. Navigate to the folder `chartalist_loader-main` and create a new `.py` script or add one which will serve as the working environment.
@@ -62,7 +64,6 @@ import chartalist
 3. All datasets in Chartalist can be downloaded and referenced as a Pandas DataFrame in a single function call.
 
 For example:
-
 
 ```py
 data = chartalist.get_dataset(dataset='ethereum', version='trans_net', download=True, data_frame=True)
@@ -88,7 +89,7 @@ Bitcoin:
 - price_prediction
 - type_prediction
 
-4. The corresponding dataset will be downloaded if not already when the script is ran and the Panda DataFrame can be used directly for processing.
+4. The corresponding dataset will be downloaded under the `data` folder if not already when the script is ran and the Panda DataFrame can be used directly for processing.
 
 ## Using Example Scripts
 
