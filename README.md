@@ -15,18 +15,15 @@ The Chartalist package contains:
 ### Requirements
 Chartalist depends on the following:
 
--	numpy>=1.19.1
--	ogb>=1.2.6
--	outdated>=0.2.0
--	pandas>=1.1.0
--	pillow>=7.2.0
--	ogb>=1.2.6
--	pytz>=2020.4
--	torch>=1.7.0
--	torchvision>=0.8.2
--	tqdm>=4.53.0
--	scikit-learn>=0.20.0
--	scipy>=1.5.4
+- networkx>=2.8.3
+- numpy>=1.22.3
+- outdated>=0.2.1
+- pandas>=1.4.2
+- patool>=1.12
+- requests>=2.27.1
+- setuptools>=60.2.0
+- torch>=1.11.0
+- torch_scatter>=2.0.9
 
 
 ## Datasets
@@ -39,14 +36,17 @@ The following is a summary of the available datasets and their related tasks.  U
 | [Ransomware Family: Bitcoinheist](https://chartalist.org/btc/TaskTypePrediction.html)              | address, year, day, length, weight, count, looped, neighbors, income, label                      | type_prediction                                 |       
 | [Bitcoin Transaction Network Input](https://chartalist.org/BitcoinData.html)            | trans | trans_net_in                   |
 | [Bitcoin Transaction Network Output](https://chartalist.org/BitcoinData.html)           | trans | trans_net_out                                   |
-| [Bitcoin Price Data](https://chartalist.org/btc/TaskPriceAnalytics.html)                           | date, price, year, day, totaltx                                      | price_prediction                                |
+| [Bitcoin Block Times](https://chartalist.org/BitcoinData.html)      | unix_time | block_time                                   |
+| [Bitcoin Price Data](https://chartalist.org/btc/TaskPriceAnalytics.html)                           | date, price, year, day, totaltx                                      | price_prediction                  |
 
 ### Ethereum ML-Ready Datasets
 | Dataset                                      | Labels                                                         | Version Argument                                |
 | -------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------|
 | [Ethereum Token Networks](https://chartalist.org/eth/TaskTypePrediction.html)                      | token_address, from_address, to_address, value, transaction_hash, log_index, block_number      |     type_prediction_trans                                            |     
-| [Ethereum Token Network Labels](https://chartalist.org/eth/TaskTypePrediction.html)                      | type, address, name     |     type_prediction_trans  |  
-| [Ether-to-Token Transactions](https://chartalist.org/eth/TaskPatternDetection.html)                  | Anomalous transaction pattern detection                      |                                                 |
+| [Ethereum Token Network Labels](https://chartalist.org/eth/TaskTypePrediction.html)                      | type, address, name     |     type_prediction_labels  |  
+| [EtherDelta Ether-to-Token Transactions](https://chartalist.org/eth/TaskPatternDetection.html)                  | transaction_hash, block_number, timestamp,	tokenGet,	amountGet,	tokenGive,	amountGive,	get,	give                      |            anomaly_detection_ether_delta_trades            |
+| [IDEX Ether-to-Token Transactions](https://chartalist.org/eth/TaskPatternDetection.html)       | transaction_hash, status, block_number, gas, gas_price, timestamp, amountBuy, amountSell, expires, nonce, amount, tradeNonce, feeMake, feeTake, tokenBuy, tokenSell, maker, taker  |        anomaly_detection_idex       |
+| [Ether-to-Token Ether-Dollar Price](https://chartalist.org/eth/TaskPatternDetection.html)            | Date(UTC), UnixTimeStamp, Value   |            anomaly_detection_ether_dollar_price                                     |
 | [Bytom Network](https://chartalist.org/eth/TaskMultilayer.html)                                | fromAddress, toAddress, time, amount                                          | multilayer_bytom                                |
 | [Cybermiles Network](https://chartalist.org/eth/TaskMultilayer.html)                           | fromAddress, toAddress, time, amount                                          | multilayer_cybermiles                           |
 | [Decentraland Network](https://chartalist.org/eth/TaskMultilayer.html)                         | fromAddress, toAddress, time, amount                                          | multilayer_decentraland                         |
