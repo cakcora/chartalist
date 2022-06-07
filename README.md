@@ -7,6 +7,8 @@ Chartalist is the first blockchain machine learning ready dataset platform from 
 The Chartalist package contains:
 
 ## Installation
+1. Download this repository and extract the contents to the a desired location.
+2. Inside the `chartalist_loader-main` folder will serve as the working directory.
 
 ### Requirements
 Chartalist depends on the following:
@@ -43,3 +45,39 @@ Chartalist depends on the following:
 | Token Price Prediction                       | Etheruem price prediction                                    |                                                 |
 
 ## Using Chartalist
+1. Navigate to the folder `chartalist_loader-main` and create a new `.py` script or add one which will serve as the working environment.
+2. Ensure to add `import chartalist` at the top of the script.
+```py 
+import chartalist 
+```
+3. All datasets in Chartalist can be downloaded and referenced as a Pandas DataFrame in a single function call.
+
+For example:
+
+
+```py
+data = chartalist.get_dataset(dataset='ethereum', version='trans_net', download=True, data_frame=True)
+```
+There are two options for the dataset argument:
+- ethereum
+- bitcoin  
+
+Depending on the choice of the dataset argument, the following are options for the version argument:
+
+Ethereum:
+- trans_net
+- multilayer_bytom
+- multilayer_cybermiles
+- multilayer_decentraland
+- multilayer_tierion
+- multilayer_vechain
+- multilayer_zrx  
+
+Bitcoin:
+- trans_net_in
+- trans_net_out
+- price_prediction
+- type_prediction  
+
+4. The corresponding dataset will be downloaded when the script is ran and the Panda DataFrame can be used directly for processing.
+
