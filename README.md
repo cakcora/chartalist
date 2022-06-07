@@ -29,20 +29,23 @@ Chartalist depends on the following:
 
 ## Datasets
 
+The following is a summary of the available datasets.  Use the corresponding version argument when using Chartalist to retrieve the correct dataset.
+
 ### Bitcoin ML-Ready Datasets
-| Dataset                                      | Task                                                         | Notes                                           |
+| Dataset                                      | Task                                                         | Version Argument                                |
 | -------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------|
-| Ransomware Classification: Bitcoinheist      | Address and transaction type prediction                      |                                                 |       
-| Bitcoin Transaction Network                  | Anomalous transaction pattern detection & Address clustering |                                                 |
-| Bitcoin Price Data                           | Bitcoin Price Analytics                                      |                                                 |
+| Ransomware Classification: Bitcoinheist      | Address and transaction type prediction                      | type_prediction                                 |       
+| Bitcoin Transaction Network                  | Anomalous transaction pattern detection & Address clustering | trans_net_in & trans_net_out                    |
+| Bitcoin Price Data                           | Bitcoin Price Analytics                                      | price_prediction                                |
 
 ### Ethereum ML-Ready Datasets
-| Dataset                                      | Task                                                         | Notes                                           |
+| Dataset                                      | Task                                                         | Version Argument                                |
 | -------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------|
-| Decentralized Exchange Network Data          | Address and transaction type prediction                      |                                                 |       
+| Decentralized Exchange Network Data          | Address and transaction type prediction                      |                          |       
 | Wash-Trading Transaction Identification      | Anomalous transaction pattern detection                      |                                                 |
-| Topological Analysis For Event Detection     | Multilayer analysis                                          |                                                 |
-| Token Price Prediction                       | Etheruem price prediction                                    |                                                 |
+| Topological Analysis For Event Detection     | Multilayer analysis                                          | multilayer_bytom & multilayer_cybermiles & multilayer_decentraland & multilayer_tierion & multilayer_vechain & multilayer_zrx                                                |
+| Token Price Prediction                       | Ethereum price prediction                                    |                                                 |
+| Stablecoin ERC20 Transactions                | Stable coin analysis                                         |                                                 |
 
 ## Using Chartalist
 1. Navigate to the folder `chartalist_loader-main` and create a new `.py` script or add one which will serve as the working environment.
@@ -77,7 +80,7 @@ Bitcoin:
 - trans_net_in
 - trans_net_out
 - price_prediction
-- type_prediction  
+- type_prediction
 
-4. The corresponding dataset will be downloaded when the script is ran and the Panda DataFrame can be used directly for processing.
+4. The corresponding dataset will be downloaded if not already when the script is ran and the Panda DataFrame can be used directly for processing.
 
