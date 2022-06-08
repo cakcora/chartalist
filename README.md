@@ -113,4 +113,5 @@ For other Network datasets that have labels fromAddress, toAddress, and value la
 
 Parsing any dataset for basic statistical information can be done so easily by using the Pandas Dataframe returned by the dataloader. See `stablecoin_erc20_example.py` for reference.
 
-## Challenges
+[//]: # (## Challenges)
+
