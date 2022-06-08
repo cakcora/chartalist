@@ -32,7 +32,7 @@ Chartalist depends on the following:
 The following is a summary of the available datasets and their related tasks.  Use the corresponding version argument when using Chartalist to retrieve the correct dataset of interest.  Click on the dataset for more information. 
 
 ### Bitcoin ML-Ready Datasets
-| Dataset                                      | Labels                                                         | Version Constant                                |
+| Dataset                                      | Features                                                         | Version Constant                                |
 | -------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------|
 | [Ransomware Family: Bitcoinheist](https://chartalist.org/btc/TaskTypePrediction.html)              | address, year, day, length, weight, count, looped, neighbors, income, label                      | TYPE_PREDICTION                                 |       
 | [Bitcoin Transaction Network Input](https://chartalist.org/BitcoinData.html)            | trans | TRANSACTION_NETWORK_INPUT_SAMPLE                   |
@@ -41,7 +41,7 @@ The following is a summary of the available datasets and their related tasks.  U
 | [Bitcoin Price Data](https://chartalist.org/btc/TaskPriceAnalytics.html)                           | date, price, year, day, totaltx                                      | PRICE_PREDICTION                  |
 
 ### Ethereum ML-Ready Datasets
-| Dataset                                      | Labels                                                         | Version Constant                                |
+| Dataset                                      | Features                                                         | Version Constant                                |
 | -------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------|
 | [Ethereum Token Networks](https://chartalist.org/eth/TaskTypePrediction.html)                      | token_address, from_address, to_address, value, transaction_hash, log_index, block_number      |     TYPE_PREDICTION_TRANSACTIONS                                            |     
 | [Ethereum Token Network Labels](https://chartalist.org/eth/TaskTypePrediction.html)                      | type, address, name     |     TYPE_PREDICTION_LABELS  |  
@@ -59,7 +59,7 @@ The following is a summary of the available datasets and their related tasks.  U
 | [Stablecoin ERC20 Transactions](https://chartalist.org/eth/StablecoinAnalysis.html)                | fromAddress, toAddress, time, amount                                         |   STABLECOIN_ERC20                                              |
 
 ### Dashcoin ML-Ready Datasets
-| Dataset                                      | Labels                                                         | Version Constant                                |
+| Dataset                                      | Features                                                         | Version Constant                                |
 | -------------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------|     
 | [Dashcoin Transaction Network Input](https://chartalist.org/dash/DashData.html)      | trans                     | TRANSACTION_NETWORK_INPUT_SAMPLE                                                          |
 | [Dashcoin Transaction Network Output](https://chartalist.org/dash/DashData.html)      | trans                     | TRANSACTION_NETWORK_OUTPUT_SAMPLE                                                        |
