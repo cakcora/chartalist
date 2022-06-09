@@ -121,5 +121,5 @@ For other Network datasets that have labels fromAddress, toAddress, and value la
 Parsing any dataset for basic statistical information can be done so easily by using the Pandas Dataframe returned by the dataloader. See `stablecoin_erc20_example.py` for reference.
 
 ##  Address Exclusion
-Please use our online form at <a href="https://www.chartalist.org/AddressExclusion.html"> our online tool </a> to submit your request for removing an address from our dataset due to security and privacy issue. 
+Please use <a href="https://www.chartalist.org/AddressExclusion.html"> our online tool </a> to submit your request for removing an address from our dataset due to security and privacy issue. 
 
