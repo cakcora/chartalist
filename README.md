@@ -3,7 +3,7 @@
 </p>
 
 --------------------------------------------------------------------------------
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/p-lambda/wilds/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/cakcora/chartalist/blob/master/LICENSE)
 
 
 
