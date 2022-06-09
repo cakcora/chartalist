@@ -1,3 +1,12 @@
+<p align='center'>
+  <img width='40%' src='https://chartalist.org/img/chartalist-hor.png' />
+</p>
+
+--------------------------------------------------------------------------------
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/p-lambda/wilds/blob/master/LICENSE)
+
+
+
 # Chartalist
 Please visit https://www.chartalist.org for more information.
 
