@@ -11,6 +11,11 @@ Please visit https://www.chartalist.org for more information.
 ## Overview
 Chartalist is the first blockchain machine learning ready dataset platform from unspent transaction output and account-based blockchains.
 
+<p align='center'>
+  <img width='100%' src='https://chartalist.org/images/Picture5.png' />
+</p>
+
+
 The Chartalist package contains:
 1. Dataloaders which automate and handle the download of datasets from a single package import and a simple two-argument function call.
 2. Ability to use the downloaded dataset directly after download as a Pandas DataFrame from the same two-argument function call.
