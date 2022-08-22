@@ -6,15 +6,14 @@
 
 
 # Chartalist
-Please visit https://www.chartalist.org for more information.
-
-## Overview
-Chartalist is the first blockchain machine learning ready dataset platform from unspent transaction output and account-based blockchains.
-
 <p align='center'>
   <img width='100%' src='https://chartalist.org/images/Picture5.png' />
 </p>
 
+Please visit https://www.chartalist.org for more information.
+
+## Overview
+Chartalist is the first blockchain machine learning ready dataset platform from unspent transaction output and account-based blockchains.
 
 The Chartalist package contains:
 1. Dataloaders which automate and handle the download of datasets from a single package import and a simple two-argument function call.
