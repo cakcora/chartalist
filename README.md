@@ -126,3 +126,15 @@ Parsing any dataset for basic statistical information can be done so easily by u
 
 ##  Address Exclusion
 Please use <a href="https://www.chartalist.org/AddressExclusion.html"> our online tool </a> to submit your request for removing an address from our dataset due to security and privacy issue.
+
+## BibTeX Citation
+
+If you use Chartalist in a scientific publication, please cite us with the following bibtex:
+
+```
+@article{Chartalist2022,
+    year      = {2022},
+    author    = {Kiarash Shamsi and Friedhelm Victor and Murat Kantarcioglu and Yulia R. Gel and Cuneyt G. Akcora},
+    title     = {Chartalist: Labeled Graph Datasets for UTXO and Account-based Blockchains},
+    journal   = {36th Conference on Neural Information Processing Systems (NeurIPS 2022) }
+}

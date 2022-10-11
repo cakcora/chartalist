@@ -7,3 +7,5 @@ dist
 venv
 .DS_Store
 data\
+chartalist.png
+chartalistc.png
