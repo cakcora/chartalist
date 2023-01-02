@@ -137,4 +137,6 @@ If you use Chartalist in a scientific publication, please cite us with the follo
     author    = {Kiarash Shamsi and Friedhelm Victor and Murat Kantarcioglu and Yulia R. Gel and Cuneyt G. Akcora},
     title     = {Chartalist: Labeled Graph Datasets for UTXO and Account-based Blockchains},
     journal   = {36th Conference on Neural Information Processing Systems (NeurIPS 2022) }
+    volume    = {36},
+    pages     = {1--10}
 }
