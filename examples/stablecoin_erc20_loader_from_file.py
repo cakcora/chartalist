@@ -68,6 +68,7 @@ def main():
         })
 
     # Counting daily transaction for each network
+    # first day in data as UNIX timestamp = 86400 sec
     for item in ethereumStableCoinERC20.to_dict(orient="records"):
         try:
             dailyTransactions[int((int(item['time_stamp']) - 1648811666) / 86400)][item['contract_address']] += 1
