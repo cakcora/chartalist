@@ -132,11 +132,13 @@ Please use <a href="https://www.chartalist.org/AddressExclusion.html"> our onlin
 If you use Chartalist in a scientific publication, please cite us with the following bibtex:
 
 ```
-@article{Chartalist2022,
-    year      = {2022},
-    author    = {Kiarash Shamsi and Friedhelm Victor and Murat Kantarcioglu and Yulia R. Gel and Cuneyt G. Akcora},
-    title     = {Chartalist: Labeled Graph Datasets for UTXO and Account-based Blockchains},
-    journal   = {36th Conference on Neural Information Processing Systems (NeurIPS 2022) }
-    volume    = {36},
-    pages     = {1--10}
-}
+@inproceedings{chartalistNeurips2022,
+  author    = {Kiarash Shamsi and Yulia R. Gel and  Murat Kantarcioglu and Cuneyt G. Akcora},
+  title     = {Chartalist: Labeled Graph Datasets for UTXO and Account-based Blockchains},
+  booktitle = {Advances in Neural Information Processing Systems 36: Annual Conference
+               on Neural Information Processing Systems 2022, NeurIPS 2022, November 29-December
+               1, 2022, New Orleans, LA, USA},
+  pages     = {1--14},
+  year      = {2022},
+  url       = {https://openreview.net/pdf?id=10iA3OowAV3}
+  }
