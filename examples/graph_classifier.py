@@ -16,6 +16,7 @@ import torch.nn.functional as F
 from torch_geometric.nn import GCNConv, global_add_pool, GINConv, global_mean_pool
 import pytorch_lightning as pl
 from torch.nn import BatchNorm1d
+
 random.seed(123)
 
 
@@ -23,7 +24,7 @@ class GCN(torch.nn.Module):
     def __init__(self, hidden_channels, num_node_features, num_classes):
         super(GCN, self).__init__()
         torch.manual_seed(12345)
-
+        # TODO list of conv layers
         self.conv1 = GCNConv(num_node_features, hidden_channels)
         self.conv2 = GCNConv(hidden_channels, hidden_channels)
         self.conv3 = GCNConv(hidden_channels, hidden_channels)
@@ -32,6 +33,7 @@ class GCN(torch.nn.Module):
     def forward(self, x, edge_index, batch):
         # 1. Obtain node embeddings
         x = self.conv1(x, edge_index)
+        # TODO add dropout here
         x = x.relu()
         x = self.conv2(x, edge_index)
         x = x.relu()
@@ -45,6 +47,7 @@ class GCN(torch.nn.Module):
         x = self.lin(x)
 
         return x
+
 
 class GIN(torch.nn.Module):
 
@@ -70,12 +73,12 @@ class GIN(torch.nn.Module):
 
             if layer == 0:
                 self.first_h = Sequential(Linear(dim_features, out_emb_dim), BatchNorm1d(out_emb_dim), ReLU(),
-                                    Linear(out_emb_dim, out_emb_dim), BatchNorm1d(out_emb_dim), ReLU())
+                                          Linear(out_emb_dim, out_emb_dim), BatchNorm1d(out_emb_dim), ReLU())
                 self.linears.append(Linear(out_emb_dim, dim_target))
             else:
-                input_emb_dim = self.embeddings_dim[layer-1]
+                input_emb_dim = self.embeddings_dim[layer - 1]
                 self.nns.append(Sequential(Linear(input_emb_dim, out_emb_dim), BatchNorm1d(out_emb_dim), ReLU(),
-                                      Linear(out_emb_dim, out_emb_dim), BatchNorm1d(out_emb_dim), ReLU()))
+                                           Linear(out_emb_dim, out_emb_dim), BatchNorm1d(out_emb_dim), ReLU()))
                 self.convs.append(GINConv(self.nns[-1], train_eps=train_eps))  # Eq. 4.2
 
                 self.linears.append(Linear(out_emb_dim, dim_target))
@@ -93,11 +96,10 @@ class GIN(torch.nn.Module):
                 out += F.dropout(self.pooling(self.linears[layer](x), batch), p=self.dropout)
             else:
                 # Layer l ("convolution" layer)
-                x = self.convs[layer-1](x, edge_index)
+                x = self.convs[layer - 1](x, edge_index)
                 out += F.dropout(self.linears[layer](self.pooling(x, batch)), p=self.dropout, training=self.training)
 
         return out
-
 
 
 def read_data():
@@ -141,6 +143,20 @@ def read_torch_data():
                 data = pickle.load(f)
                 GraphDataList.append(data)
                 inx += 1
+    return GraphDataList
+
+
+def read_torch_time_series_data(network):
+    file_path = "PygGraphs/TimeSeries/{}/".format(network)
+    inx = 1
+    GraphDataList = []
+    files = os.listdir(file_path)
+    for file in files:
+        with open(file_path + file, 'rb') as f:
+            print("\n Reading Torch Data {} / {}".format(inx, len(files)))
+            data = pickle.load(f)
+            GraphDataList.append(data)
+            inx += 1
     return GraphDataList
 
 
@@ -421,17 +437,20 @@ def GCN_classifier(data):
                       f"Train Accuracy\t {train_acc:.4f}\t Train AUC Score: {train_auc:.4f}\t "
                       f"Test Accuracy: {test_acc:.4f}\t Test AUC Score: {test_auc:.4f}")
 
-def GIN_classifier(data):
+
+def GIN_classifier(data, network):
+    count_one_labels = sum(1 for item in data if item['y'] == 1)
+    count_zero_labels = sum(1 for item in data if item['y'] == 0)
     with open("config_GIN.yml", "r") as f:
         config = yaml.load(f)
-    for duplication in range(0, 5):
+    for duplication in range(0, 1):
         train_size = int(0.8 * len(data))
         test_size = len(data) - train_size
         train_dataset, test_dataset = torch.utils.data.random_split(data, [train_size, test_size])
         train_loader = DataLoader(train_dataset, shuffle=True)
         test_loader = DataLoader(test_dataset)
-        model = GIN(dim_features=5, dim_target=2, config=config)
-        optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+        model = GIN(dim_features=4, dim_target=2, config=config)
+        optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
         criterion = torch.nn.CrossEntropyLoss()
 
         for epoch in range(0, 101):
@@ -446,19 +465,27 @@ def GIN_classifier(data):
             unseen_acc = scores_unseen[0]
             unseen_auc = scores_unseen[1]
             if epoch % 10 == 0:
+                with open('GIN_TimeSeries_Result.txt', 'a+') as file:
+                    file.write(
+                        f"\nNetwork\t{network}\tDuplicate\t{duplication}\tEpoch\t{epoch}\tTrain Accuracy\t{train_acc:.4f}\tTrain AUC Score\t{train_auc:.4f}\tTest Accuracy:{test_acc:.4f}\tTest AUC Score\t{test_auc:.4f}\tunseen AUC Score\t{unseen_auc:.4f}\tNumber of Zero labels\t{count_zero_labels}\tNumber of one labels\t{count_one_labels}")
+                    file.close()
                 print(
-                    f"Duplicate\t{duplication}\tEpoch\t {epoch}\t Train Accuracy\t {train_acc:.4f}\t Train AUC Score\t {train_auc:.4f}\t Test Accuracy: {test_acc:.4f}\t test AUC Score\t {test_auc:.4f}\t unseen AUC Score\t {unseen_auc:.4f}")
+                    f"Network\t{network} Duplicate\t{duplication}\tEpoch\t {epoch}\t Train Accuracy\t {train_acc:.4f}\t Train AUC Score\t {train_auc:.4f}\t Test Accuracy: {test_acc:.4f}\t test AUC Score\t {test_auc:.4f}\t unseen AUC Score\t {unseen_auc:.4f}")
 
 
 def train(train_loader, model, criterion, optimizer):
     model.train()
 
     for data in train_loader:  # Iterate in batches over the training dataset.
-        out = model(data.x, data.edge_index, data.batch)  # Perform a single forward pass.
-        loss = criterion(out, data.y)  # Compute the loss.
-        loss.backward()  # Derive gradients.
-        optimizer.step()  # Update parameters based on gradients.
-        optimizer.zero_grad()  # Clear gradients.
+        try:
+            out = model(data.x.type(torch.float32), data.edge_index, data.batch)  # Perform a single forward pass.
+            loss = criterion(out, data.y)  # Compute the loss.
+            loss.backward()  # Derive gradients.
+            optimizer.step()  # Update parameters based on gradients.
+            optimizer.zero_grad()  # Clear gradients.
+        except Exception as e:
+            # print(str(e) + "In train")
+            continue
 
 
 def test(test_loader, model):
@@ -472,16 +499,20 @@ def test(test_loader, model):
     y_score_list = []
 
     for data in test_loader:  # Iterate in batches over the training/test dataset.
-        out = model(data.x, data.edge_index, data.batch)
-        pred = out.argmax(dim=1)  # Use the class with the highest probability.
+        try:
+            out = model(data.x.type(torch.float32), data.edge_index, data.batch)
+            pred = out.argmax(dim=1)  # Use the class with the highest probability.
 
-        correct += int((pred == data.y).sum().item())  # Check against ground-truth labels.
-        total_samples += data.y.size(0)
+            correct += int((pred == data.y).sum().item())  # Check against ground-truth labels.
+            total_samples += data.y.size(0)
 
-        arr2 = out[:, 1].detach().numpy()
-        y_score_list.append(arr2[0])
-        arr1 = data.y.detach().numpy()
-        y_true_list.append(arr1[0])
+            arr2 = out[:, 1].detach().numpy()
+            y_score_list.append(arr2[0])
+            arr1 = data.y.detach().numpy()
+            y_true_list.append(arr1[0])
+        except Exception as e:
+            # print(str(e) + "In Test")
+            continue
 
     try:
         auc_score += roc_auc_score(y_true=y_true_list, y_score=y_score_list, multi_class='ovr', average='weighted')
@@ -501,6 +532,8 @@ def test(test_loader, model):
 
 
 if __name__ == "__main__":
+    networkList = ["networkcoindash.txt", "networkdgd.txt",
+                   "networkiconomi.txt", "networkaion.txt"]
     # data = read_data()
     # data_by_edge_visualization(data)
     # data_by_node_visualization(data)
@@ -514,6 +547,7 @@ if __name__ == "__main__":
     # data_by_clique_visualization(data)
     # data_by_avg_daily_trans_visualization(data)
     # classifier(data)
-    data = read_torch_data()
-    GIN_classifier(data)
-    #GCN_classifier(data)
+    for network in networkList:
+        data = read_torch_time_series_data(network)
+        GIN_classifier(data, network)
+    # GCN_classifier(data)
