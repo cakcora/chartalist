@@ -1,4 +1,5 @@
 import ast
+import csv
 import os
 import shutil
 from collections import defaultdict
@@ -8,9 +9,14 @@ import pandas as pd
 import datetime as dt
 import numpy as np
 import multiprocessing as mp
+from collections import Counter
 import numpy as nump
-
+import kmapper as km
+import sklearn
+from sklearn.neighbors import NearestNeighbors
+from sklearn.preprocessing import MinMaxScaler
 from matplotlib import pyplot as plt
+from pyvis.network import Network
 from matplotlib.ticker import MaxNLocator
 from numpy import long
 from torch_geometric.data import Data
@@ -261,12 +267,12 @@ class NetworkParser:
                 transactionGraph.add_nodes_from([(item["from"], from_node_features)])
                 transactionGraph.add_nodes_from([(item["to"], to_node_features)])
                 transactionGraph.add_edge(item["from"], item["to"], value=item["value"])
+
             featureNames = ["outgoing_edge_weight_sum", "incoming_edge_weight_sum", "outgoing_edge_count",
                             "incoming_edge_count"]
             pygData = self.from_networkx(transactionGraph, label=label, group_node_attrs=featureNames)
             with open('PygGraphs/' + file, 'wb') as f:
                 pickle.dump(pygData, f)
-
 
     def creatTimeSeriesGraphs(self, file):
         print("Processing {}".format(file))
@@ -275,15 +281,17 @@ class NetworkParser:
         lableWindowSize = 7  # Day
         maxDuration = 180  # Day
         indx = 0
+        maxIndx = 2
 
-        selectedNetwork = pd.read_csv((self.timeseries_file_path + file), sep=' ', names=["from", "to", "date", "value"])
+        selectedNetwork = pd.read_csv((self.timeseries_file_path + file), sep=' ',
+                                      names=["from", "to", "date", "value"])
         selectedNetwork['date'] = pd.to_datetime(selectedNetwork['date'], unit='s').dt.date
         selectedNetwork['value'] = selectedNetwork['value'].astype(float)
         selectedNetwork = selectedNetwork.sort_values(by='date')
         window_start_date = selectedNetwork['date'].min()
         data_last_date = selectedNetwork['date'].max()
 
-        #print("\n {} Days OF Data -> {} ".format(file, (data_last_date - window_start_date).days ))
+        # print("\n {} Days OF Data -> {} ".format(file, (data_last_date - window_start_date).days ))
         # check if the network has more than 20 days of data
         if ((data_last_date - window_start_date).days < maxDuration):
             print(file + "Is not a valid network")
@@ -301,8 +309,9 @@ class NetworkParser:
             print("\nRemaining Process {} ".format(
                 (data_last_date - window_start_date).days / (windowSize + gap + lableWindowSize)))
             indx += 1
+            if (indx == maxIndx):
+                break
             transactionGraph = nx.MultiDiGraph()
-
 
             # select window data
             window_end_date = window_start_date + dt.timedelta(days=windowSize)
@@ -310,13 +319,14 @@ class NetworkParser:
                 (selectedNetwork['date'] >= window_start_date) & (selectedNetwork['date'] < window_end_date)]
 
             # select labeling data
-            label_end_date = window_start_date + dt.timedelta(days=windowSize) + dt.timedelta(days=gap) + dt.timedelta(days=lableWindowSize)
+            label_end_date = window_start_date + dt.timedelta(days=windowSize) + dt.timedelta(days=gap) + dt.timedelta(
+                days=lableWindowSize)
             label_start_date = window_start_date + dt.timedelta(days=windowSize) + dt.timedelta(days=gap)
             selectedNetworkInLbelingWindow = selectedNetwork[
                 (selectedNetwork['date'] >= label_start_date) & (selectedNetwork['date'] < label_end_date)]
 
-           # generating the label for this window
-           # 1 -> Increading Transactions 0 -> Decreasing Transactions
+            # generating the label for this window
+            # 1 -> Increading Transactions 0 -> Decreasing Transactions
             label = 1 if (len(selectedNetworkInLbelingWindow) - len(selectedNetworkInGraphDataWindow)) > 0 else 0
 
             # group by for extracting node features
@@ -324,6 +334,9 @@ class NetworkParser:
             incoming_weight_sum = (selectedNetwork.groupby(by=['to'])['value'].sum())
             outgoing_count = (selectedNetwork.groupby(by=['from'])['value'].count())
             incoming_count = (selectedNetwork.groupby(by=['to'])['value'].count())
+
+            # Node Features Dictionary for TDA mapper usage
+            node_features = pd.DataFrame()
 
             # Populate graph with edges
             for item in selectedNetworkInGraphDataWindow.to_dict(orient="records"):
@@ -373,15 +386,127 @@ class NetworkParser:
                 transactionGraph.add_nodes_from([(item["from"], from_node_features)])
                 transactionGraph.add_nodes_from([(item["to"], to_node_features)])
                 transactionGraph.add_edge(item["from"], item["to"], value=item["value"])
+
+                new_row = pd.DataFrame(({**{"nodeID": item["from"]}, **from_node_features}), index=[0])
+                node_features = pd.concat([node_features, new_row], ignore_index=True)
+
+                new_row = pd.DataFrame(({**{"nodeID": item["to"]}, **to_node_features}), index=[0])
+                node_features = pd.concat([node_features, new_row], ignore_index=True)
+
+                node_features = node_features.drop_duplicates(subset=['nodeID'])
+
+            directory = 'PygGraphs/TimeSeries/' + file
+            # TODO: Draw the network x graph
+
+            # Generating TDA graphs
+            self.createTDAGraph(node_features, label, directory, network=file, timeWindow=indx)
+
             featureNames = ["outgoing_edge_weight_sum", "incoming_edge_weight_sum", "outgoing_edge_count",
                             "incoming_edge_count"]
             window_start_date = window_start_date + dt.timedelta(days=1)
-            directory = 'PygGraphs/TimeSeries/' + file
-            if not os.path.exists(directory):
-                os.makedirs(directory)
-            pygData = self.from_networkx(transactionGraph, label=label, group_node_attrs=featureNames)
-            with open(directory+"/" + file + "_" + "graph_"+str(indx), 'wb') as f:
-                pickle.dump(pygData, f)
+
+            # Generating PyGraphs for timeseries data
+            # if not os.path.exists(directory):
+            #     os.makedirs(directory)
+            # pygData = self.from_networkx(transactionGraph, label=label, group_node_attrs=featureNames)
+            # with open(directory + "/" + file + "_" + "graph_" + str(indx), 'wb') as f:
+            #     pickle.dump(pygData, f)
+
+    def getDailyNodeAvg(self, file):
+        selectedNetwork = pd.read_csv((self.timeseries_file_path + file), sep=' ',
+                                      names=["from", "to", "date", "value"])
+        selectedNetwork['date'] = pd.to_datetime(selectedNetwork['date'], unit='s').dt.date
+        selectedNetwork['value'] = selectedNetwork['value'].astype(float)
+        selectedNetwork = selectedNetwork.sort_values(by='date')
+        window_start_date = selectedNetwork['date'].min()
+        data_last_date = selectedNetwork['date'].max()
+        end_date = window_start_date + dt.timedelta(days=7)
+        selectedNetworkInTimeFrame = selectedNetwork[
+            (selectedNetwork['date'] >= window_start_date) & (selectedNetwork['date'] < end_date)]
+        print("Daily node avg of {} is {} \n".format(file, (
+            (len(set(selectedNetworkInTimeFrame['from'].unique() + selectedNetworkInTimeFrame['from'].unique())) / 7))))
+
+    def createTDAGraph(self, data, label, htmlPath, timeWindow=0, network=""):
+        try:
+            per_overlap = [0.1, 0.2, 0.3, 0.5, 0.6]
+            n_cubes = [2, 5]
+            Xfilt = data
+            Xfilt = Xfilt.drop(columns=['nodeID'])
+            mapper = km.KeplerMapper()
+            scaler = MinMaxScaler(feature_range=(0, 1))
+
+            Xfilt = scaler.fit_transform(Xfilt)
+            lens = mapper.fit_transform(Xfilt, projection=sklearn.manifold.TSNE())
+            cls = 5  # We use cls=5, but this parameter can be further refined.  Its impact on results seems minimal.
+
+            for overlap in per_overlap:
+                for n_cube in n_cubes:
+                    graph = mapper.map(
+                        lens,
+                        Xfilt,
+                        clusterer=sklearn.cluster.KMeans(n_clusters=cls, random_state=1618033),
+                        cover=km.Cover(n_cubes=n_cube, perc_overlap=overlap))  # 0.2 0.4
+
+                    mapper.visualize(graph,
+                                     path_html=htmlPath + "/mapper_output_{}_day_{}_cubes_{}_overlap_{}.html".format(
+                                         network.split(".")[0], timeWindow, n_cube, overlap),
+                                     title="Mapper graph for network {} in Day {}".format(network.split(".")[0],
+                                                                                          timeWindow))
+
+                    # Creat a networkX graph for TDA mapper graph, in this graph nodes will be the clusters and the node featre would be the cluster size
+
+                    # removing al the nodes without any edges (Just looking at the links)
+                    # tdaGraph = nx.Graph()
+                    # for key, value in graph['links'].items():
+                    #     tdaGraph.add_nodes_from([(key, {"cluster_size": len(graph["nodes"][key])})])
+                    #     for to_add in value:
+                    #         tdaGraph.add_nodes_from([(to_add, {"cluster_size": len(graph["nodes"][to_add])})])
+                    #         tdaGraph.add_edge(key, to_add)
+                    #
+                    # # we have the tda Graph here
+                    # # convert TDA graph to pytorch data
+                    # directory = 'PygGraphs/TimeSeries/' + network + '/TDA/Overlap_{}_Ncube_{}/'.format(overlap, n_cube)
+                    # featureNames = ["cluster_size"]
+                    # if not os.path.exists(directory):
+                    #     os.makedirs(directory)
+                    # pygData = self.from_networkx(tdaGraph, label=label, group_node_attrs=featureNames)
+                    # with open(directory + "/" + network + "_" + "TDA_graph(cube-{},overlap-{})_".format(n_cube,
+                    #                                                                                     overlap) + str(
+                    #         timeWindow), 'wb') as f:
+                    #     pickle.dump(pygData, f)
+
+                # nbrs = NearestNeighbors(n_neighbors=5).fit(lens)
+                # # Find the k-neighbors of a point
+                # neigh_dist, neigh_ind = nbrs.kneighbors(lens)
+                # # sort the neighbor distances (lengths to points) in ascending order
+                # # axis = 0 represents sort along first axis i.e. sort along row
+                # sort_neigh_dist = np.sort(neigh_dist, axis=0)
+                #
+                # k_dist = sort_neigh_dist[:, 4]
+                # plt.plot(k_dist)
+                # plt.axhline(y=2, linewidth=1, linestyle='dashed', color='k')
+                # plt.ylabel("k-NN distance")
+                # plt.xlabel("Sorted observations (5th NN)")
+                # plt.show()
+                #
+                # clusters = sklearn.cluster.DBSCAN(eps=0.05, min_samples=4).fit(lens)
+                # set(clusters.labels_)
+                # Counter(clusters.labels_)
+                # df = pd.DataFrame(clusters.labels_, columns=["clusterID"])
+                # df['nodeID'] = df.index
+                # cluster_series = df.groupby("clusterID").treeID.apply(pd.Series.tolist)
+
+                # with open(os.path.join(abs_dir_path, datasetName + 'clusterLinks.csv'), 'w') as csv_file:
+                #     writer = csv.writer(csv_file, delimiter='\t')
+                #     for key, value in graph['links'].items():
+                #         writer.writerow([key, value])
+                # with open(os.path.join(abs_dir_path, datasetName + 'clusterNodes.csv'), 'w') as csv_file:
+                #     writer = csv.writer(csv_file, delimiter='\t')
+                #     for key, value in graph['nodes'].items():
+                #         writer.writerow([key, value])
+                # print("TEST FINISHED")
+        except Exception as e:
+            print(str(e))
 
     def processDataDUration(self, file):
         # load each network file
@@ -532,10 +657,10 @@ class NetworkParser:
         files = os.listdir(self.timeseries_file_path)
         for file in files:
             if file.endswith(".txt"):
-                print("Processing {} / {} \n".format(self.processingIndx, len(files) -2))
+                print("Processing {} / {} \n".format(self.processingIndx, len(files) - 2))
                 p = Process(target=self.creatTimeSeriesGraphs, args=(file,))  # make process
                 p.start()  # start function
-                p.join(timeout=240)
+                p.join(timeout=2400)
 
                 # Check if the process is still running
                 if p.is_alive():
@@ -551,7 +676,6 @@ class NetworkParser:
                     shutil.move(self.timeseries_file_path + file, self.timeseries_file_path + "Processed/" + file)
                     print("Process finished successfully")
                     p.terminate()
-
 
         # stat_data.to_csv("final_data.csv")
 

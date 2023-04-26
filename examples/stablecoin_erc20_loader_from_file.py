@@ -55,7 +55,7 @@ def main():
         print("{} graph has {} edges and {} nodes \n".format(graph, transactionGraphs[graph].number_of_edges(),
                                                              transactionGraphs[graph].number_of_nodes()))
 
-    # Track number of transactions per day
+    # Track number of transactions per timeWindow
     dailyTransactions = []
     for i in range(0, 214):
         dailyTransactions.append({
@@ -68,7 +68,7 @@ def main():
         })
 
     # Counting daily transaction for each network
-    # first day in data as UNIX timestamp = 86400 sec
+    # first timeWindow in data as UNIX timestamp = 86400 sec
     for item in ethereumStableCoinERC20.to_dict(orient="records"):
         try:
             dailyTransactions[int((int(item['time_stamp']) - 1648811666) / 86400)][item['contract_address']] += 1
@@ -78,7 +78,7 @@ def main():
             print(item['contract_address'])
 
     # From Thursday, April 1, 2022 to Tuesday, November 1, 2022
-    print("\nNumber of transactions per day")
+    print("\nNumber of transactions per timeWindow")
     dayVal = 0
     for day in dailyTransactions:
         print(str(dayVal) + ": " + str(dailyTransactions[dayVal]) + " transactions")

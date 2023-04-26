@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="KeplerMapper">
+  <title>make_circles(n_samples=5000, noise=0.03, factor=0.3) | KeplerMapper</title>
+
+  <link rel="icon" type="image/png" href="http://i.imgur.com/axOG6GJ.jpg" />
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto+Mono:700,300' rel='stylesheet' type='text/css'>
+  <style>* {
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: "Roboto Mono", "Helvetica", sans-serif;
+  font-size: 14px;
+}
+
+#logo {
+  width:  85px;
+  height: 85px;
+}
+
+#display {
+  color: #95A5A6;
+  background: #212121;
+}
+
+#header {
+  background: #111111;
+}
+
+#print {
+  color: #000;
+  background: #FFF;
+}
+
+h1 {
+  font-size: 21px;
+  font-weight: 300;
+  font-weight: 300;
+}
+
+h2 {
+  font-size: 18px;
+  padding-bottom: 20px;
+  font-weight: 300;
+}
+
+h3 {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+h4 {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding-bottom:0px;
+}
+
+
+#meta_content h3 {
+  float: left;
+  padding-right: 8px;
+}
+
+p, #tooltip_content h3, ol, ul, table {
+  padding-bottom: 10px;
+}
+
+ol, ul {
+  padding-left: 20px;
+}
+
+ol b {
+  display: block;
+}
+
+a {
+  color: #16a085;
+  text-decoration: none;
+}
+
+.pane {
+  position: relative;
+}
+
+.pane-left {
+  float: left;
+}
+
+.pane-right {
+  float: right;
+}
+
+a:hover {
+  color: #2ecc71;
+}
+
+.banner {
+  /* height: 35px; */
+  padding: 10px 0px;
+}
+
+
+#print #header {
+  background: #FFF;
+}
+
+
+#canvas {
+  width: 100%;
+}
+
+#svg {
+  position: absolute;
+}
+
+#toolbar {
+  padding-top: 5px;
+  margin-bottom: 5px;
+  width: 100%;
+}
+
+#display #toolbar {
+}
+
+#display .banner {
+  border-top: 1px solid #000;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+.tool_item {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.pane_content {
+  width: 300px;
+  height:100%;
+  padding: 20px;
+  overflow: auto;
+  display: none;
+}
+
+.pane {
+  z-index: 1;
+}
+
+#display .pane_content {
+  background: #191919;
+}
+
+#print .pane_content{
+  background: #FFF;
+}
+
+#meta_content::-webkit-scrollbar, #tooltip_content::-webkit-scrollbar {
+  width: 1em;
+}
+
+#meta_content::-webkit-scrollbar-track, #tooltip_content::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+#meta_content::-webkit-scrollbar-thumb, #tooltip_content::-webkit-scrollbar-thumb {
+  background-color: darkgrey;
+  outline: 1px solid slategrey;
+}
+
+.histogram {
+  display: block;
+  height: 100px;
+  padding-top: 50px;
+  clear: both;
+}
+
+#display .histogram {
+  opacity: 0.68;
+}
+
+.bin {
+  width: 10%;
+  float: left;
+}
+
+.bin div {
+  font-size: 10px;
+  display: block;
+  width: 35px;
+  margin-top: -30px;
+  text-align: right;
+  margin-left: -3px;
+  -webkit-transform: rotate(-90deg);
+  -moz-transform: rotate(-90deg);
+  -ms-transform: rotate(-90deg);
+  -o-transform: rotate(-90deg);
+}
+
+.histogram:hover {
+  opacity: 1.;
+}
+
+#display .circle {
+  stroke-opacity: 0.18;
+  stroke-width: 7px;
+  stroke: #000;
+}
+
+#print .circle {
+  stroke-opacity: 1;
+  stroke-width: 2px;
+  stroke: #000;
+  stroke-linecap: round;
+}
+
+#print .link {
+  stroke: #000;
+}
+
+#display .link {
+  stroke: rgba(160, 160, 160, 0.5);
+}
+
+table {
+  border-collapse: collapse;
+  display: table;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+td, th {
+  padding: 5px;
+  text-align: left;
+}
+
+#display th {
+  background: #212121
+}
+
+td {
+  border-bottom: 1px solid #111;
+}
+
+.highlight {
+  filter: url(#drop-shadow-pulse);
+}
+
+.control-row {
+  padding: 5px 0px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.35em 1.2em;
+  border: 0.1em solid #FFFFFF;
+  margin: 0 0.3em 0.3em 0;
+  border-radius: 0.12em;
+  box-sizing: border-box;
+  text-decoration: none;
+  background-color: transparent;
+  font-weight: 300;
+  color: #FFFFFF;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.btn:hover {
+  color: #000000;
+  background-color: #FFFFFF;
+}
+
+.btn:disabled {
+  color: #FFFFFF;
+  opacity: .35;
+}
+
+#print .btn {
+  color: #000;
+  border-color: #000
+}
+
+#print .btn:hover {
+  color: #FFFFFF;
+  background-color: #000000
+}
+
+#print .btn:disabled {}
+
+#toolbar .btn {
+  padding: 0 1.2em;
+}
+
+label {
+  display: inline-block;
+  margin-bottom: .5rem;
+}
+
+#config-file-loader {
+  margin-bottom: .5em;
+}
+
+.btn:not(:disabled):not(.disabled) {
+    cursor: pointer;
+}
+
+.wrap {
+  display: flex;
+}
+
+.wrap-header div:last-child {
+  margin-left: auto;
+}
+
+.wrap-end {
+  justify-content: flex-end;
+}
+
+.wrap-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.wrap-logo .logo {
+  margin: auto;
+}
+
+.wrap-header {
+  /* padding: 5px 10px; */
+  padding: 5px 5px 5px 10px;
+  justify-content: space-between;
+}
+
+#display .wrap-header {
+  box-shadow: 0px 0px 4px #000;
+}
+
+.toolbar-container {
+  margin-left: -10px;
+}
+</style>
+
+</head>
+
+<body id="display">
+
+  <!-- Variables used later -->
+  <script>
+    const graph = {"links": [{"source": 1, "target": 2, "width": 1}, {"source": 3, "target": 4, "width": 1}, {"source": 3, "target": 9, "width": 1}, {"source": 3, "target": 10, "width": 1}, {"source": 4, "target": 9, "width": 1}, {"source": 4, "target": 10, "width": 1}, {"source": 5, "target": 6, "width": 1}, {"source": 5, "target": 11, "width": 1}, {"source": 5, "target": 12, "width": 1}, {"source": 6, "target": 11, "width": 1}, {"source": 6, "target": 12, "width": 1}, {"source": 7, "target": 8, "width": 1}, {"source": 9, "target": 10, "width": 1}, {"source": 11, "target": 12, "width": 1}, {"source": 13, "target": 21, "width": 1}, {"source": 14, "target": 15, "width": 1}, {"source": 18, "target": 19, "width": 1}, {"source": 18, "target": 33, "width": 1}, {"source": 18, "target": 35, "width": 1}, {"source": 19, "target": 33, "width": 1}, {"source": 19, "target": 35, "width": 1}, {"source": 22, "target": 43, "width": 1}, {"source": 23, "target": 25, "width": 1}, {"source": 23, "target": 28, "width": 1}, {"source": 26, "target": 44, "width": 1}, {"source": 29, "target": 44, "width": 1}, {"source": 30, "target": 31, "width": 1}, {"source": 30, "target": 49, "width": 1}, {"source": 30, "target": 50, "width": 1}, {"source": 31, "target": 49, "width": 1}, {"source": 31, "target": 50, "width": 1}, {"source": 33, "target": 35, "width": 1}, {"source": 38, "target": 43, "width": 1}, {"source": 38, "target": 56, "width": 1}, {"source": 38, "target": 61, "width": 1}, {"source": 39, "target": 44, "width": 1}, {"source": 40, "target": 59, "width": 1}, {"source": 41, "target": 60, "width": 1}, {"source": 41, "target": 61, "width": 1}, {"source": 42, "target": 58, "width": 1}, {"source": 43, "target": 44, "width": 1}, {"source": 43, "target": 56, "width": 1}, {"source": 43, "target": 61, "width": 1}, {"source": 45, "target": 64, "width": 1}, {"source": 46, "target": 62, "width": 1}, {"source": 47, "target": 65, "width": 1}, {"source": 47, "target": 66, "width": 1}, {"source": 48, "target": 63, "width": 1}, {"source": 49, "target": 50, "width": 1}, {"source": 51, "target": 52, "width": 1}, {"source": 56, "target": 61, "width": 1}, {"source": 57, "target": 67, "width": 1}, {"source": 68, "target": 69, "width": 1}], "nodes": [{"color": [[0.5124157840714958]], "id": "", "name": "cube0_cluster0", "size": 6, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 339}, "custom_tooltips": [1, 2, 5, 11, 12, 20, 25, 26, 31, 33, 34, 41, 43, 48, 56, 60, 64, 69, 70, 83, 93, 95, 96, 98, 114, 121, 123, 128, 147, 159, 163, 167, 168, 171, 179, 192, 194, 199, 202, 211, 234, 243, 247, 251, 252, 260, 261, 263, 271, 278, 285, 286, 287, 296, 297, 298, 304, 306, 310, 312, 314, 315, 316, 319, 324, 332, 344, 347, 350, 354, 361, 363, 365, 367, 375, 380, 383, 385, 387, 388, 389, 395, 400, 401, 404, 409, 418, 420, 422, 423, 438, 448, 465, 467, 476, 485, 496, 501, 505, 506, 520, 527, 536, 538, 547, 549, 556, 559, 567, 577, 579, 582, 594, 595, 596, 599, 608, 613, 625, 629, 631, 632, 636, 644, 651, 656, 658, 665, 669, 683, 688, 695, 706, 709, 720, 726, 729, 732, 736, 737, 739, 752, 753, 763, 764, 766, 768, 773, 775, 776, 778, 781, 794, 798, 800, 804, 808, 809, 824, 826, 828, 842, 843, 848, 854, 856, 862, 870, 875, 883, 884, 885, 893, 903, 906, 907, 909, 921, 922, 936, 943, 948, 949, 954, 956, 958, 966, 967, 980, 985, 987, 990, 993, 996, 997, 1003, 1004, 1027, 1031, 1037, 1044, 1051, 1055, 1064, 1069, 1070, 1071, 1080, 1085, 1086, 1087, 1091, 1102, 1103, 1105, 1109, 1116, 1121, 1123, 1128, 1130, 1139, 1158, 1159, 1161, 1172, 1177, 1178, 1185, 1186, 1190, 1191, 1199, 1200, 1201, 1204, 1205, 1210, 1214, 1215, 1229, 1231, 1232, 1239, 1242, 1247, 1249, 1256, 1263, 1266, 1269, 1270, 1277, 1279, 1283, 1285, 1292, 1296, 1303, 1310, 1314, 1323, 1331, 1334, 1339, 1340, 1343, 1350, 1357, 1360, 1362, 1368, 1379, 1384, 1386, 1396, 1397, 1408, 1415, 1418, 1421, 1433, 1439, 1442, 1446, 1447, 1450, 1453, 1459, 1462, 1466, 1467, 1468, 1480, 1484, 1490, 1492, 1493, 1504, 1505, 1507, 1512, 1515, 1518, 1521, 1522, 1525, 1526, 1533, 1538, 1541, 1562, 1577, 1580, 1592, 1593, 1595, 1605, 1606, 1611, 1617, 1619, 1620, 1621, 1622, 1624, 1626, 1634, 1639, 1643, 1644, 1648, 1652, 1654, 1656, 1669, 1679, 1680, 1684], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 85.0, "perc": 9.7}, {"color": "rgb(68, 51, 125)", "height": 85.0, "perc": 9.7}, {"color": "rgb(58, 80, 138)", "height": 87.0, "perc": 10.0}, {"color": "rgb(46, 107, 141)", "height": 74.0, "perc": 8.6}, {"color": "rgb(36, 131, 141)", "height": 87.0, "perc": 10.0}, {"color": "rgb(33, 155, 136)", "height": 87.0, "perc": 10.0}, {"color": "rgb(51, 178, 121)", "height": 79.0, "perc": 9.1}, {"color": "rgb(94, 199, 96)", "height": 100.0, "perc": 11.5}, {"color": "rgb(155, 215, 59)", "height": 95.0, "perc": 10.9}, {"color": "rgb(220, 226, 37)", "height": 90.0, "perc": 10.3}]], "node_id": "cube0_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.5104573262797641]], "id": "", "name": "cube1_cluster0", "size": 5, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 106}, "custom_tooltips": [30, 36, 38, 42, 52, 58, 62, 78, 119, 139, 209, 239, 255, 265, 289, 293, 323, 325, 329, 340, 343, 349, 368, 373, 378, 382, 393, 427, 450, 461, 474, 488, 524, 532, 557, 587, 592, 627, 633, 638, 654, 674, 691, 733, 747, 757, 762, 790, 802, 814, 816, 818, 833, 837, 846, 867, 880, 926, 940, 945, 988, 1000, 1002, 1013, 1028, 1053, 1074, 1089, 1100, 1118, 1136, 1137, 1143, 1195, 1228, 1251, 1261, 1272, 1287, 1288, 1300, 1371, 1406, 1426, 1429, 1440, 1445, 1458, 1475, 1498, 1502, 1537, 1539, 1548, 1550, 1557, 1561, 1563, 1569, 1571, 1575, 1584, 1596, 1608, 1615, 1666], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 67.0, "perc": 9.4}, {"color": "rgb(68, 51, 125)", "height": 60.0, "perc": 8.5}, {"color": "rgb(58, 80, 138)", "height": 87.0, "perc": 12.3}, {"color": "rgb(46, 107, 141)", "height": 67.0, "perc": 9.4}, {"color": "rgb(36, 131, 141)", "height": 80.0, "perc": 11.3}, {"color": "rgb(33, 155, 136)", "height": 60.0, "perc": 8.5}, {"color": "rgb(51, 178, 121)", "height": 67.0, "perc": 9.4}, {"color": "rgb(94, 199, 96)", "height": 53.0, "perc": 7.5}, {"color": "rgb(155, 215, 59)", "height": 67.0, "perc": 9.4}, {"color": "rgb(220, 226, 37)", "height": 100.0, "perc": 14.2}]], "node_id": "cube1_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.5161241805200435]], "id": "", "name": "cube3_cluster0", "size": 5, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 67}, "custom_tooltips": [30, 36, 38, 42, 52, 62, 78, 119, 239, 265, 289, 293, 325, 343, 349, 368, 373, 378, 382, 393, 488, 524, 532, 587, 654, 691, 757, 762, 802, 818, 837, 846, 867, 926, 940, 988, 1000, 1002, 1028, 1074, 1118, 1136, 1155, 1195, 1251, 1261, 1272, 1287, 1288, 1300, 1371, 1406, 1426, 1429, 1440, 1445, 1458, 1475, 1498, 1502, 1548, 1550, 1557, 1561, 1569, 1596, 1666], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 80.0, "perc": 11.9}, {"color": "rgb(68, 51, 125)", "height": 50.0, "perc": 7.5}, {"color": "rgb(58, 80, 138)", "height": 80.0, "perc": 11.9}, {"color": "rgb(46, 107, 141)", "height": 40.0, "perc": 6.0}, {"color": "rgb(36, 131, 141)", "height": 60.0, "perc": 9.0}, {"color": "rgb(33, 155, 136)", "height": 70.0, "perc": 10.4}, {"color": "rgb(51, 178, 121)", "height": 50.0, "perc": 7.5}, {"color": "rgb(94, 199, 96)", "height": 70.0, "perc": 10.4}, {"color": "rgb(155, 215, 59)", "height": 100.0, "perc": 14.9}, {"color": "rgb(220, 226, 37)", "height": 70.0, "perc": 10.4}]], "node_id": "cube3_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.5098611228723854]], "id": "", "name": "cube5_cluster0", "size": 5, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 140}, "custom_tooltips": [8, 23, 27, 40, 49, 61, 71, 77, 84, 99, 118, 140, 149, 169, 170, 187, 189, 197, 219, 226, 228, 240, 242, 250, 279, 292, 333, 359, 384, 390, 394, 396, 398, 405, 411, 415, 421, 428, 433, 445, 457, 462, 464, 469, 491, 497, 499, 500, 570, 572, 593, 601, 605, 609, 610, 614, 623, 649, 657, 692, 735, 744, 746, 756, 788, 793, 805, 815, 819, 831, 888, 898, 908, 925, 939, 944, 968, 973, 999, 1010, 1047, 1056, 1090, 1099, 1104, 1117, 1120, 1124, 1142, 1144, 1156, 1179, 1181, 1187, 1224, 1241, 1248, 1258, 1271, 1286, 1305, 1315, 1324, 1332, 1338, 1351, 1355, 1363, 1372, 1378, 1401, 1422, 1424, 1428, 1430, 1432, 1444, 1449, 1454, 1465, 1469, 1485, 1497, 1510, 1513, 1531, 1536, 1544, 1547, 1549, 1568, 1583, 1585, 1601, 1604, 1612, 1635, 1662, 1681, 1687], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 62.0, "perc": 9.3}, {"color": "rgb(68, 51, 125)", "height": 67.0, "perc": 10.0}, {"color": "rgb(58, 80, 138)", "height": 100.0, "perc": 15.0}, {"color": "rgb(46, 107, 141)", "height": 52.0, "perc": 7.9}, {"color": "rgb(36, 131, 141)", "height": 52.0, "perc": 7.9}, {"color": "rgb(33, 155, 136)", "height": 48.0, "perc": 7.1}, {"color": "rgb(51, 178, 121)", "height": 57.0, "perc": 8.6}, {"color": "rgb(94, 199, 96)", "height": 62.0, "perc": 9.3}, {"color": "rgb(155, 215, 59)", "height": 95.0, "perc": 14.3}, {"color": "rgb(220, 226, 37)", "height": 71.0, "perc": 10.7}]], "node_id": "cube5_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.5124864883712821]], "id": "", "name": "cube6_cluster0", "size": 5, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 85}, "custom_tooltips": [27, 49, 61, 77, 84, 140, 169, 170, 187, 226, 228, 240, 242, 250, 279, 333, 384, 421, 433, 457, 462, 464, 469, 499, 570, 572, 593, 601, 605, 609, 610, 614, 623, 649, 657, 735, 793, 819, 888, 898, 908, 925, 944, 968, 973, 999, 1010, 1047, 1056, 1090, 1099, 1117, 1120, 1124, 1142, 1144, 1156, 1179, 1181, 1187, 1224, 1241, 1248, 1271, 1286, 1315, 1324, 1332, 1338, 1351, 1355, 1363, 1372, 1422, 1424, 1428, 1430, 1432, 1444, 1454, 1469, 1513, 1547, 1662, 1687], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 46.0, "perc": 7.1}, {"color": "rgb(68, 51, 125)", "height": 77.0, "perc": 11.8}, {"color": "rgb(58, 80, 138)", "height": 62.0, "perc": 9.4}, {"color": "rgb(46, 107, 141)", "height": 85.0, "perc": 12.9}, {"color": "rgb(36, 131, 141)", "height": 23.0, "perc": 3.5}, {"color": "rgb(33, 155, 136)", "height": 69.0, "perc": 10.6}, {"color": "rgb(51, 178, 121)", "height": 85.0, "perc": 12.9}, {"color": "rgb(94, 199, 96)", "height": 85.0, "perc": 12.9}, {"color": "rgb(155, 215, 59)", "height": 100.0, "perc": 15.3}, {"color": "rgb(220, 226, 37)", "height": 23.0, "perc": 3.5}]], "node_id": "cube6_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.4861155442068305]], "id": "", "name": "cube7_cluster0", "size": 5, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 65}, "custom_tooltips": [29, 45, 50, 72, 91, 100, 131, 206, 223, 225, 262, 327, 334, 339, 346, 412, 414, 439, 458, 478, 487, 529, 565, 571, 578, 581, 597, 600, 693, 708, 723, 745, 760, 784, 840, 882, 972, 994, 1066, 1078, 1112, 1119, 1171, 1176, 1180, 1184, 1202, 1209, 1253, 1257, 1259, 1280, 1306, 1316, 1317, 1380, 1404, 1427, 1514, 1517, 1546, 1589, 1590, 1602, 1661], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 70.0, "perc": 10.8}, {"color": "rgb(68, 51, 125)", "height": 60.0, "perc": 9.2}, {"color": "rgb(58, 80, 138)", "height": 80.0, "perc": 12.3}, {"color": "rgb(46, 107, 141)", "height": 70.0, "perc": 10.8}, {"color": "rgb(36, 131, 141)", "height": 70.0, "perc": 10.8}, {"color": "rgb(33, 155, 136)", "height": 30.0, "perc": 4.6}, {"color": "rgb(51, 178, 121)", "height": 70.0, "perc": 10.8}, {"color": "rgb(94, 199, 96)", "height": 100.0, "perc": 15.4}, {"color": "rgb(155, 215, 59)", "height": 50.0, "perc": 7.7}, {"color": "rgb(220, 226, 37)", "height": 50.0, "perc": 7.7}]], "node_id": "cube7_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.5187675871607763]], "id": "", "name": "cube8_cluster0", "size": 5, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 87}, "custom_tooltips": [29, 39, 45, 46, 50, 53, 72, 91, 100, 131, 206, 223, 225, 262, 283, 327, 334, 339, 346, 412, 414, 435, 439, 458, 478, 487, 529, 543, 565, 571, 578, 581, 597, 600, 693, 723, 745, 760, 784, 840, 882, 928, 972, 974, 994, 998, 1006, 1022, 1066, 1078, 1112, 1119, 1171, 1176, 1180, 1184, 1202, 1209, 1253, 1254, 1257, 1259, 1280, 1306, 1316, 1317, 1330, 1373, 1380, 1391, 1400, 1404, 1425, 1427, 1451, 1464, 1470, 1487, 1514, 1517, 1534, 1546, 1589, 1590, 1602, 1636, 1661], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 77.0, "perc": 11.5}, {"color": "rgb(68, 51, 125)", "height": 54.0, "perc": 8.0}, {"color": "rgb(58, 80, 138)", "height": 69.0, "perc": 10.3}, {"color": "rgb(46, 107, 141)", "height": 62.0, "perc": 9.2}, {"color": "rgb(36, 131, 141)", "height": 46.0, "perc": 6.9}, {"color": "rgb(33, 155, 136)", "height": 54.0, "perc": 8.0}, {"color": "rgb(51, 178, 121)", "height": 62.0, "perc": 9.2}, {"color": "rgb(94, 199, 96)", "height": 92.0, "perc": 13.8}, {"color": "rgb(155, 215, 59)", "height": 100.0, "perc": 14.9}, {"color": "rgb(220, 226, 37)", "height": 54.0, "perc": 8.0}]], "node_id": "cube8_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.29689956444421534]], "id": "", "name": "cube9_cluster0", "size": 5, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 92}, "custom_tooltips": [4, 47, 55, 68, 73, 75, 79, 89, 90, 92, 97, 101, 113, 117, 120, 122, 266, 277, 309, 311, 318, 320, 330, 341, 356, 358, 362, 364, 374, 379, 402, 408, 413, 417, 419, 424, 432, 436, 437, 441, 447, 459, 466, 468, 479, 481, 484, 486, 492, 494, 495, 502, 507, 508, 509, 516, 518, 526, 535, 562, 568, 574, 576, 603, 606, 624, 626, 635, 655, 659, 663, 667, 678, 682, 684, 685, 705, 738, 751, 754, 765, 772, 774, 777, 780, 783, 792, 863, 1496, 1642, 1647, 1686], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 55.0, "perc": 17.4}, {"color": "rgb(68, 51, 125)", "height": 24.0, "perc": 7.6}, {"color": "rgb(58, 80, 138)", "height": 100.0, "perc": 31.5}, {"color": "rgb(46, 107, 141)", "height": 69.0, "perc": 21.7}, {"color": "rgb(36, 131, 141)", "height": 52.0, "perc": 16.3}, {"color": "rgb(33, 155, 136)", "height": 3.0, "perc": 1.1}, {"color": "rgb(51, 178, 121)", "height": 0.0, "perc": 0.0}, {"color": "rgb(94, 199, 96)", "height": 0.0, "perc": 0.0}, {"color": "rgb(155, 215, 59)", "height": 3.0, "perc": 1.1}, {"color": "rgb(220, 226, 37)", "height": 10.0, "perc": 3.3}]], "node_id": "cube9_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.5129314479532279]], "id": "", "name": "cube10_cluster0", "size": 6, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 241}, "custom_tooltips": [0, 4, 19, 32, 47, 55, 68, 73, 75, 79, 89, 90, 92, 97, 101, 113, 117, 120, 122, 124, 125, 144, 153, 162, 166, 178, 182, 185, 191, 196, 200, 207, 213, 216, 221, 227, 236, 246, 266, 277, 309, 311, 318, 320, 330, 341, 356, 358, 362, 364, 374, 379, 402, 408, 413, 417, 419, 424, 432, 436, 437, 441, 447, 459, 466, 468, 479, 481, 484, 486, 492, 494, 495, 502, 507, 508, 509, 516, 518, 526, 535, 537, 562, 568, 574, 576, 603, 606, 624, 626, 635, 655, 659, 663, 667, 678, 682, 684, 685, 705, 738, 751, 754, 765, 772, 774, 777, 780, 783, 792, 810, 813, 825, 838, 841, 847, 852, 853, 859, 861, 863, 868, 869, 886, 889, 892, 896, 900, 902, 904, 920, 953, 955, 957, 960, 964, 977, 984, 989, 995, 1026, 1030, 1043, 1059, 1061, 1063, 1067, 1072, 1073, 1082, 1094, 1101, 1108, 1122, 1127, 1129, 1141, 1160, 1165, 1170, 1173, 1189, 1196, 1198, 1206, 1208, 1213, 1216, 1236, 1255, 1262, 1264, 1276, 1278, 1284, 1289, 1291, 1295, 1297, 1304, 1307, 1308, 1312, 1318, 1327, 1335, 1352, 1358, 1364, 1366, 1370, 1381, 1382, 1383, 1385, 1393, 1398, 1402, 1403, 1405, 1407, 1409, 1420, 1437, 1441, 1452, 1494, 1496, 1499, 1516, 1519, 1520, 1527, 1529, 1540, 1551, 1554, 1565, 1574, 1579, 1591, 1599, 1610, 1623, 1625, 1627, 1640, 1642, 1647, 1651, 1653, 1655, 1659, 1663, 1665, 1670, 1672, 1674, 1677, 1683, 1686], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 81.0, "perc": 10.4}, {"color": "rgb(68, 51, 125)", "height": 65.0, "perc": 8.3}, {"color": "rgb(58, 80, 138)", "height": 94.0, "perc": 12.0}, {"color": "rgb(46, 107, 141)", "height": 68.0, "perc": 8.7}, {"color": "rgb(36, 131, 141)", "height": 65.0, "perc": 8.3}, {"color": "rgb(33, 155, 136)", "height": 81.0, "perc": 10.4}, {"color": "rgb(51, 178, 121)", "height": 68.0, "perc": 8.7}, {"color": "rgb(94, 199, 96)", "height": 81.0, "perc": 10.4}, {"color": "rgb(155, 215, 59)", "height": 77.0, "perc": 10.0}, {"color": "rgb(220, 226, 37)", "height": 100.0, "perc": 12.9}]], "node_id": "cube10_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.5476437462951985]], "id": "", "name": "cube11_cluster0", "size": 5, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 72}, "custom_tooltips": [23, 27, 99, 140, 189, 197, 219, 226, 240, 242, 250, 292, 333, 390, 394, 398, 411, 415, 428, 445, 499, 570, 572, 593, 605, 609, 614, 744, 746, 756, 788, 805, 815, 831, 888, 908, 968, 973, 1010, 1056, 1120, 1142, 1179, 1181, 1187, 1224, 1248, 1332, 1338, 1363, 1372, 1422, 1424, 1428, 1432, 1444, 1454, 1485, 1497, 1510, 1531, 1536, 1544, 1549, 1568, 1583, 1585, 1601, 1604, 1612, 1635, 1681], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 33.0, "perc": 5.6}, {"color": "rgb(68, 51, 125)", "height": 75.0, "perc": 12.5}, {"color": "rgb(58, 80, 138)", "height": 67.0, "perc": 11.1}, {"color": "rgb(46, 107, 141)", "height": 50.0, "perc": 8.3}, {"color": "rgb(36, 131, 141)", "height": 58.0, "perc": 9.7}, {"color": "rgb(33, 155, 136)", "height": 42.0, "perc": 6.9}, {"color": "rgb(51, 178, 121)", "height": 33.0, "perc": 5.6}, {"color": "rgb(94, 199, 96)", "height": 50.0, "perc": 8.3}, {"color": "rgb(155, 215, 59)", "height": 92.0, "perc": 15.3}, {"color": "rgb(220, 226, 37)", "height": 100.0, "perc": 16.7}]], "node_id": "cube11_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.5385059036511318]], "id": "", "name": "cube12_cluster0", "size": 4, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 37}, "custom_tooltips": [27, 140, 226, 240, 242, 250, 333, 499, 570, 572, 593, 605, 609, 614, 888, 908, 968, 973, 1010, 1056, 1120, 1142, 1179, 1181, 1187, 1224, 1248, 1332, 1338, 1363, 1372, 1422, 1424, 1428, 1432, 1444, 1454], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 25.0, "perc": 5.4}, {"color": "rgb(68, 51, 125)", "height": 63.0, "perc": 13.5}, {"color": "rgb(58, 80, 138)", "height": 13.0, "perc": 2.7}, {"color": "rgb(46, 107, 141)", "height": 75.0, "perc": 16.2}, {"color": "rgb(36, 131, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(33, 155, 136)", "height": 63.0, "perc": 13.5}, {"color": "rgb(51, 178, 121)", "height": 50.0, "perc": 10.8}, {"color": "rgb(94, 199, 96)", "height": 75.0, "perc": 16.2}, {"color": "rgb(155, 215, 59)", "height": 100.0, "perc": 21.6}, {"color": "rgb(220, 226, 37)", "height": 0.0, "perc": 0.0}]], "node_id": "cube12_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.47991490121882896]], "id": "", "name": "cube13_cluster0", "size": 5, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 73}, "custom_tooltips": [29, 45, 50, 72, 91, 100, 129, 131, 133, 206, 223, 225, 262, 327, 334, 339, 346, 412, 414, 439, 458, 463, 478, 487, 529, 565, 571, 578, 581, 597, 600, 615, 693, 708, 723, 745, 760, 784, 840, 882, 912, 972, 994, 1062, 1065, 1066, 1078, 1112, 1171, 1176, 1180, 1184, 1202, 1209, 1226, 1253, 1257, 1259, 1280, 1306, 1311, 1316, 1317, 1380, 1404, 1427, 1514, 1517, 1546, 1589, 1590, 1602, 1661], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 75.0, "perc": 12.3}, {"color": "rgb(68, 51, 125)", "height": 50.0, "perc": 8.2}, {"color": "rgb(58, 80, 138)", "height": 75.0, "perc": 12.3}, {"color": "rgb(46, 107, 141)", "height": 67.0, "perc": 11.0}, {"color": "rgb(36, 131, 141)", "height": 58.0, "perc": 9.6}, {"color": "rgb(33, 155, 136)", "height": 33.0, "perc": 5.5}, {"color": "rgb(51, 178, 121)", "height": 67.0, "perc": 11.0}, {"color": "rgb(94, 199, 96)", "height": 100.0, "perc": 16.4}, {"color": "rgb(155, 215, 59)", "height": 42.0, "perc": 6.8}, {"color": "rgb(220, 226, 37)", "height": 42.0, "perc": 6.8}]], "node_id": "cube13_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.510247323083908]], "id": "", "name": "cube14_cluster0", "size": 5, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 94}, "custom_tooltips": [29, 39, 45, 46, 50, 53, 72, 91, 100, 129, 131, 133, 206, 223, 225, 262, 283, 327, 334, 339, 346, 412, 414, 435, 439, 458, 463, 478, 487, 529, 543, 565, 571, 578, 581, 597, 600, 615, 693, 723, 745, 760, 784, 840, 882, 912, 928, 972, 974, 994, 998, 1006, 1062, 1065, 1066, 1078, 1112, 1171, 1176, 1180, 1184, 1202, 1209, 1226, 1253, 1254, 1257, 1259, 1280, 1306, 1311, 1316, 1317, 1330, 1373, 1380, 1391, 1400, 1404, 1425, 1427, 1451, 1464, 1470, 1487, 1514, 1517, 1534, 1546, 1589, 1590, 1602, 1636, 1661], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 86.0, "perc": 12.8}, {"color": "rgb(68, 51, 125)", "height": 50.0, "perc": 7.4}, {"color": "rgb(58, 80, 138)", "height": 71.0, "perc": 10.6}, {"color": "rgb(46, 107, 141)", "height": 64.0, "perc": 9.6}, {"color": "rgb(36, 131, 141)", "height": 43.0, "perc": 6.4}, {"color": "rgb(33, 155, 136)", "height": 57.0, "perc": 8.5}, {"color": "rgb(51, 178, 121)", "height": 57.0, "perc": 8.5}, {"color": "rgb(94, 199, 96)", "height": 100.0, "perc": 14.9}, {"color": "rgb(155, 215, 59)", "height": 93.0, "perc": 13.8}, {"color": "rgb(220, 226, 37)", "height": 50.0, "perc": 7.4}]], "node_id": "cube14_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.5032602252519265]], "id": "", "name": "cube15_cluster0", "size": 4, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 23}, "custom_tooltips": [7, 148, 233, 245, 258, 282, 308, 434, 442, 694, 742, 787, 914, 1058, 1207, 1225, 1294, 1349, 1431, 1564, 1573, 1664, 1668], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 40.0, "perc": 8.7}, {"color": "rgb(68, 51, 125)", "height": 100.0, "perc": 21.7}, {"color": "rgb(58, 80, 138)", "height": 40.0, "perc": 8.7}, {"color": "rgb(46, 107, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(36, 131, 141)", "height": 60.0, "perc": 13.0}, {"color": "rgb(33, 155, 136)", "height": 20.0, "perc": 4.3}, {"color": "rgb(51, 178, 121)", "height": 20.0, "perc": 4.3}, {"color": "rgb(94, 199, 96)", "height": 80.0, "perc": 17.4}, {"color": "rgb(155, 215, 59)", "height": 20.0, "perc": 4.3}, {"color": "rgb(220, 226, 37)", "height": 80.0, "perc": 17.4}]], "node_id": "cube15_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.5087382212865115]], "id": "", "name": "cube15_cluster1", "size": 4, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 29}, "custom_tooltips": [107, 137, 156, 175, 288, 353, 397, 460, 591, 612, 704, 779, 796, 807, 930, 942, 979, 1049, 1113, 1151, 1157, 1164, 1174, 1299, 1455, 1461, 1479, 1543, 1631], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 50.0, "perc": 10.3}, {"color": "rgb(68, 51, 125)", "height": 33.0, "perc": 6.9}, {"color": "rgb(58, 80, 138)", "height": 50.0, "perc": 10.3}, {"color": "rgb(46, 107, 141)", "height": 33.0, "perc": 6.9}, {"color": "rgb(36, 131, 141)", "height": 67.0, "perc": 13.8}, {"color": "rgb(33, 155, 136)", "height": 50.0, "perc": 10.3}, {"color": "rgb(51, 178, 121)", "height": 100.0, "perc": 20.7}, {"color": "rgb(94, 199, 96)", "height": 17.0, "perc": 3.4}, {"color": "rgb(155, 215, 59)", "height": 50.0, "perc": 10.3}, {"color": "rgb(220, 226, 37)", "height": 33.0, "perc": 6.9}]], "node_id": "cube15_cluster1", "projection_stats": []}, "type": "circle"}, {"color": [[0.5087382212865115]], "id": "", "name": "cube16_cluster0", "size": 4, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 29}, "custom_tooltips": [107, 137, 156, 175, 288, 353, 397, 460, 591, 612, 704, 779, 796, 807, 930, 942, 979, 1049, 1113, 1151, 1157, 1164, 1174, 1299, 1455, 1461, 1479, 1543, 1631], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 50.0, "perc": 10.3}, {"color": "rgb(68, 51, 125)", "height": 33.0, "perc": 6.9}, {"color": "rgb(58, 80, 138)", "height": 50.0, "perc": 10.3}, {"color": "rgb(46, 107, 141)", "height": 33.0, "perc": 6.9}, {"color": "rgb(36, 131, 141)", "height": 67.0, "perc": 13.8}, {"color": "rgb(33, 155, 136)", "height": 50.0, "perc": 10.3}, {"color": "rgb(51, 178, 121)", "height": 100.0, "perc": 20.7}, {"color": "rgb(94, 199, 96)", "height": 17.0, "perc": 3.4}, {"color": "rgb(155, 215, 59)", "height": 50.0, "perc": 10.3}, {"color": "rgb(220, 226, 37)", "height": 33.0, "perc": 6.9}]], "node_id": "cube16_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.3570620251118176]], "id": "", "name": "cube16_cluster1", "size": 3, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 11}, "custom_tooltips": [54, 116, 127, 152, 201, 294, 555, 1060, 1243, 1246, 1578], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 100.0, "perc": 36.4}, {"color": "rgb(68, 51, 125)", "height": 50.0, "perc": 18.2}, {"color": "rgb(58, 80, 138)", "height": 0.0, "perc": 0.0}, {"color": "rgb(46, 107, 141)", "height": 25.0, "perc": 9.1}, {"color": "rgb(36, 131, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(33, 155, 136)", "height": 0.0, "perc": 0.0}, {"color": "rgb(51, 178, 121)", "height": 25.0, "perc": 9.1}, {"color": "rgb(94, 199, 96)", "height": 50.0, "perc": 18.2}, {"color": "rgb(155, 215, 59)", "height": 0.0, "perc": 0.0}, {"color": "rgb(220, 226, 37)", "height": 25.0, "perc": 9.1}]], "node_id": "cube16_cluster1", "projection_stats": []}, "type": "circle"}, {"color": [[0.4765522596157859]], "id": "", "name": "cube17_cluster0", "size": 5, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 71}, "custom_tooltips": [18, 74, 141, 150, 181, 186, 190, 222, 229, 280, 303, 336, 337, 348, 351, 357, 366, 449, 482, 493, 517, 530, 546, 560, 569, 575, 620, 622, 642, 648, 676, 679, 755, 759, 811, 827, 834, 860, 877, 878, 879, 887, 895, 924, 970, 976, 983, 1009, 1025, 1076, 1083, 1095, 1107, 1110, 1167, 1217, 1234, 1274, 1290, 1319, 1341, 1356, 1375, 1394, 1413, 1438, 1500, 1567, 1600, 1613, 1685], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 36.0, "perc": 5.6}, {"color": "rgb(68, 51, 125)", "height": 82.0, "perc": 12.7}, {"color": "rgb(58, 80, 138)", "height": 64.0, "perc": 9.9}, {"color": "rgb(46, 107, 141)", "height": 91.0, "perc": 14.1}, {"color": "rgb(36, 131, 141)", "height": 64.0, "perc": 9.9}, {"color": "rgb(33, 155, 136)", "height": 100.0, "perc": 15.5}, {"color": "rgb(51, 178, 121)", "height": 64.0, "perc": 9.9}, {"color": "rgb(94, 199, 96)", "height": 55.0, "perc": 8.5}, {"color": "rgb(155, 215, 59)", "height": 55.0, "perc": 8.5}, {"color": "rgb(220, 226, 37)", "height": 36.0, "perc": 5.6}]], "node_id": "cube17_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.558045688751083]], "id": "", "name": "cube18_cluster0", "size": 4, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 26}, "custom_tooltips": [44, 173, 244, 249, 322, 338, 376, 399, 523, 938, 1014, 1017, 1024, 1029, 1219, 1237, 1293, 1333, 1353, 1392, 1399, 1411, 1495, 1506, 1511, 1638], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 14.0, "perc": 3.8}, {"color": "rgb(68, 51, 125)", "height": 57.0, "perc": 15.4}, {"color": "rgb(58, 80, 138)", "height": 43.0, "perc": 11.5}, {"color": "rgb(46, 107, 141)", "height": 14.0, "perc": 3.8}, {"color": "rgb(36, 131, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(33, 155, 136)", "height": 14.0, "perc": 3.8}, {"color": "rgb(51, 178, 121)", "height": 57.0, "perc": 15.4}, {"color": "rgb(94, 199, 96)", "height": 57.0, "perc": 15.4}, {"color": "rgb(155, 215, 59)", "height": 100.0, "perc": 26.9}, {"color": "rgb(220, 226, 37)", "height": 14.0, "perc": 3.8}]], "node_id": "cube18_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.558045688751083]], "id": "", "name": "cube19_cluster0", "size": 4, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 26}, "custom_tooltips": [44, 173, 244, 249, 322, 338, 376, 399, 523, 938, 1014, 1017, 1024, 1029, 1219, 1237, 1293, 1333, 1353, 1392, 1399, 1411, 1495, 1506, 1511, 1638], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 14.0, "perc": 3.8}, {"color": "rgb(68, 51, 125)", "height": 57.0, "perc": 15.4}, {"color": "rgb(58, 80, 138)", "height": 43.0, "perc": 11.5}, {"color": "rgb(46, 107, 141)", "height": 14.0, "perc": 3.8}, {"color": "rgb(36, 131, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(33, 155, 136)", "height": 14.0, "perc": 3.8}, {"color": "rgb(51, 178, 121)", "height": 57.0, "perc": 15.4}, {"color": "rgb(94, 199, 96)", "height": 57.0, "perc": 15.4}, {"color": "rgb(155, 215, 59)", "height": 100.0, "perc": 26.9}, {"color": "rgb(220, 226, 37)", "height": 14.0, "perc": 3.8}]], "node_id": "cube19_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.41379456346854093]], "id": "", "name": "cube20_cluster0", "size": 3, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 14}, "custom_tooltips": [180, 268, 429, 452, 483, 504, 548, 602, 730, 770, 782, 812, 1553, 1660], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 0.0, "perc": 0.0}, {"color": "rgb(68, 51, 125)", "height": 50.0, "perc": 14.3}, {"color": "rgb(58, 80, 138)", "height": 100.0, "perc": 28.6}, {"color": "rgb(46, 107, 141)", "height": 50.0, "perc": 14.3}, {"color": "rgb(36, 131, 141)", "height": 100.0, "perc": 28.6}, {"color": "rgb(33, 155, 136)", "height": 0.0, "perc": 0.0}, {"color": "rgb(51, 178, 121)", "height": 0.0, "perc": 0.0}, {"color": "rgb(94, 199, 96)", "height": 0.0, "perc": 0.0}, {"color": "rgb(155, 215, 59)", "height": 0.0, "perc": 0.0}, {"color": "rgb(220, 226, 37)", "height": 50.0, "perc": 14.3}]], "node_id": "cube20_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.5032602252519265]], "id": "", "name": "cube20_cluster1", "size": 4, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 23}, "custom_tooltips": [7, 148, 233, 245, 258, 282, 308, 434, 442, 694, 742, 787, 914, 1058, 1207, 1225, 1294, 1349, 1431, 1564, 1573, 1664, 1668], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 40.0, "perc": 8.7}, {"color": "rgb(68, 51, 125)", "height": 100.0, "perc": 21.7}, {"color": "rgb(58, 80, 138)", "height": 40.0, "perc": 8.7}, {"color": "rgb(46, 107, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(36, 131, 141)", "height": 60.0, "perc": 13.0}, {"color": "rgb(33, 155, 136)", "height": 20.0, "perc": 4.3}, {"color": "rgb(51, 178, 121)", "height": 20.0, "perc": 4.3}, {"color": "rgb(94, 199, 96)", "height": 80.0, "perc": 17.4}, {"color": "rgb(155, 215, 59)", "height": 20.0, "perc": 4.3}, {"color": "rgb(220, 226, 37)", "height": 80.0, "perc": 17.4}]], "node_id": "cube20_cluster1", "projection_stats": []}, "type": "circle"}, {"color": [[0.524303497332543]], "id": "", "name": "cube20_cluster2", "size": 3, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 14}, "custom_tooltips": [67, 88, 188, 237, 905, 918, 950, 1033, 1045, 1238, 1244, 1412, 1471, 1587], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 67.0, "perc": 14.3}, {"color": "rgb(68, 51, 125)", "height": 67.0, "perc": 14.3}, {"color": "rgb(58, 80, 138)", "height": 0.0, "perc": 0.0}, {"color": "rgb(46, 107, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(36, 131, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(33, 155, 136)", "height": 100.0, "perc": 21.4}, {"color": "rgb(51, 178, 121)", "height": 67.0, "perc": 14.3}, {"color": "rgb(94, 199, 96)", "height": 67.0, "perc": 14.3}, {"color": "rgb(155, 215, 59)", "height": 67.0, "perc": 14.3}, {"color": "rgb(220, 226, 37)", "height": 33.0, "perc": 7.1}]], "node_id": "cube20_cluster2", "projection_stats": []}, "type": "circle"}, {"color": [[0.5480438648488442]], "id": "", "name": "cube20_cluster3", "size": 4, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 20}, "custom_tooltips": [158, 345, 522, 542, 647, 731, 771, 820, 891, 894, 933, 1015, 1018, 1021, 1035, 1114, 1322, 1365, 1671, 1676], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 20.0, "perc": 5.0}, {"color": "rgb(68, 51, 125)", "height": 0.0, "perc": 0.0}, {"color": "rgb(58, 80, 138)", "height": 20.0, "perc": 5.0}, {"color": "rgb(46, 107, 141)", "height": 60.0, "perc": 15.0}, {"color": "rgb(36, 131, 141)", "height": 60.0, "perc": 15.0}, {"color": "rgb(33, 155, 136)", "height": 60.0, "perc": 15.0}, {"color": "rgb(51, 178, 121)", "height": 100.0, "perc": 25.0}, {"color": "rgb(94, 199, 96)", "height": 20.0, "perc": 5.0}, {"color": "rgb(155, 215, 59)", "height": 20.0, "perc": 5.0}, {"color": "rgb(220, 226, 37)", "height": 40.0, "perc": 10.0}]], "node_id": "cube20_cluster3", "projection_stats": []}, "type": "circle"}, {"color": [[0.4956036356451294]], "id": "", "name": "cube20_cluster4", "size": 4, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 24}, "custom_tooltips": [9, 22, 65, 86, 313, 371, 425, 477, 533, 566, 618, 1011, 1016, 1038, 1084, 1093, 1152, 1265, 1313, 1419, 1435, 1481, 1616, 1658], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 80.0, "perc": 16.7}, {"color": "rgb(68, 51, 125)", "height": 20.0, "perc": 4.2}, {"color": "rgb(58, 80, 138)", "height": 60.0, "perc": 12.5}, {"color": "rgb(46, 107, 141)", "height": 60.0, "perc": 12.5}, {"color": "rgb(36, 131, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(33, 155, 136)", "height": 20.0, "perc": 4.2}, {"color": "rgb(51, 178, 121)", "height": 100.0, "perc": 20.8}, {"color": "rgb(94, 199, 96)", "height": 40.0, "perc": 8.3}, {"color": "rgb(155, 215, 59)", "height": 60.0, "perc": 12.5}, {"color": "rgb(220, 226, 37)", "height": 40.0, "perc": 8.3}]], "node_id": "cube20_cluster4", "projection_stats": []}, "type": "circle"}, {"color": [[0.5346769413159455]], "id": "", "name": "cube21_cluster0", "size": 3, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 8}, "custom_tooltips": [345, 731, 771, 894, 1018, 1021, 1114, 1322], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 0.0, "perc": 0.0}, {"color": "rgb(68, 51, 125)", "height": 0.0, "perc": 0.0}, {"color": "rgb(58, 80, 138)", "height": 33.0, "perc": 12.5}, {"color": "rgb(46, 107, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(36, 131, 141)", "height": 67.0, "perc": 25.0}, {"color": "rgb(33, 155, 136)", "height": 33.0, "perc": 12.5}, {"color": "rgb(51, 178, 121)", "height": 100.0, "perc": 37.5}, {"color": "rgb(94, 199, 96)", "height": 33.0, "perc": 12.5}, {"color": "rgb(155, 215, 59)", "height": 0.0, "perc": 0.0}, {"color": "rgb(220, 226, 37)", "height": 0.0, "perc": 0.0}]], "node_id": "cube21_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.5993479549496147]], "id": "", "name": "cube21_cluster1", "size": 3, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 10}, "custom_tooltips": [82, 586, 690, 865, 872, 1148, 1328, 1448, 1483, 1609], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 50.0, "perc": 10.0}, {"color": "rgb(68, 51, 125)", "height": 0.0, "perc": 0.0}, {"color": "rgb(58, 80, 138)", "height": 0.0, "perc": 0.0}, {"color": "rgb(46, 107, 141)", "height": 50.0, "perc": 10.0}, {"color": "rgb(36, 131, 141)", "height": 50.0, "perc": 10.0}, {"color": "rgb(33, 155, 136)", "height": 100.0, "perc": 20.0}, {"color": "rgb(51, 178, 121)", "height": 50.0, "perc": 10.0}, {"color": "rgb(94, 199, 96)", "height": 50.0, "perc": 10.0}, {"color": "rgb(155, 215, 59)", "height": 100.0, "perc": 20.0}, {"color": "rgb(220, 226, 37)", "height": 50.0, "perc": 10.0}]], "node_id": "cube21_cluster1", "projection_stats": []}, "type": "circle"}, {"color": [[0.5684647302904564]], "id": "", "name": "cube21_cluster2", "size": 3, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 14}, "custom_tooltips": [104, 109, 302, 331, 646, 749, 1098, 1268, 1389, 1410, 1417, 1486, 1488, 1629], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 40.0, "perc": 14.3}, {"color": "rgb(68, 51, 125)", "height": 40.0, "perc": 14.3}, {"color": "rgb(58, 80, 138)", "height": 0.0, "perc": 0.0}, {"color": "rgb(46, 107, 141)", "height": 20.0, "perc": 7.1}, {"color": "rgb(36, 131, 141)", "height": 20.0, "perc": 7.1}, {"color": "rgb(33, 155, 136)", "height": 0.0, "perc": 0.0}, {"color": "rgb(51, 178, 121)", "height": 20.0, "perc": 7.1}, {"color": "rgb(94, 199, 96)", "height": 20.0, "perc": 7.1}, {"color": "rgb(155, 215, 59)", "height": 100.0, "perc": 35.7}, {"color": "rgb(220, 226, 37)", "height": 20.0, "perc": 7.1}]], "node_id": "cube21_cluster2", "projection_stats": []}, "type": "circle"}, {"color": [[0.5569551472041099]], "id": "", "name": "cube21_cluster3", "size": 3, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 12}, "custom_tooltips": [158, 522, 542, 647, 820, 891, 933, 1015, 1035, 1365, 1671, 1676], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 33.0, "perc": 8.3}, {"color": "rgb(68, 51, 125)", "height": 0.0, "perc": 0.0}, {"color": "rgb(58, 80, 138)", "height": 0.0, "perc": 0.0}, {"color": "rgb(46, 107, 141)", "height": 100.0, "perc": 25.0}, {"color": "rgb(36, 131, 141)", "height": 33.0, "perc": 8.3}, {"color": "rgb(33, 155, 136)", "height": 67.0, "perc": 16.7}, {"color": "rgb(51, 178, 121)", "height": 67.0, "perc": 16.7}, {"color": "rgb(94, 199, 96)", "height": 0.0, "perc": 0.0}, {"color": "rgb(155, 215, 59)", "height": 33.0, "perc": 8.3}, {"color": "rgb(220, 226, 37)", "height": 67.0, "perc": 16.7}]], "node_id": "cube21_cluster3", "projection_stats": []}, "type": "circle"}, {"color": [[0.6708519696071562]], "id": "", "name": "cube21_cluster4", "size": 3, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 11}, "custom_tooltips": [634, 822, 951, 1008, 1041, 1133, 1169, 1235, 1347, 1477, 1632], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 0.0, "perc": 0.0}, {"color": "rgb(68, 51, 125)", "height": 0.0, "perc": 0.0}, {"color": "rgb(58, 80, 138)", "height": 0.0, "perc": 0.0}, {"color": "rgb(46, 107, 141)", "height": 33.0, "perc": 9.1}, {"color": "rgb(36, 131, 141)", "height": 33.0, "perc": 9.1}, {"color": "rgb(33, 155, 136)", "height": 67.0, "perc": 18.2}, {"color": "rgb(51, 178, 121)", "height": 100.0, "perc": 27.3}, {"color": "rgb(94, 199, 96)", "height": 67.0, "perc": 18.2}, {"color": "rgb(155, 215, 59)", "height": 33.0, "perc": 9.1}, {"color": "rgb(220, 226, 37)", "height": 33.0, "perc": 9.1}]], "node_id": "cube21_cluster4", "projection_stats": []}, "type": "circle"}, {"color": [[0.44913836904056226]], "id": "", "name": "cube22_cluster0", "size": 5, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 56}, "custom_tooltips": [14, 63, 94, 112, 145, 193, 238, 241, 267, 291, 321, 391, 410, 446, 472, 480, 498, 503, 519, 531, 551, 580, 604, 660, 661, 672, 711, 715, 716, 721, 722, 750, 832, 845, 855, 866, 890, 937, 952, 965, 981, 1012, 1042, 1048, 1197, 1211, 1298, 1301, 1302, 1345, 1473, 1491, 1528, 1535, 1555, 1678], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 56.0, "perc": 8.9}, {"color": "rgb(68, 51, 125)", "height": 67.0, "perc": 10.7}, {"color": "rgb(58, 80, 138)", "height": 78.0, "perc": 12.5}, {"color": "rgb(46, 107, 141)", "height": 89.0, "perc": 14.3}, {"color": "rgb(36, 131, 141)", "height": 78.0, "perc": 12.5}, {"color": "rgb(33, 155, 136)", "height": 100.0, "perc": 16.1}, {"color": "rgb(51, 178, 121)", "height": 22.0, "perc": 3.6}, {"color": "rgb(94, 199, 96)", "height": 67.0, "perc": 10.7}, {"color": "rgb(155, 215, 59)", "height": 22.0, "perc": 3.6}, {"color": "rgb(220, 226, 37)", "height": 44.0, "perc": 7.1}]], "node_id": "cube22_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.4091637577114756]], "id": "", "name": "cube23_cluster0", "size": 4, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 27}, "custom_tooltips": [14, 94, 145, 238, 291, 321, 391, 410, 498, 503, 580, 604, 661, 672, 715, 716, 721, 722, 750, 832, 855, 1042, 1197, 1301, 1345, 1491, 1528], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 50.0, "perc": 11.1}, {"color": "rgb(68, 51, 125)", "height": 50.0, "perc": 11.1}, {"color": "rgb(58, 80, 138)", "height": 67.0, "perc": 14.8}, {"color": "rgb(46, 107, 141)", "height": 67.0, "perc": 14.8}, {"color": "rgb(36, 131, 141)", "height": 100.0, "perc": 22.2}, {"color": "rgb(33, 155, 136)", "height": 17.0, "perc": 3.7}, {"color": "rgb(51, 178, 121)", "height": 17.0, "perc": 3.7}, {"color": "rgb(94, 199, 96)", "height": 50.0, "perc": 11.1}, {"color": "rgb(155, 215, 59)", "height": 17.0, "perc": 3.7}, {"color": "rgb(220, 226, 37)", "height": 17.0, "perc": 3.7}]], "node_id": "cube23_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.5311203319502075]], "id": "", "name": "cube24_cluster0", "size": 4, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 29}, "custom_tooltips": [184, 220, 275, 403, 406, 561, 573, 662, 670, 677, 741, 743, 789, 791, 874, 899, 1057, 1125, 1150, 1182, 1220, 1222, 1223, 1227, 1252, 1325, 1423, 1524, 1586], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 0.0, "perc": 0.0}, {"color": "rgb(68, 51, 125)", "height": 43.0, "perc": 10.3}, {"color": "rgb(58, 80, 138)", "height": 29.0, "perc": 6.9}, {"color": "rgb(46, 107, 141)", "height": 57.0, "perc": 13.8}, {"color": "rgb(36, 131, 141)", "height": 71.0, "perc": 17.2}, {"color": "rgb(33, 155, 136)", "height": 29.0, "perc": 6.9}, {"color": "rgb(51, 178, 121)", "height": 43.0, "perc": 10.3}, {"color": "rgb(94, 199, 96)", "height": 100.0, "perc": 24.1}, {"color": "rgb(155, 215, 59)", "height": 14.0, "perc": 3.4}, {"color": "rgb(220, 226, 37)", "height": 29.0, "perc": 6.9}]], "node_id": "cube24_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.558045688751083]], "id": "", "name": "cube25_cluster0", "size": 4, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 26}, "custom_tooltips": [44, 173, 244, 249, 322, 338, 376, 399, 523, 938, 1014, 1017, 1024, 1029, 1219, 1237, 1293, 1333, 1353, 1392, 1399, 1411, 1495, 1506, 1511, 1638], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 14.0, "perc": 3.8}, {"color": "rgb(68, 51, 125)", "height": 57.0, "perc": 15.4}, {"color": "rgb(58, 80, 138)", "height": 43.0, "perc": 11.5}, {"color": "rgb(46, 107, 141)", "height": 14.0, "perc": 3.8}, {"color": "rgb(36, 131, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(33, 155, 136)", "height": 14.0, "perc": 3.8}, {"color": "rgb(51, 178, 121)", "height": 57.0, "perc": 15.4}, {"color": "rgb(94, 199, 96)", "height": 57.0, "perc": 15.4}, {"color": "rgb(155, 215, 59)", "height": 100.0, "perc": 26.9}, {"color": "rgb(220, 226, 37)", "height": 14.0, "perc": 3.8}]], "node_id": "cube25_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.5146018573404466]], "id": "", "name": "cube26_cluster0", "size": 3, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 15}, "custom_tooltips": [76, 80, 212, 301, 355, 829, 919, 969, 982, 1040, 1168, 1188, 1603, 1633, 1667], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 67.0, "perc": 13.3}, {"color": "rgb(68, 51, 125)", "height": 67.0, "perc": 13.3}, {"color": "rgb(58, 80, 138)", "height": 33.0, "perc": 6.7}, {"color": "rgb(46, 107, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(36, 131, 141)", "height": 33.0, "perc": 6.7}, {"color": "rgb(33, 155, 136)", "height": 100.0, "perc": 20.0}, {"color": "rgb(51, 178, 121)", "height": 67.0, "perc": 13.3}, {"color": "rgb(94, 199, 96)", "height": 33.0, "perc": 6.7}, {"color": "rgb(155, 215, 59)", "height": 0.0, "perc": 0.0}, {"color": "rgb(220, 226, 37)", "height": 100.0, "perc": 20.0}]], "node_id": "cube26_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.558045688751083]], "id": "", "name": "cube26_cluster1", "size": 4, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 26}, "custom_tooltips": [44, 173, 244, 249, 322, 338, 376, 399, 523, 938, 1014, 1017, 1024, 1029, 1219, 1237, 1293, 1333, 1353, 1392, 1399, 1411, 1495, 1506, 1511, 1638], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 14.0, "perc": 3.8}, {"color": "rgb(68, 51, 125)", "height": 57.0, "perc": 15.4}, {"color": "rgb(58, 80, 138)", "height": 43.0, "perc": 11.5}, {"color": "rgb(46, 107, 141)", "height": 14.0, "perc": 3.8}, {"color": "rgb(36, 131, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(33, 155, 136)", "height": 14.0, "perc": 3.8}, {"color": "rgb(51, 178, 121)", "height": 57.0, "perc": 15.4}, {"color": "rgb(94, 199, 96)", "height": 57.0, "perc": 15.4}, {"color": "rgb(155, 215, 59)", "height": 100.0, "perc": 26.9}, {"color": "rgb(220, 226, 37)", "height": 14.0, "perc": 3.8}]], "node_id": "cube26_cluster1", "projection_stats": []}, "type": "circle"}, {"color": [[0.39608772969768824]], "id": "", "name": "cube26_cluster2", "size": 3, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 15}, "custom_tooltips": [85, 210, 284, 317, 386, 513, 521, 554, 639, 710, 897, 959, 1115, 1275, 1558], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 25.0, "perc": 6.7}, {"color": "rgb(68, 51, 125)", "height": 75.0, "perc": 20.0}, {"color": "rgb(58, 80, 138)", "height": 25.0, "perc": 6.7}, {"color": "rgb(46, 107, 141)", "height": 100.0, "perc": 26.7}, {"color": "rgb(36, 131, 141)", "height": 25.0, "perc": 6.7}, {"color": "rgb(33, 155, 136)", "height": 50.0, "perc": 13.3}, {"color": "rgb(51, 178, 121)", "height": 25.0, "perc": 6.7}, {"color": "rgb(94, 199, 96)", "height": 25.0, "perc": 6.7}, {"color": "rgb(155, 215, 59)", "height": 0.0, "perc": 0.0}, {"color": "rgb(220, 226, 37)", "height": 25.0, "perc": 6.7}]], "node_id": "cube26_cluster2", "projection_stats": []}, "type": "circle"}, {"color": [[0.6090693538826318]], "id": "", "name": "cube26_cluster3", "size": 2, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 6}, "custom_tooltips": [328, 616, 978, 1050, 1552, 1641], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 0.0, "perc": 0.0}, {"color": "rgb(68, 51, 125)", "height": 50.0, "perc": 16.7}, {"color": "rgb(58, 80, 138)", "height": 0.0, "perc": 0.0}, {"color": "rgb(46, 107, 141)", "height": 50.0, "perc": 16.7}, {"color": "rgb(36, 131, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(33, 155, 136)", "height": 50.0, "perc": 16.7}, {"color": "rgb(51, 178, 121)", "height": 50.0, "perc": 16.7}, {"color": "rgb(94, 199, 96)", "height": 0.0, "perc": 0.0}, {"color": "rgb(155, 215, 59)", "height": 0.0, "perc": 0.0}, {"color": "rgb(220, 226, 37)", "height": 100.0, "perc": 33.3}]], "node_id": "cube26_cluster3", "projection_stats": []}, "type": "circle"}, {"color": [[0.6787196206283342]], "id": "", "name": "cube26_cluster4", "size": 1, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 1}, "custom_tooltips": [1145], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 0.0, "perc": 0.0}, {"color": "rgb(68, 51, 125)", "height": 0.0, "perc": 0.0}, {"color": "rgb(58, 80, 138)", "height": 0.0, "perc": 0.0}, {"color": "rgb(46, 107, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(36, 131, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(33, 155, 136)", "height": 0.0, "perc": 0.0}, {"color": "rgb(51, 178, 121)", "height": 100.0, "perc": 100.0}, {"color": "rgb(94, 199, 96)", "height": 0.0, "perc": 0.0}, {"color": "rgb(155, 215, 59)", "height": 0.0, "perc": 0.0}, {"color": "rgb(220, 226, 37)", "height": 0.0, "perc": 0.0}]], "node_id": "cube26_cluster4", "projection_stats": []}, "type": "circle"}, {"color": [[0.455720213396562]], "id": "", "name": "cube27_cluster0", "size": 4, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 30}, "custom_tooltips": [10, 16, 24, 35, 87, 134, 230, 269, 272, 475, 510, 511, 514, 583, 607, 725, 830, 932, 992, 1032, 1034, 1140, 1221, 1436, 1501, 1532, 1581, 1588, 1598, 1645], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 100.0, "perc": 20.0}, {"color": "rgb(68, 51, 125)", "height": 50.0, "perc": 10.0}, {"color": "rgb(58, 80, 138)", "height": 17.0, "perc": 3.3}, {"color": "rgb(46, 107, 141)", "height": 83.0, "perc": 16.7}, {"color": "rgb(36, 131, 141)", "height": 33.0, "perc": 6.7}, {"color": "rgb(33, 155, 136)", "height": 33.0, "perc": 6.7}, {"color": "rgb(51, 178, 121)", "height": 50.0, "perc": 10.0}, {"color": "rgb(94, 199, 96)", "height": 17.0, "perc": 3.3}, {"color": "rgb(155, 215, 59)", "height": 33.0, "perc": 6.7}, {"color": "rgb(220, 226, 37)", "height": 83.0, "perc": 16.7}]], "node_id": "cube27_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.2608180201541197]], "id": "", "name": "cube27_cluster1", "size": 1, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 1}, "custom_tooltips": [440], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 0.0, "perc": 0.0}, {"color": "rgb(68, 51, 125)", "height": 0.0, "perc": 0.0}, {"color": "rgb(58, 80, 138)", "height": 100.0, "perc": 100.0}, {"color": "rgb(46, 107, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(36, 131, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(33, 155, 136)", "height": 0.0, "perc": 0.0}, {"color": "rgb(51, 178, 121)", "height": 0.0, "perc": 0.0}, {"color": "rgb(94, 199, 96)", "height": 0.0, "perc": 0.0}, {"color": "rgb(155, 215, 59)", "height": 0.0, "perc": 0.0}, {"color": "rgb(220, 226, 37)", "height": 0.0, "perc": 0.0}]], "node_id": "cube27_cluster1", "projection_stats": []}, "type": "circle"}, {"color": [[0.44787873655686344]], "id": "", "name": "cube27_cluster2", "size": 4, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 28}, "custom_tooltips": [59, 157, 214, 274, 290, 326, 455, 539, 545, 550, 619, 640, 701, 712, 717, 718, 785, 910, 923, 931, 946, 1068, 1245, 1267, 1282, 1336, 1387, 1560], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 40.0, "perc": 7.1}, {"color": "rgb(68, 51, 125)", "height": 80.0, "perc": 14.3}, {"color": "rgb(58, 80, 138)", "height": 20.0, "perc": 3.6}, {"color": "rgb(46, 107, 141)", "height": 100.0, "perc": 17.9}, {"color": "rgb(36, 131, 141)", "height": 100.0, "perc": 17.9}, {"color": "rgb(33, 155, 136)", "height": 80.0, "perc": 14.3}, {"color": "rgb(51, 178, 121)", "height": 20.0, "perc": 3.6}, {"color": "rgb(94, 199, 96)", "height": 80.0, "perc": 14.3}, {"color": "rgb(155, 215, 59)", "height": 20.0, "perc": 3.6}, {"color": "rgb(220, 226, 37)", "height": 20.0, "perc": 3.6}]], "node_id": "cube27_cluster2", "projection_stats": []}, "type": "circle"}, {"color": [[0.49792531120331945]], "id": "", "name": "cube27_cluster3", "size": 2, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 4}, "custom_tooltips": [248, 699, 799, 1614], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 0.0, "perc": 0.0}, {"color": "rgb(68, 51, 125)", "height": 50.0, "perc": 25.0}, {"color": "rgb(58, 80, 138)", "height": 0.0, "perc": 0.0}, {"color": "rgb(46, 107, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(36, 131, 141)", "height": 100.0, "perc": 50.0}, {"color": "rgb(33, 155, 136)", "height": 0.0, "perc": 0.0}, {"color": "rgb(51, 178, 121)", "height": 0.0, "perc": 0.0}, {"color": "rgb(94, 199, 96)", "height": 0.0, "perc": 0.0}, {"color": "rgb(155, 215, 59)", "height": 0.0, "perc": 0.0}, {"color": "rgb(220, 226, 37)", "height": 50.0, "perc": 25.0}]], "node_id": "cube27_cluster3", "projection_stats": []}, "type": "circle"}, {"color": [[0.48072156059707927]], "id": "", "name": "cube27_cluster4", "size": 4, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 44}, "custom_tooltips": [37, 67, 88, 111, 154, 188, 195, 217, 235, 237, 254, 300, 342, 431, 490, 589, 643, 707, 719, 734, 905, 918, 934, 950, 962, 1033, 1045, 1046, 1079, 1097, 1126, 1145, 1149, 1238, 1244, 1321, 1344, 1359, 1412, 1471, 1474, 1509, 1587, 1597], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 63.0, "perc": 11.4}, {"color": "rgb(68, 51, 125)", "height": 88.0, "perc": 15.9}, {"color": "rgb(58, 80, 138)", "height": 38.0, "perc": 6.8}, {"color": "rgb(46, 107, 141)", "height": 25.0, "perc": 4.5}, {"color": "rgb(36, 131, 141)", "height": 38.0, "perc": 6.8}, {"color": "rgb(33, 155, 136)", "height": 63.0, "perc": 11.4}, {"color": "rgb(51, 178, 121)", "height": 100.0, "perc": 18.2}, {"color": "rgb(94, 199, 96)", "height": 50.0, "perc": 9.1}, {"color": "rgb(155, 215, 59)", "height": 63.0, "perc": 11.4}, {"color": "rgb(220, 226, 37)", "height": 25.0, "perc": 4.5}]], "node_id": "cube27_cluster4", "projection_stats": []}, "type": "circle"}, {"color": [[0.5158096859341671]], "id": "", "name": "cube28_cluster0", "size": 5, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 117}, "custom_tooltips": [10, 16, 24, 35, 82, 134, 135, 143, 154, 161, 165, 215, 230, 231, 235, 257, 269, 272, 300, 305, 370, 431, 453, 456, 471, 475, 490, 510, 511, 512, 515, 525, 534, 540, 544, 552, 583, 584, 586, 607, 617, 630, 634, 690, 697, 698, 702, 713, 725, 734, 767, 769, 786, 822, 830, 849, 850, 857, 865, 872, 911, 916, 927, 932, 935, 947, 951, 962, 992, 1008, 1032, 1034, 1041, 1046, 1096, 1097, 1133, 1134, 1140, 1148, 1149, 1163, 1169, 1193, 1212, 1221, 1235, 1320, 1321, 1328, 1337, 1346, 1347, 1367, 1377, 1436, 1443, 1448, 1456, 1457, 1472, 1474, 1477, 1482, 1483, 1501, 1509, 1532, 1559, 1581, 1582, 1588, 1598, 1609, 1632, 1645, 1650], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 69.0, "perc": 9.4}, {"color": "rgb(68, 51, 125)", "height": 56.0, "perc": 7.7}, {"color": "rgb(58, 80, 138)", "height": 44.0, "perc": 6.0}, {"color": "rgb(46, 107, 141)", "height": 100.0, "perc": 13.7}, {"color": "rgb(36, 131, 141)", "height": 75.0, "perc": 10.3}, {"color": "rgb(33, 155, 136)", "height": 94.0, "perc": 12.8}, {"color": "rgb(51, 178, 121)", "height": 81.0, "perc": 11.1}, {"color": "rgb(94, 199, 96)", "height": 63.0, "perc": 8.5}, {"color": "rgb(155, 215, 59)", "height": 88.0, "perc": 12.0}, {"color": "rgb(220, 226, 37)", "height": 63.0, "perc": 8.5}]], "node_id": "cube28_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.001778304682868998]], "id": "", "name": "cube28_cluster1", "size": 1, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 1}, "custom_tooltips": [3], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 100.0, "perc": 100.0}, {"color": "rgb(68, 51, 125)", "height": 0.0, "perc": 0.0}, {"color": "rgb(58, 80, 138)", "height": 0.0, "perc": 0.0}, {"color": "rgb(46, 107, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(36, 131, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(33, 155, 136)", "height": 0.0, "perc": 0.0}, {"color": "rgb(51, 178, 121)", "height": 0.0, "perc": 0.0}, {"color": "rgb(94, 199, 96)", "height": 0.0, "perc": 0.0}, {"color": "rgb(155, 215, 59)", "height": 0.0, "perc": 0.0}, {"color": "rgb(220, 226, 37)", "height": 0.0, "perc": 0.0}]], "node_id": "cube28_cluster1", "projection_stats": []}, "type": "circle"}, {"color": [[0.6407824540604623]], "id": "", "name": "cube28_cluster2", "size": 1, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 1}, "custom_tooltips": [1081], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 0.0, "perc": 0.0}, {"color": "rgb(68, 51, 125)", "height": 0.0, "perc": 0.0}, {"color": "rgb(58, 80, 138)", "height": 0.0, "perc": 0.0}, {"color": "rgb(46, 107, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(36, 131, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(33, 155, 136)", "height": 0.0, "perc": 0.0}, {"color": "rgb(51, 178, 121)", "height": 100.0, "perc": 100.0}, {"color": "rgb(94, 199, 96)", "height": 0.0, "perc": 0.0}, {"color": "rgb(155, 215, 59)", "height": 0.0, "perc": 0.0}, {"color": "rgb(220, 226, 37)", "height": 0.0, "perc": 0.0}]], "node_id": "cube28_cluster2", "projection_stats": []}, "type": "circle"}, {"color": [[0.46374234341039317]], "id": "", "name": "cube28_cluster3", "size": 2, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 3}, "custom_tooltips": [177, 844, 1326], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 0.0, "perc": 0.0}, {"color": "rgb(68, 51, 125)", "height": 100.0, "perc": 33.3}, {"color": "rgb(58, 80, 138)", "height": 0.0, "perc": 0.0}, {"color": "rgb(46, 107, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(36, 131, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(33, 155, 136)", "height": 100.0, "perc": 33.3}, {"color": "rgb(51, 178, 121)", "height": 0.0, "perc": 0.0}, {"color": "rgb(94, 199, 96)", "height": 100.0, "perc": 33.3}, {"color": "rgb(155, 215, 59)", "height": 0.0, "perc": 0.0}, {"color": "rgb(220, 226, 37)", "height": 0.0, "perc": 0.0}]], "node_id": "cube28_cluster3", "projection_stats": []}, "type": "circle"}, {"color": [[0.4615688599091088]], "id": "", "name": "cube28_cluster4", "size": 3, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 9}, "custom_tooltips": [102, 204, 675, 700, 917, 929, 1131, 1147, 1203], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 50.0, "perc": 11.1}, {"color": "rgb(68, 51, 125)", "height": 50.0, "perc": 11.1}, {"color": "rgb(58, 80, 138)", "height": 0.0, "perc": 0.0}, {"color": "rgb(46, 107, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(36, 131, 141)", "height": 100.0, "perc": 22.2}, {"color": "rgb(33, 155, 136)", "height": 100.0, "perc": 22.2}, {"color": "rgb(51, 178, 121)", "height": 100.0, "perc": 22.2}, {"color": "rgb(94, 199, 96)", "height": 50.0, "perc": 11.1}, {"color": "rgb(155, 215, 59)", "height": 0.0, "perc": 0.0}, {"color": "rgb(220, 226, 37)", "height": 0.0, "perc": 0.0}]], "node_id": "cube28_cluster4", "projection_stats": []}, "type": "circle"}, {"color": [[0.4855926527532928]], "id": "", "name": "cube29_cluster0", "size": 5, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 77}, "custom_tooltips": [14, 63, 94, 112, 145, 193, 205, 238, 241, 267, 291, 321, 391, 410, 446, 451, 472, 480, 498, 503, 519, 531, 551, 558, 563, 580, 588, 604, 653, 660, 661, 666, 668, 672, 686, 711, 715, 716, 721, 722, 750, 801, 832, 845, 855, 866, 890, 937, 952, 965, 981, 1005, 1012, 1019, 1042, 1048, 1077, 1154, 1162, 1197, 1211, 1298, 1301, 1302, 1345, 1369, 1473, 1491, 1528, 1530, 1535, 1545, 1555, 1628, 1646, 1673, 1678], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 36.0, "perc": 6.5}, {"color": "rgb(68, 51, 125)", "height": 50.0, "perc": 9.1}, {"color": "rgb(58, 80, 138)", "height": 57.0, "perc": 10.4}, {"color": "rgb(46, 107, 141)", "height": 100.0, "perc": 18.2}, {"color": "rgb(36, 131, 141)", "height": 64.0, "perc": 11.7}, {"color": "rgb(33, 155, 136)", "height": 71.0, "perc": 13.0}, {"color": "rgb(51, 178, 121)", "height": 43.0, "perc": 7.8}, {"color": "rgb(94, 199, 96)", "height": 43.0, "perc": 7.8}, {"color": "rgb(155, 215, 59)", "height": 21.0, "perc": 3.9}, {"color": "rgb(220, 226, 37)", "height": 64.0, "perc": 11.7}]], "node_id": "cube29_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.47304551142725415]], "id": "", "name": "cube30_cluster0", "size": 4, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 36}, "custom_tooltips": [14, 94, 145, 238, 291, 321, 391, 410, 498, 503, 558, 563, 580, 604, 661, 672, 715, 716, 721, 722, 750, 801, 832, 855, 1005, 1042, 1154, 1162, 1197, 1301, 1345, 1491, 1528, 1530, 1646, 1673], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 43.0, "perc": 8.3}, {"color": "rgb(68, 51, 125)", "height": 43.0, "perc": 8.3}, {"color": "rgb(58, 80, 138)", "height": 57.0, "perc": 11.1}, {"color": "rgb(46, 107, 141)", "height": 86.0, "perc": 16.7}, {"color": "rgb(36, 131, 141)", "height": 100.0, "perc": 19.4}, {"color": "rgb(33, 155, 136)", "height": 29.0, "perc": 5.6}, {"color": "rgb(51, 178, 121)", "height": 43.0, "perc": 8.3}, {"color": "rgb(94, 199, 96)", "height": 43.0, "perc": 8.3}, {"color": "rgb(155, 215, 59)", "height": 14.0, "perc": 2.8}, {"color": "rgb(220, 226, 37)", "height": 57.0, "perc": 11.1}]], "node_id": "cube30_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.45463676480273985]], "id": "", "name": "cube31_cluster0", "size": 4, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 36}, "custom_tooltips": [51, 57, 105, 138, 198, 259, 270, 276, 381, 392, 416, 443, 444, 470, 473, 564, 590, 611, 664, 740, 806, 836, 881, 986, 1052, 1153, 1218, 1250, 1309, 1354, 1388, 1414, 1489, 1576, 1675, 1682], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 57.0, "perc": 11.1}, {"color": "rgb(68, 51, 125)", "height": 57.0, "perc": 11.1}, {"color": "rgb(58, 80, 138)", "height": 100.0, "perc": 19.4}, {"color": "rgb(46, 107, 141)", "height": 57.0, "perc": 11.1}, {"color": "rgb(36, 131, 141)", "height": 43.0, "perc": 8.3}, {"color": "rgb(33, 155, 136)", "height": 29.0, "perc": 5.6}, {"color": "rgb(51, 178, 121)", "height": 29.0, "perc": 5.6}, {"color": "rgb(94, 199, 96)", "height": 43.0, "perc": 8.3}, {"color": "rgb(155, 215, 59)", "height": 57.0, "perc": 11.1}, {"color": "rgb(220, 226, 37)", "height": 43.0, "perc": 8.3}]], "node_id": "cube31_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.45463676480273985]], "id": "", "name": "cube32_cluster0", "size": 4, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 36}, "custom_tooltips": [51, 57, 105, 138, 198, 259, 270, 276, 381, 392, 416, 443, 444, 470, 473, 564, 590, 611, 664, 740, 806, 836, 881, 986, 1052, 1153, 1218, 1250, 1309, 1354, 1388, 1414, 1489, 1576, 1675, 1682], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 57.0, "perc": 11.1}, {"color": "rgb(68, 51, 125)", "height": 57.0, "perc": 11.1}, {"color": "rgb(58, 80, 138)", "height": 100.0, "perc": 19.4}, {"color": "rgb(46, 107, 141)", "height": 57.0, "perc": 11.1}, {"color": "rgb(36, 131, 141)", "height": 43.0, "perc": 8.3}, {"color": "rgb(33, 155, 136)", "height": 29.0, "perc": 5.6}, {"color": "rgb(51, 178, 121)", "height": 29.0, "perc": 5.6}, {"color": "rgb(94, 199, 96)", "height": 43.0, "perc": 8.3}, {"color": "rgb(155, 215, 59)", "height": 57.0, "perc": 11.1}, {"color": "rgb(220, 226, 37)", "height": 43.0, "perc": 8.3}]], "node_id": "cube32_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.3913258249357834]], "id": "", "name": "cube32_cluster1", "size": 2, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 6}, "custom_tooltips": [13, 108, 681, 915, 1106, 1138], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 100.0, "perc": 33.3}, {"color": "rgb(68, 51, 125)", "height": 0.0, "perc": 0.0}, {"color": "rgb(58, 80, 138)", "height": 0.0, "perc": 0.0}, {"color": "rgb(46, 107, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(36, 131, 141)", "height": 50.0, "perc": 16.7}, {"color": "rgb(33, 155, 136)", "height": 50.0, "perc": 16.7}, {"color": "rgb(51, 178, 121)", "height": 100.0, "perc": 33.3}, {"color": "rgb(94, 199, 96)", "height": 0.0, "perc": 0.0}, {"color": "rgb(155, 215, 59)", "height": 0.0, "perc": 0.0}, {"color": "rgb(220, 226, 37)", "height": 0.0, "perc": 0.0}]], "node_id": "cube32_cluster1", "projection_stats": []}, "type": "circle"}, {"color": [[0.494836676754126]], "id": "", "name": "cube32_cluster2", "size": 3, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 19}, "custom_tooltips": [132, 146, 208, 218, 264, 335, 650, 728, 797, 821, 858, 901, 1088, 1092, 1240, 1478, 1618, 1630, 1657], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 50.0, "perc": 10.5}, {"color": "rgb(68, 51, 125)", "height": 100.0, "perc": 21.1}, {"color": "rgb(58, 80, 138)", "height": 0.0, "perc": 0.0}, {"color": "rgb(46, 107, 141)", "height": 25.0, "perc": 5.3}, {"color": "rgb(36, 131, 141)", "height": 75.0, "perc": 15.8}, {"color": "rgb(33, 155, 136)", "height": 50.0, "perc": 10.5}, {"color": "rgb(51, 178, 121)", "height": 50.0, "perc": 10.5}, {"color": "rgb(94, 199, 96)", "height": 25.0, "perc": 5.3}, {"color": "rgb(155, 215, 59)", "height": 25.0, "perc": 5.3}, {"color": "rgb(220, 226, 37)", "height": 75.0, "perc": 15.8}]], "node_id": "cube32_cluster2", "projection_stats": []}, "type": "circle"}, {"color": [[0.5466400819097914]], "id": "", "name": "cube32_cluster3", "size": 3, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 11}, "custom_tooltips": [136, 172, 203, 652, 835, 913, 963, 1476, 1508, 1637, 1649], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 50.0, "perc": 9.1}, {"color": "rgb(68, 51, 125)", "height": 100.0, "perc": 18.2}, {"color": "rgb(58, 80, 138)", "height": 0.0, "perc": 0.0}, {"color": "rgb(46, 107, 141)", "height": 50.0, "perc": 9.1}, {"color": "rgb(36, 131, 141)", "height": 50.0, "perc": 9.1}, {"color": "rgb(33, 155, 136)", "height": 100.0, "perc": 18.2}, {"color": "rgb(51, 178, 121)", "height": 0.0, "perc": 0.0}, {"color": "rgb(94, 199, 96)", "height": 0.0, "perc": 0.0}, {"color": "rgb(155, 215, 59)", "height": 100.0, "perc": 18.2}, {"color": "rgb(220, 226, 37)", "height": 100.0, "perc": 18.2}]], "node_id": "cube32_cluster3", "projection_stats": []}, "type": "circle"}, {"color": [[0.44264967397747473]], "id": "", "name": "cube32_cluster4", "size": 2, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 4}, "custom_tooltips": [273, 377, 1145, 1192], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 0.0, "perc": 0.0}, {"color": "rgb(68, 51, 125)", "height": 100.0, "perc": 25.0}, {"color": "rgb(58, 80, 138)", "height": 100.0, "perc": 25.0}, {"color": "rgb(46, 107, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(36, 131, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(33, 155, 136)", "height": 0.0, "perc": 0.0}, {"color": "rgb(51, 178, 121)", "height": 100.0, "perc": 25.0}, {"color": "rgb(94, 199, 96)", "height": 100.0, "perc": 25.0}, {"color": "rgb(155, 215, 59)", "height": 0.0, "perc": 0.0}, {"color": "rgb(220, 226, 37)", "height": 0.0, "perc": 0.0}]], "node_id": "cube32_cluster4", "projection_stats": []}, "type": "circle"}, {"color": [[0.39522821576763484]], "id": "", "name": "cube33_cluster0", "size": 5, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 56}, "custom_tooltips": [15, 17, 21, 28, 81, 103, 106, 110, 115, 142, 151, 160, 164, 174, 176, 232, 253, 281, 295, 360, 369, 426, 430, 454, 489, 541, 585, 621, 689, 696, 724, 727, 748, 758, 761, 803, 839, 864, 975, 1007, 1075, 1132, 1146, 1166, 1194, 1230, 1273, 1281, 1329, 1342, 1361, 1374, 1390, 1395, 1566, 1594], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 100.0, "perc": 23.2}, {"color": "rgb(68, 51, 125)", "height": 46.0, "perc": 10.7}, {"color": "rgb(58, 80, 138)", "height": 46.0, "perc": 10.7}, {"color": "rgb(46, 107, 141)", "height": 23.0, "perc": 5.4}, {"color": "rgb(36, 131, 141)", "height": 69.0, "perc": 16.1}, {"color": "rgb(33, 155, 136)", "height": 23.0, "perc": 5.4}, {"color": "rgb(51, 178, 121)", "height": 31.0, "perc": 7.1}, {"color": "rgb(94, 199, 96)", "height": 46.0, "perc": 10.7}, {"color": "rgb(155, 215, 59)", "height": 31.0, "perc": 7.1}, {"color": "rgb(220, 226, 37)", "height": 15.0, "perc": 3.6}]], "node_id": "cube33_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.49792531120331945]], "id": "", "name": "cube33_cluster1", "size": 2, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 4}, "custom_tooltips": [248, 699, 799, 1614], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 0.0, "perc": 0.0}, {"color": "rgb(68, 51, 125)", "height": 50.0, "perc": 25.0}, {"color": "rgb(58, 80, 138)", "height": 0.0, "perc": 0.0}, {"color": "rgb(46, 107, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(36, 131, 141)", "height": 100.0, "perc": 50.0}, {"color": "rgb(33, 155, 136)", "height": 0.0, "perc": 0.0}, {"color": "rgb(51, 178, 121)", "height": 0.0, "perc": 0.0}, {"color": "rgb(94, 199, 96)", "height": 0.0, "perc": 0.0}, {"color": "rgb(155, 215, 59)", "height": 0.0, "perc": 0.0}, {"color": "rgb(220, 226, 37)", "height": 50.0, "perc": 25.0}]], "node_id": "cube33_cluster1", "projection_stats": []}, "type": "circle"}, {"color": [[0.2608180201541197]], "id": "", "name": "cube33_cluster2", "size": 1, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 1}, "custom_tooltips": [440], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 0.0, "perc": 0.0}, {"color": "rgb(68, 51, 125)", "height": 0.0, "perc": 0.0}, {"color": "rgb(58, 80, 138)", "height": 100.0, "perc": 100.0}, {"color": "rgb(46, 107, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(36, 131, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(33, 155, 136)", "height": 0.0, "perc": 0.0}, {"color": "rgb(51, 178, 121)", "height": 0.0, "perc": 0.0}, {"color": "rgb(94, 199, 96)", "height": 0.0, "perc": 0.0}, {"color": "rgb(155, 215, 59)", "height": 0.0, "perc": 0.0}, {"color": "rgb(220, 226, 37)", "height": 0.0, "perc": 0.0}]], "node_id": "cube33_cluster2", "projection_stats": []}, "type": "circle"}, {"color": [[0.4284973325429757]], "id": "", "name": "cube33_cluster3", "size": 3, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 8}, "custom_tooltips": [59, 214, 274, 718, 923, 1068, 1245, 1282], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 50.0, "perc": 12.5}, {"color": "rgb(68, 51, 125)", "height": 100.0, "perc": 25.0}, {"color": "rgb(58, 80, 138)", "height": 0.0, "perc": 0.0}, {"color": "rgb(46, 107, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(36, 131, 141)", "height": 50.0, "perc": 12.5}, {"color": "rgb(33, 155, 136)", "height": 50.0, "perc": 12.5}, {"color": "rgb(51, 178, 121)", "height": 50.0, "perc": 12.5}, {"color": "rgb(94, 199, 96)", "height": 100.0, "perc": 25.0}, {"color": "rgb(155, 215, 59)", "height": 0.0, "perc": 0.0}, {"color": "rgb(220, 226, 37)", "height": 0.0, "perc": 0.0}]], "node_id": "cube33_cluster3", "projection_stats": []}, "type": "circle"}, {"color": [[0.46511135574561774]], "id": "", "name": "cube33_cluster4", "size": 4, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 28}, "custom_tooltips": [130, 157, 273, 290, 326, 377, 455, 539, 550, 553, 619, 640, 701, 712, 717, 785, 910, 931, 941, 946, 961, 1145, 1192, 1267, 1336, 1387, 1560, 1570], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 40.0, "perc": 7.1}, {"color": "rgb(68, 51, 125)", "height": 60.0, "perc": 10.7}, {"color": "rgb(58, 80, 138)", "height": 40.0, "perc": 7.1}, {"color": "rgb(46, 107, 141)", "height": 100.0, "perc": 17.9}, {"color": "rgb(36, 131, 141)", "height": 80.0, "perc": 14.3}, {"color": "rgb(33, 155, 136)", "height": 100.0, "perc": 17.9}, {"color": "rgb(51, 178, 121)", "height": 20.0, "perc": 3.6}, {"color": "rgb(94, 199, 96)", "height": 60.0, "perc": 10.7}, {"color": "rgb(155, 215, 59)", "height": 20.0, "perc": 3.6}, {"color": "rgb(220, 226, 37)", "height": 40.0, "perc": 7.1}]], "node_id": "cube33_cluster4", "projection_stats": []}, "type": "circle"}, {"color": [[0.6407824540604623]], "id": "", "name": "cube34_cluster0", "size": 1, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 1}, "custom_tooltips": [1081], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 0.0, "perc": 0.0}, {"color": "rgb(68, 51, 125)", "height": 0.0, "perc": 0.0}, {"color": "rgb(58, 80, 138)", "height": 0.0, "perc": 0.0}, {"color": "rgb(46, 107, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(36, 131, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(33, 155, 136)", "height": 0.0, "perc": 0.0}, {"color": "rgb(51, 178, 121)", "height": 100.0, "perc": 100.0}, {"color": "rgb(94, 199, 96)", "height": 0.0, "perc": 0.0}, {"color": "rgb(155, 215, 59)", "height": 0.0, "perc": 0.0}, {"color": "rgb(220, 226, 37)", "height": 0.0, "perc": 0.0}]], "node_id": "cube34_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.41392158523160294]], "id": "", "name": "cube34_cluster1", "size": 3, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 7}, "custom_tooltips": [102, 204, 675, 700, 929, 1131, 1147], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 50.0, "perc": 14.3}, {"color": "rgb(68, 51, 125)", "height": 50.0, "perc": 14.3}, {"color": "rgb(58, 80, 138)", "height": 0.0, "perc": 0.0}, {"color": "rgb(46, 107, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(36, 131, 141)", "height": 100.0, "perc": 28.6}, {"color": "rgb(33, 155, 136)", "height": 50.0, "perc": 14.3}, {"color": "rgb(51, 178, 121)", "height": 100.0, "perc": 28.6}, {"color": "rgb(94, 199, 96)", "height": 0.0, "perc": 0.0}, {"color": "rgb(155, 215, 59)", "height": 0.0, "perc": 0.0}, {"color": "rgb(220, 226, 37)", "height": 0.0, "perc": 0.0}]], "node_id": "cube34_cluster1", "projection_stats": []}, "type": "circle"}, {"color": [[0.001778304682868998]], "id": "", "name": "cube34_cluster2", "size": 1, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 1}, "custom_tooltips": [3], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 100.0, "perc": 100.0}, {"color": "rgb(68, 51, 125)", "height": 0.0, "perc": 0.0}, {"color": "rgb(58, 80, 138)", "height": 0.0, "perc": 0.0}, {"color": "rgb(46, 107, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(36, 131, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(33, 155, 136)", "height": 0.0, "perc": 0.0}, {"color": "rgb(51, 178, 121)", "height": 0.0, "perc": 0.0}, {"color": "rgb(94, 199, 96)", "height": 0.0, "perc": 0.0}, {"color": "rgb(155, 215, 59)", "height": 0.0, "perc": 0.0}, {"color": "rgb(220, 226, 37)", "height": 0.0, "perc": 0.0}]], "node_id": "cube34_cluster2", "projection_stats": []}, "type": "circle"}, {"color": [[0.3026081802015412]], "id": "", "name": "cube34_cluster3", "size": 2, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 2}, "custom_tooltips": [177, 844], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 0.0, "perc": 0.0}, {"color": "rgb(68, 51, 125)", "height": 100.0, "perc": 50.0}, {"color": "rgb(58, 80, 138)", "height": 0.0, "perc": 0.0}, {"color": "rgb(46, 107, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(36, 131, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(33, 155, 136)", "height": 100.0, "perc": 50.0}, {"color": "rgb(51, 178, 121)", "height": 0.0, "perc": 0.0}, {"color": "rgb(94, 199, 96)", "height": 0.0, "perc": 0.0}, {"color": "rgb(155, 215, 59)", "height": 0.0, "perc": 0.0}, {"color": "rgb(220, 226, 37)", "height": 0.0, "perc": 0.0}]], "node_id": "cube34_cluster3", "projection_stats": []}, "type": "circle"}, {"color": [[0.7860106698280972]], "id": "", "name": "cube34_cluster4", "size": 1, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 1}, "custom_tooltips": [1326], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 0.0, "perc": 0.0}, {"color": "rgb(68, 51, 125)", "height": 0.0, "perc": 0.0}, {"color": "rgb(58, 80, 138)", "height": 0.0, "perc": 0.0}, {"color": "rgb(46, 107, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(36, 131, 141)", "height": 0.0, "perc": 0.0}, {"color": "rgb(33, 155, 136)", "height": 0.0, "perc": 0.0}, {"color": "rgb(51, 178, 121)", "height": 0.0, "perc": 0.0}, {"color": "rgb(94, 199, 96)", "height": 100.0, "perc": 100.0}, {"color": "rgb(155, 215, 59)", "height": 0.0, "perc": 0.0}, {"color": "rgb(220, 226, 37)", "height": 0.0, "perc": 0.0}]], "node_id": "cube34_cluster4", "projection_stats": []}, "type": "circle"}, {"color": [[0.4338607450640646]], "id": "", "name": "cube35_cluster0", "size": 4, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 26}, "custom_tooltips": [21, 81, 106, 110, 115, 142, 176, 232, 281, 360, 426, 541, 585, 758, 803, 1075, 1132, 1146, 1194, 1273, 1281, 1329, 1342, 1361, 1566, 1594], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 100.0, "perc": 23.1}, {"color": "rgb(68, 51, 125)", "height": 50.0, "perc": 11.5}, {"color": "rgb(58, 80, 138)", "height": 33.0, "perc": 7.7}, {"color": "rgb(46, 107, 141)", "height": 33.0, "perc": 7.7}, {"color": "rgb(36, 131, 141)", "height": 33.0, "perc": 7.7}, {"color": "rgb(33, 155, 136)", "height": 0.0, "perc": 0.0}, {"color": "rgb(51, 178, 121)", "height": 50.0, "perc": 11.5}, {"color": "rgb(94, 199, 96)", "height": 83.0, "perc": 19.2}, {"color": "rgb(155, 215, 59)", "height": 17.0, "perc": 3.8}, {"color": "rgb(220, 226, 37)", "height": 33.0, "perc": 7.7}]], "node_id": "cube35_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.5147308104285611]], "id": "", "name": "cube36_cluster0", "size": 5, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 57}, "custom_tooltips": [6, 66, 126, 155, 183, 224, 256, 299, 307, 352, 372, 407, 528, 598, 628, 637, 641, 645, 671, 673, 680, 687, 703, 714, 795, 817, 823, 851, 871, 873, 876, 971, 991, 1001, 1020, 1023, 1036, 1039, 1054, 1111, 1135, 1175, 1183, 1233, 1260, 1348, 1376, 1416, 1434, 1460, 1463, 1503, 1523, 1542, 1556, 1572, 1607], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 50.0, "perc": 7.0}, {"color": "rgb(68, 51, 125)", "height": 63.0, "perc": 8.8}, {"color": "rgb(58, 80, 138)", "height": 38.0, "perc": 5.3}, {"color": "rgb(46, 107, 141)", "height": 100.0, "perc": 14.0}, {"color": "rgb(36, 131, 141)", "height": 88.0, "perc": 12.3}, {"color": "rgb(33, 155, 136)", "height": 88.0, "perc": 12.3}, {"color": "rgb(51, 178, 121)", "height": 100.0, "perc": 14.0}, {"color": "rgb(94, 199, 96)", "height": 50.0, "perc": 7.0}, {"color": "rgb(155, 215, 59)", "height": 75.0, "perc": 10.5}, {"color": "rgb(220, 226, 37)", "height": 63.0, "perc": 8.8}]], "node_id": "cube36_cluster0", "projection_stats": []}, "type": "circle"}, {"color": [[0.5931831653823355]], "id": "", "name": "cube37_cluster0", "size": 4, "tooltip": {"cluster_stats": {"above": [], "below": [], "size": 20}, "custom_tooltips": [126, 307, 372, 628, 641, 680, 714, 795, 873, 876, 1135, 1183, 1260, 1376, 1434, 1460, 1503, 1523, 1556, 1572], "dist_label": "Member", "histogram": [[{"color": "rgb(70, 18, 100)", "height": 25.0, "perc": 5.0}, {"color": "rgb(68, 51, 125)", "height": 25.0, "perc": 5.0}, {"color": "rgb(58, 80, 138)", "height": 25.0, "perc": 5.0}, {"color": "rgb(46, 107, 141)", "height": 50.0, "perc": 10.0}, {"color": "rgb(36, 131, 141)", "height": 75.0, "perc": 15.0}, {"color": "rgb(33, 155, 136)", "height": 50.0, "perc": 10.0}, {"color": "rgb(51, 178, 121)", "height": 25.0, "perc": 5.0}, {"color": "rgb(94, 199, 96)", "height": 50.0, "perc": 10.0}, {"color": "rgb(155, 215, 59)", "height": 100.0, "perc": 20.0}, {"color": "rgb(220, 226, 37)", "height": 75.0, "perc": 15.0}]], "node_id": "cube37_cluster0", "projection_stats": []}, "type": "circle"}]};
+    const colorscale = [[0.0, "rgb(68, 1, 84)"], [0.1, "rgb(72, 35, 116)"], [0.2, "rgb(64, 67, 135)"], [0.3, "rgb(52, 94, 141)"], [0.4, "rgb(41, 120, 142)"], [0.5, "rgb(32, 144, 140)"], [0.6, "rgb(34, 167, 132)"], [0.7, "rgb(68, 190, 112)"], [0.8, "rgb(121, 209, 81)"], [0.9, "rgb(189, 222, 38)"], [1.0, "rgb(253, 231, 36)"]];
+    const summary = {"color_function_name": ["Row number"], "custom_meta": {"clusterer": "KMeans(n_clusters=5, random_state=1618033)", "n_cubes": 10, "perc_overlap": 0.2, "projection": "TSNE()", "scaler": "MinMaxScaler()"}, "n_edges": 53, "n_nodes": 70, "n_total": 2739, "n_unique": 1688, "node_color_function": ["mean"]};
+    const summary_histogram = [[[{"color": "rgb(70, 18, 100)", "height": 7.0, "perc": 2.9}, {"color": "rgb(68, 51, 125)", "height": 0.0, "perc": 0.0}, {"color": "rgb(58, 80, 138)", "height": 10.0, "perc": 4.3}, {"color": "rgb(46, 107, 141)", "height": 17.0, "perc": 7.1}, {"color": "rgb(36, 131, 141)", "height": 80.0, "perc": 34.3}, {"color": "rgb(33, 155, 136)", "height": 100.0, "perc": 42.9}, {"color": "rgb(51, 178, 121)", "height": 17.0, "perc": 7.1}, {"color": "rgb(94, 199, 96)", "height": 3.0, "perc": 1.4}, {"color": "rgb(155, 215, 59)", "height": 0.0, "perc": 0.0}, {"color": "rgb(220, 226, 37)", "height": 0.0, "perc": 0.0}]]];
+  </script>
+
+  <div id="header">
+    <div class="wrap wrap-header">
+
+      <div class="">
+
+        <!-- toolbar -->
+        <div class="toolbar-container">
+        
+<div id="toolbar" class='wrap'>
+    <div id="tooltip_control" class="tool_item">
+        <h3>
+        <a href="#"><small id="tooltip_tag">[+]</small></a>
+        Cluster Details
+        </h3>
+    </div>
+
+    <div id="meta_control" class="tool_item">
+        <h3>
+        <a href="#"><small id="meta_tag">[+]</small></a>
+        Mapper Summary
+        </h3>
+    </div>
+
+    <div id="help_control" class="tool_item">
+        <h3>
+        <a href="#"><small id="helptip_tag">[+]</small></a>
+        Help
+        </h3>
+    </div>
+
+    
+
+    
+
+    
+
+</div>
+        </div>
+        <!-- /toolbar -->
+
+        <div class='banner'>
+          <noscript><b>Requires JavaScript (d3.js) for visualizations</b></noscript>
+          <h1> make_circles(n_samples=5000, noise=0.03, factor=0.3) </h1>
+        </div>
+
+      </div>
+
+      <div class="wrap-logo">
+        <img id="logo" class='logo' src="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAFoAAABaCAIAAAC3ytZVAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAACK1SURBVHhevdxXrJVV0wdw9NhfsfdeUVREEJHeFJCmgCg2jEaRmCCWxAtDYrwy8cJojAZRmgUJRZpUAUFBREGQpoK99977+9t71tnss5v7oDgX+13PembNmvnPf2at58j3bdfgP5eaWvlfVn755Zd99tnnxx9//PXXX41/+umn33777Y8//vjzzz/Tgv9Q/gs4tttuu1133XXffffdaaed9t9//++++26XXXb56quvBH/44YefdtppHufNm/fzzz9vv/32DRs23GuvvSBC/9tvv/36668/+OADA2Alc9tStiEcUBDS7rvvfsQRR4jqk08+kXmBpddZmpx55pmDBw9GjfHjxy9fvjy9qJUdd9zxkEMOadSoEXT23HPP995777XXXoNmer0NZJvAAQJpF8wPP/zw0UcfQeGvv/5K7/KkSZMm559/ft++fT/88ENVc+GFF4IsvSsS4B555JGNGzf+/fff8eX111/fFnypSf/7L8lxxx3XrFkzQLz55pucVhESm97VlYj/oIMOQhA1EtE+88wzok0aRYJiUGAZ6U499VR19+WXX1bQ3wr5d+AIVnPxs88+W7t27aefflrZS8F37dq1RYsWxsccc4zwVq9efckllwjvhRdeCJ0K8vnnnwMFOqeccspJJ52EU+VAr6/8UzjUvwwfeuihKmLjxo1VFrYyufjii7VSiOgse++9t5o6+OCDW7ZsuW7dOqEmvYoCAgTUUIBywAEHYKLzKL3bWvlHcOyxxx6KmR/vvvtu9R1OUxw0aNBRRx31xRdfNG3a1CmLU8j16quvnnzyyQwiSIUmUiDOY60HXyDr/MKv9GKrZOvh0CZw/p133qlXq99hhx0GDBjQpk0bXda5e+KJJ/rVaHfeeWe8gAWioZtzF3fSmioEKMrz9NNPZ/+bb77ZappsDRy77bYbtr/99ttSUd+NNU6nCVpppSBQKfoo2us+fqWX8eOPP94dBEeqaZOWwHTIkCFDhw4Fh8djjz0W3fJP9Oql3nDYT9k3b968X79+jjpSPTtUuFUap3uXsu/QoYPJ/fbbT99xNqOJruGEBpC7mX68Zs2aWFgsoETPc84559Zbb73lllt69+6tBpUMI7fddhtrMNWPknbVsn363+oE8LZR88gpFfPnz3/66aefeOKJyy67zLECqaRXSjRd8btTiQQcMo/YoFH5IhG8yyiMQllzHTZsWI8ePeIxJxYedthhAwcOHDly5LRp08aOHXvuueceeOCB2PTcc885pOgoPTYZ7NixI2RjYZVSD3bAgvVXXnnFb69evdavXw8CLRBAcg6Rnj174q043TJJWlYrXbp0USlqRKiaDnSEARog4pdLBHoDyLzcUvCW5vvvv689xUHubL7mmmtuv/129HQGWUKZJlFZgJYkjWPy5MkQYY1ZaqCpvqKrhUOzwENYGHOuW7duDvzp06fbTwwcEpi8tW7d+qKLLoKLahIM4OSTZw5R83qktSbfeuutuEopEz1V++S0+L1y0XIfY1BIEuDcYdlFXkVcfvnl7du3N8OT8Couu9a6gxiwb/mMGTMifsY//vjjPn36ALTKi0lVcGh4wtiwYUM8yuell176/fff88zpCBfexysCHYEppfPOO69///6dOnVq27atNDo1vMIaMLksXHnllWoblVhGbBBs2rTp6KOP9ovzmYxnxQw43NCCSuybjI1CMMJdFrjsKxnLlXDuVGIfFnJmi2oQ+Xs4xAyOl156KT1nTxZlKULba6W2kV6JigBCqPmlieQaZLwVs5CQRckIgGXIAshB88YbbyCgLzRmKesmYcEjfnlri5jJeFArHp999lnUsxEj8FUsDmmMSxrZ2xos0NblKNhUQf6m0+A/xhZfnFGDE5ym4C1OFjiak82bNzv23K94zFcz3JJS1zDntEnuahaaDk1cQHhNMd9vmn6dGvGYL25r8IVXw4YN2eGPcwrd0utagbiPAIik5/JSCQ47oeiLL76YnmsF58VjECHJ+bhx4/ITEiIk8atkjMUFBwdegAaTlY+EI46jxOlLGaXjniowxnPgxkAnUgJyEJOEca1h6dKlbujmuWovPQXvuJeU8sTVOaomPZeRsnDw44wzztAaIvJ80fBsaXs3MX7gs66urabXebJ48WL9X2MTPDWVBQsN3yq0shzcggETDip7NPH2hBNOwKBkIiuccXixFqyJ31WrVrVr144bOGULsOIFQIvZEaJhQZByei4lZeHgn/5fnHMCDk6IRGwS4lcXAH8Bj5YtW8ZjkXgbKCCIeSgbqGflZhWG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">
+      </div>
+    </div>
+
+  </div>
+
+    <div id="canvas" class='canvas'>
+      <!-- Graph will go in here -->
+      <svg id='svg'>
+        <defs>
+          <filter id="drop-shadow-glow" filterUnits="userSpaceOnUse" width="250%" height="250%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur-out"/>
+            <feColorMatrix in="blur-out" type="hueRotate" values="0" result="color-out"/>
+            <feOffset in="color-out" dx="0" dy="0" result="the-shadow"/>
+            <feComponentTransfer type="linear" slope="0.2" result="shadow-opacity"/>
+            <feBlend in="SourceGraphic" in2="the-shadow" mode="normal"/>
+          </filter>
+          <filter id="drop-shadow-pulse" filterUnits="userSpaceOnUse" width="250%" height="250%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur-out">
+              <animate attributeName="stdDeviation" from="0" to="100" dur="1.5s" repeatCount="indefinite" />
+            </feGaussianBlur>
+            <feColorMatrix in="blur-out" type="hueRotate" values="0" result="color-out"/>
+            <feOffset in="color-out" dx="0" dy="0" result="the-shadow"/>
+            <feComponentTransfer type="linear" slope="0.2" result="shadow-opacity"/>
+            <feBlend in="SourceGraphic" in2="the-shadow" mode="normal"/>
+          </filter>
+        </defs>
+      </svg>
+
+    <!-- Panes for each of the tips -->
+    <div id="tooltip" class='pane pane-left'>
+      <div id="tooltip_content" class="pane_content">
+        <div id='tooltip_content_no_focus_node'>
+          Hover over a node to see attributes about it.
+        </div>
+        <div id='tooltip_content_focus_node' style='display:none'>
+        <div>
+  <div class='actions'>
+    <h3>Actions</h3>
+    <p>
+      <button class='btn center-on-node'>Center viewport on node</button>
+    </p>
+  </div>
+
+  <div class='details'>
+    <h2>Cluster Details <span style="font-size:0.7em">(node id: <span class='node_id'></span>)</span></h2>
+
+    <!-- histogram -->
+    <div class='histogram-wrapper'>
+      <hr><br/>
+
+      <h3><span class='distribution_label'></span> Distribution</h3>
+
+      <div class="histogram"></div>
+
+      <br><br>
+    </div>
+    <!-- /histogram -->
+
+    <!-- Projection Statistics -->
+    <div class='projection_stats' style='display:none'>
+
+      <hr><br/>
+
+      <h3>Projection Statistics</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Lens</th>
+            <th style="width:50px;"><small>Mean</small></th>
+            <th style="width:50px;"><small>Max</small></th>
+            <th style="width:50px;"><small>Min</small></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- Cluster Statistics -->
+    <div class='cluster_stats'>
+        <hr><br/>
+
+        <h3>Cluster Statistics</h3>
+        <div class='above-wrapper'>
+            <h3>Above Average</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Feature</th>
+                  <th style="width:50px;"><small>Mean</small></th>
+                  <th style="width:50px;"><small>STD</small></th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+        </div>
+
+        <div class='below-wrapper'>
+            <h3>Below Average</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Feature</th>
+                  <th style="width:50px;"><small>Mean</small></th>
+                  <th style="width:50px;"><small>STD</small></th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+        </div>
+
+        <h3>Size</h3>
+        <p class='cluster-size'></p>
+    </div>
+
+    <!-- Membership information -->
+    <div class='membership-information'>
+      <hr> <br/>
+
+      <h3>Members</h3>
+      <div class='list-of-members'></div>
+
+      <br><br>
+      <hr><br>
+    </div>
+    <!-- /membership information -->
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="helptip" class='pane pane-right'>
+      <div id="helptip_content" class="pane_content">
+        <!-- Help pane.
+    TODO: Add more information here.  -->
+
+<ul>
+<li>Click on a node to lock focus on that node. The node with the current focus will pulse. Click off of a node to release the lock.</li>
+<li>Dragging a node will fix its position on the screen. Double-click a fixed-position node to unfreeze it.</li>
+</ul>
+
+<table>
+    <tr>
+        <th>Key</th>
+        <th><small>Action</small></th>
+    </tr>
+
+    <tr>
+        <td>s</td>
+        <td><small>Nodes glow :D</small></td>
+    </tr>
+
+    <tr>
+        <td>c</td>
+        <td><small>remove glow</small></td>
+    </tr>
+
+    <tr>
+        <td>p</td>
+        <td><small>Print mode - white backgrounds</small></td>
+    </tr>
+
+    <tr>
+        <td>d</td>
+        <td><small>Display mode - black backgrounds</small></td>
+    </tr>
+
+    <tr>
+        <td>z</td>
+        <td><small>Turn off gravity</small></td>
+    </tr>
+
+    <tr>
+        <td>m</td>
+        <td><small>Spacious layout</small></td>
+    </tr>
+
+    <tr>
+        <td>e</td>
+        <td><small>Tight layout</small></td>
+    </tr>
+
+    <tr>
+        <td>f</td>
+        <td><small>Freeze layout</small></td>
+    </tr>
+
+    <tr>
+        <td>x</td>
+        <td><small>Unfreeze all nodes</small></td>
+    </tr>
+
+</table>
+
+<div class="control-wrapper">
+  <div class="control-row">
+    <button class='btn' type="button" id="download-config" name="download-config">Save config</button>
+  </div>
+
+  <div class="control-row">
+    <label for="config-file-loader">Load config file</label>
+    <input type="file" id="config-file-loader" name="config-file-loader" accept="application/json">
+    <button class='btn' id='load-config' disabled>Load</button>
+  </div>
+</div>
+      </div>
+    </div>
+
+    <div id="meta" class='pane pane-right'>
+      <div id="meta_content" class="pane_content">
+        <h2>Mapper Summary</h2>
+
+<hr><br>
+
+
+    
+        <h3>projection </h3> <p> TSNE()</p>
+    
+        <h3>n_cubes </h3> <p> 10</p>
+    
+        <h3>perc_overlap </h3> <p> 0.2</p>
+    
+        <h3>clusterer </h3> <p> KMeans(n_clusters=5, random_state=1618033)</p>
+    
+        <h3>scaler </h3> <p> MinMaxScaler()</p>
+    
+
+
+<h3>Nodes</h3><p> 70 </p>
+
+<h3>Edges</h3><p> 53 </p>
+
+<h3>Total Samples</h3><p> 2739</p>
+
+<h3>Unique Samples</h3><p> 1688</p>
+
+<h3>Color function</h3><p>
+  Row number
+</p>
+
+<h3>Node Color Function</h3><p> mean</p>
+
+
+<!-- histogram -->
+<hr><br/>
+
+<h3>Node Distribution</h3>
+
+<div class="histogram"></div>
+
+<br><br>
+<!-- /histogram -->
+
+<hr><br>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/6.1.1/d3.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.2/dist/FileSaver.min.js"></script>
+
+  <script>// Height and width settings
+var page_height = window.innerHeight - 5;
+var header_height = document.getElementById('header').offsetHeight;
+var canvas_height = page_height - header_height;
+document.getElementById("canvas").style.height = canvas_height + "px";
+var width = document.getElementById("canvas").offsetWidth;
+var height = document.getElementById("canvas").offsetHeight;
+var w = width;
+var h = height;
+var padding = 40;
+
+var focus_node_id = null;
+var focus_node = null;
+var text_center = false;
+var outline = false;
+
+// Size for zooming
+var size = d3.scalePow().exponent(1)
+           .domain([1,100])
+           .range([8,24]);
+
+// Variety of variable inits
+var default_node_color = "#ccc";
+var default_node_color = "rgba(160,160,160, 0.5)";
+var default_link_color = "rgba(160,160,160, 0.5)";
+var nominal_base_node_size = 8;
+var nominal_text_size = 15;
+var max_text_size = 24;
+var nominal_stroke = 1.0;
+var max_stroke = 4.5;
+var max_base_node_size = 36;
+var min_zoom = 0.1;
+var max_zoom = 7;
+var zoom;
+var svg, g;
+var simulation;
+var link, node;
+var drag;
+var dragging = false;
+var circle;
+var text;
+var focus_via_click = false;
+var nodes = [];
+var links = [];
+
+var tocolor = "fill";
+var towhite = "stroke";
+if (outline) {
+  tocolor = "stroke";
+  towhite = "fill";
+}
+
+/**
+ * Side panes
+ */
+
+// Show/Hide Functionality
+function toggle_pane(content, content_id, tag) {
+  var active = content.active ? false : true;
+
+  if (active) {
+    content_id.style("display", "block");
+    tag.node().textContent = "[-]";
+  } else {
+    content_id.style("display", "none");
+    tag.node().textContent = "[+]";
+  }
+
+  // TODO: This is probably not the best way to find the correct height.
+  var h = canvas_height - content.offsetTop - padding;
+  content_id.style("height", h + "px")
+
+  content.active = active;
+}
+
+d3.select("#tooltip_control").on("click", function(e) {
+  toggle_pane(tooltip_content,
+              d3.select("#tooltip_content"),
+              d3.select("#tooltip_tag"))
+
+});
+
+d3.select("#meta_control").on("click", function(e) {
+  toggle_pane(meta_content,
+              d3.select("#meta_content"),
+              d3.select("#meta_tag"))
+
+});
+
+d3.select("#help_control").on("click", function(e) {
+  toggle_pane(helptip_content,
+              d3.select("#helptip_content"),
+              d3.select("#helptip_tag"))
+});
+
+d3.select('#select-color-function').on('input', function(e){
+  color_function_index = parseInt(e.target.value);
+  update_color_functions()
+})
+d3.select('#select-node-color-function').on('input', function(e){
+  node_color_function_index = parseInt(e.target.value);
+  update_color_functions()
+})
+
+/**
+ *
+ * Set up color scale
+ *
+ *
+ */
+// var colorscale defined in base.html
+var domain = colorscale.map((x)=>x[0])
+var palette = colorscale.map((x)=>x[1])
+
+var color = d3.scaleLinear()
+  .domain(domain)
+  .range(palette);
+
+/*
+* one-time setups, like SVG and force init
+*/
+function init() {
+
+  zoom = d3.zoom()
+    .scaleExtent([min_zoom, max_zoom])
+    .on('zoom', zoomed)
+
+  // We draw the graph in SVG
+  svg = d3.select("#canvas svg")
+          .attr("width", width)
+          .attr("height", height)
+          .style("cursor","move")
+          .call(zoom)
+          .on('dblclick.zoom', null); // prevent default zoom-in on dblclick
+
+  svg.on('click.focus', function(e){
+    set_focus_via_click(null);
+  });
+
+  g = svg.append("g")
+
+  link = g.selectAll(".link")
+  node = g.selectAll(".node")
+  text = g.selectAll(".text")
+
+  simulation = d3.forceSimulation()
+    .force('charge', d3.forceManyBody().strength(-1200))
+    .force('center', d3.forceCenter(width / 2, height / 2))
+    .force('link', d3.forceLink().distance(5))
+    .force('x', d3.forceX()) // not sure what this does...
+    .force('y', d3.forceY())
+    .on('tick', ticked)
+
+  drag = d3.drag()
+    .on("start", function(e, d){
+      svg.style('cursor','grabbing');
+      if (!e.active) {
+        simulation.alphaTarget(0.3).restart()
+      }
+      d.fx = d.x
+      d.fy = d.y
+      dragging = true;
+    })
+    .on('drag', function(e, d){
+      d.fx = e.x
+      d.fy = e.y
+    })
+    .on('end', function(e, d){
+      if (!e.active) {
+        simulation.alphaTarget(0)
+      }
+      dragging = false;
+    });
+
+  resize();
+  d3.select(window).on("resize", resize);
+
+  d3.select(window).on("mouseup.focus", function(e){
+    if (focus_node == null) {
+      set_cursor('move');
+    } else {
+      set_cursor('pointer');
+    }
+  });
+}
+
+function set_histogram(selection, data){
+  selection.selectAll('.bin')
+    .data(data)
+    .join(
+      enter => enter.append('div')
+        .attr('class', 'bin')
+        .call(enter => enter.append('div')
+          .text(d => d.perc + '%'))
+      ,
+      update => update
+        .call(update => update.select('div')
+          .text(d => d.perc + '%'))
+    )
+    .style('height', (d) => (d.height || 1) + 'px')
+    .style('background', (d) => d.color);
+}
+
+
+
+var color_function_index = 0;
+var node_color_function_index = 0;
+
+function reset_color_functions(){
+  color_function_index = 0;
+  node_color_function_index = 0;
+  update_color_functions()
+}
+
+function update_color_functions(){
+  // update_meta_content_histogram
+  set_histogram(d3.select('#meta_content .histogram'), summary_histogram[node_color_function_index][color_function_index])
+
+  // update node colors
+  node.style(tocolor, function(d) {
+    return color(d.color[node_color_function_index][color_function_index]);
+  })
+
+  // update focus node display, if focus_node
+  if (focus_node != null){
+    set_focus_node_histogram(focus_node)
+  }
+}
+
+function update_meta_content_histogram(){
+
+}
+
+function draw_circle_size(d) {
+  return (d3.symbol()
+    .size(function(d) {
+      if (!d.size_modifier) {
+          d.size_modifier = 1;
+      }
+      return d.size * 50 * d.size_modifier;
+    })
+    .type(d3.symbolCircle))(d)
+}
+
+function start() {
+
+  /*
+  * Force-related things
+  *
+  */
+  // shallow copy to enable restarting,
+  // because otherwise, starting the force simulation mutates the links (replaces indeces with refs)
+  nodes = graph.nodes.map(n => Object.assign({}, n));
+  links = graph.links.map(l => Object.assign({}, l));
+
+  // draw links first so that they appear behind nodes
+  link = link
+    .data(links)
+    .join("line")
+      .attr("class", "link")
+      .style("stroke-width", function(d) { return d.w * nominal_stroke; })
+      .style("stroke-width", function(d) { return d.w * nominal_stroke; });
+
+  node = node
+    .data(nodes, d => d.name)
+    .join(enter => enter.append("g")
+      .attr("class", "node")
+      .attr("id", function(d){ return "node-" + d.name })
+      // append circles...
+      .append("path")
+        .attr("d", draw_circle_size )
+        .attr("class", "circle")
+        .on("mouseover.focus", node_mouseover)
+        .on("mouseout.focus", node_mouseout)
+        .on('mousedown.focus', node_mousedown)
+        .on("dblclick.freeze", (e, d) => unfreeze_node(d) )
+        .on('click.zoom', node_click)
+        .on('center_viewport', center_on_node)
+        .call(drag));
+
+  simulation.nodes(nodes);
+  simulation.force('link').links(links);
+  simulation.alpha(1).restart()
+
+  reset_color_functions()
+}
+
+init();
+start();
+
+function restart() {
+  // nodes = []
+  // links = []
+  // node.remove()
+  // link.remove()
+  focus_via_click = false;
+  start()
+}
+
+function zoomed({transform}){
+  g.attr('transform', transform)
+}
+
+function ticked() {
+  node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+      .attr("cx", function(d) { return d.x; })
+      .attr("cy", function(d) { return d.y; })
+
+  link.attr("x1", function(d) { return d.source.x; })
+      .attr("y1", function(d) { return d.source.y; })
+      .attr("x2", function(d) { return d.target.x; })
+      .attr("y2", function(d) { return d.target.y; });
+}
+
+/*
+* Resizing window and redraws
+*/
+function resize() {
+  var width = document.getElementById("canvas").offsetWidth;
+  var height = document.getElementById("canvas").offsetHeight;
+
+  svg.attr("width", width)
+     .attr("height", height);
+
+  simulation.force('center', d3.forceCenter(width / 2, height / 2));
+  simulation.alpha(.3).restart();
+
+  w = width;
+  h = height;
+}
+
+function set_focus_via_click(d) {
+  focus_via_click = (d != null ? true : false);
+  set_focus_node(d);
+}
+
+function do_above_below_stats(wrapper, data) {
+  let column_order = ['feature', 'mean', 'std'];
+  wrapper.select('tbody')
+    .selectAll('tr')
+    .data(data, d => d)
+    .join(enter => {
+        let tr = enter.append('tr')
+        tr.append('td')
+        tr.append('td').style('font-size', 'smaller')
+        tr.append('td').style('font-size', 'smaller').attr('class', 'std')
+        return tr
+        })
+    .selectAll('td')
+    .text( (d, i) => d[column_order[i]] )
+  if (data.length > 0) {
+    wrapper.style('display', 'block')
+  } else {
+    wrapper.style('display', 'none')
+  }
+}
+
+function do_projection_stats(wrapper, data) {
+  let column_order = ['name', 'mean', 'min', 'max'];
+  wrapper.select('tbody').selectAll('tr')
+    .data(data, d => d)
+    .join(enter => {
+      let tr = enter.append('tr')
+      tr.append('td')
+      tr.append('td').style('font-size', 'smaller')
+      tr.append('td').style('font-size', 'smaller')
+      tr.append('td').style('font-size', 'smaller')
+      return tr;
+    })
+    .selectAll('td')
+    .text( (d, i) => d[column_order[i]] );
+  if (data.length > 0) {
+    wrapper.style('display', 'block')
+  } else {
+    wrapper.style('display', 'none')
+  }
+}
+
+let focus_node_tooltip_select = d3.select('#tooltip_content_focus_node');
+let tooltip_content_no_focus_node = d3.select('#tooltip_content_no_focus_node')
+let projection_stats_select = focus_node_tooltip_select.select('.projection_stats');
+let cluster_stats_select = focus_node_tooltip_select.select('.cluster_stats');
+let above_wrapper = cluster_stats_select.select('.above-wrapper');
+let below_wrapper = cluster_stats_select.select('.below-wrapper');
+let list_of_members = focus_node_tooltip_select.select('.membership-information .list-of-members');
+
+function set_focus_node(d){
+  if (d == null) {
+    focus_node = null;
+    set_cursor('move');
+    tooltip_content_no_focus_node.style('display', 'block');
+    focus_node_tooltip_select.style('display', 'none')
+    exit_highlight();
+  } else if (focus_node == null || d.name != focus_node.name) {
+    exit_highlight(focus_node);
+    focus_node = d;
+    set_highlight(focus_node);
+    set_cursor('pointer');
+
+    tooltip_content_no_focus_node.style('display', 'none');
+
+    focus_node_tooltip_select.select('button.center-on-node').node().dataset.nodeId = d.tooltip.node_id;
+    focus_node_tooltip_select.select('.node_id').text(d.tooltip.node_id)
+    focus_node_tooltip_select.select('.distribution_label').text(d.tooltip.dist_label)
+
+    // histogram
+    set_focus_node_histogram(d)
+
+    // projection statistics
+    let projection_stats = d.tooltip.projection_stats;
+    do_projection_stats(projection_stats_select, projection_stats)
+
+    // cluster statistics
+    let cluster_stats = d.tooltip.cluster_stats;
+    if (cluster_stats) {
+
+      do_above_below_stats(above_wrapper, cluster_stats.above);
+
+      do_above_below_stats(below_wrapper, cluster_stats.below);
+
+      cluster_stats_select.select('.cluster-size').text(cluster_stats.size)
+
+      cluster_stats_select.style('display', 'block')
+    } else {
+      cluster_stats_select.style('display', 'none')
+    }
+
+    // membership information
+    list_of_members.selectAll('span')
+      .data(d.tooltip.custom_tooltips, d => d)
+      .join('span')
+        .html(d => d)
+        .style('display', 'inline-block')
+        .style('padding', '0 3px')
+
+    focus_node_tooltip_select.style('display', 'block');
+
+    set_focus_node_histogram(d)
+  }
+  // else, it's already the focus node, so do nothing...
+}
+
+d3.select('#tooltip .center-on-node').on('click', function(e){
+  // d3.select('#node-' + focus_node.name + ' .circle').dispatch('center_viewport')
+  d3.select('#node-' + e.target.dataset.nodeId + ' .circle').dispatch('center_viewport')
+})
+
+function set_focus_node_histogram(d){
+  set_histogram(d3.select('#tooltip_content .histogram'), d.tooltip.histogram[color_function_index])
+}
+
+function set_highlight(node) {
+  let node_id = node.name;
+  d3.select('#node-' + node_id + ' .circle').classed('highlight', true);
+  d3.select('#node-' + node_id).classed('highlight', true);
+}
+
+function exit_highlight(node) {
+  let node_id = false;
+  if (node) {
+    node_id = node.name
+  }
+  if (!node_id) {
+     d3.selectAll('.node .circle').classed('highlight', false);
+     d3.selectAll('.node').classed('highlight', false);
+  } else {
+     d3.select('#node-' + node_id + ' .circle').classed('highlight', false);
+     d3.select('#node-' + node_id).classed('highlight', false);
+  }
+
+  do_projection_stats(projection_stats_select, [])
+  do_above_below_stats(above_wrapper, [])
+  do_above_below_stats(below_wrapper, [])
+}
+
+function set_cursor(state) {
+  if (!dragging) {
+    svg.style('cursor', state);
+  }
+}
+
+function node_is_fixed(d){
+  return d.hasOwnProperty('fx') || d.hasOwnProperty('fy')
+}
+
+function node_click(e, d) {
+  e.stopPropagation()
+  // to prevent the svg click.focus listener from unsetting the focus node...
+}
+
+function center_on_node(e, d) {
+  svg.transition().duration(250).call(zoom.translateTo, d.x, d.y);
+}
+
+function node_mouseover(e, d) {
+  d.was_fixed = d.hasOwnProperty('fx') || d.hasOwnProperty('fy')
+  if (!d.was_fixed){
+    d.fx = d.x;
+    d.fy = d.y;
+  }
+
+  if (e.buttons == 0){
+    set_cursor('pointer');
+    if (!focus_via_click) {
+      set_focus_node(d);
+    }
+  }
+}
+
+function node_mouseout(e, d) {
+  if (!d.was_fixed){
+      delete d.fx
+      delete d.fy
+  }
+  if (e.buttons == 0){
+    set_cursor('move');
+    if (!focus_via_click) {
+        set_focus_node(null);
+    }
+  }
+}
+
+function node_mousedown(e, d) {
+  e.stopPropagation();
+  if (focus_node.name != d.name) {
+      //switch click focus
+      set_focus_via_click(d);
+  } else if (!focus_via_click) {
+      //d already selected but not via click; set click true
+      focus_via_click = true;
+  }
+}
+
+
+
+function isNumber(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
+function unfreeze_node(d){
+  delete d.fy
+  delete d.fx
+  return d
+}
+
+function freeze_node(d){
+  d.fx = d.x;
+  d.fy = d.y;
+  return d
+}
+
+// search functionality
+d3.select('#searchbar')
+  .on('submit', function(event){
+      /*
+      * Searchbar functionality
+      *
+      * Permits AND, OR, and EXACT functionality
+      *
+      */
+      event.preventDefault();
+      // always running this will clear search results on a submit with an empty query
+      node.datum(d => { d.size_modifier = 1; return d });
+      node.style('filter', null)
+
+      node.datum(d => {
+        let to_lower = tooltip => String(tooltip).toLowerCase();
+        d.tooltip.custom_tooltips_lowercase = d.tooltip.custom_tooltips.map(to_lower)
+        return d
+      });
+
+      let search_query = d3.select(this).select('input').property('value').toLowerCase();
+      if (search_query) {
+          let search_mode = d3.select(this).select('input[name="search_mode"]:checked').property('value');
+
+          let node_ratio_fn = (d, i) => {
+            matches = d.tooltip.custom_tooltips_lowercase.map(map_fn)
+            let how_many = matches.filter(x=>x).length;
+
+            // Future optional feature -- size relative to ratio _within-node_
+            let out_of = d.tooltip.cluster_stats.size;
+            let ratio = how_many / out_of;
+
+            // Node sizes will be overall number of items in the node
+            // number of matching
+            d.size_modifier = how_many;
+          }
+
+          let map_fn;
+          let node_each_fn;
+          switch (search_mode) {
+            case 'and':
+              search_query = search_query.split(' ');
+              map_fn = tooltip => {
+                return search_query.every(query_word => { return tooltip.includes( query_word ) })
+              }
+              node.each(node_ratio_fn)
+              break;
+            case 'or':
+              search_query = search_query.split(' ');
+              map_fn = tooltip => {
+                return search_query.some(query_word => { return tooltip.includes( query_word ) })
+              }
+              node.each(node_ratio_fn)
+              break;
+            case 'exact':
+              node.filter((d,i) => {
+                  matches = d.tooltip.custom_tooltips_lowercase.map(tooltip => tooltip == search_query)
+                  return matches.some(e => e);
+              })
+              .style("filter", "url(#drop-shadow-glow)");
+              break;
+            default:
+              console.error(`search mode ${search_mode} unknown`);
+              return;
+          }
+
+      }
+      node.attr("d", draw_circle_size )
+
+  })
+
+// Key press events
+let searchbar = d3.select('#searchbar input');
+
+d3.select(window).on("keydown", function (event) {
+  if (event.defaultPrevented) {
+    return; // Do nothing if the event was already processed
+  }
+
+  if (searchbar.size() && searchbar.node().matches(':focus')){
+      return; // let them use the search bar.
+  }
+
+  if (!event.ctrlKey && !event.altKey && !event.metaKey) {
+    switch (event.key) {
+      case "f": // freeze all
+        node.datum(freeze_node);
+        break;
+      case "x": // unfreeze all
+        node.datum(unfreeze_node);
+        simulation.alphaTarget(.3).restart()
+        break
+      case "s":
+        // Glow
+        node.style("filter", "url(#drop-shadow-glow)");
+        break;
+      case "c":
+        // Remove glow
+        node.style("filter", null);
+        break;
+      case "p":
+        // Turn to print mode, white backgrounds
+        d3.select("body").attr('id', null).attr('id', "print")
+        break;
+      case "d":
+        // "Display" mode (dark background)
+        d3.select("body").attr('id', null).attr('id', "display")
+        break;
+      case "z":
+        // turn off gravity (??)
+        simulation
+          .force('charge', d3.forceManyBody().strength(0))
+          .alphaTarget(.3)
+          .restart()
+        break
+      case "m":
+        // spacious layout
+        simulation
+          .force('charge', d3.forceManyBody().strength(-1200))
+          .alphaTarget(.3)
+          .restart()
+        break
+      case "e":
+        // tight layout
+        simulation
+          .force('charge', d3.forceManyBody().strength(-60))
+          .alphaTarget(.3)
+          .restart()
+        break
+      default:
+        return; // Quit when this doesn't handle the key event.
+    }
+  event.preventDefault();
+  }
+  // Cancel the default action to avoid it being handled twice
+}, true);
+
+
+
+/*
+* Save and load config
+*
+*/
+
+// save config
+document.getElementById('download-config').addEventListener('click', function(e){
+  let config = {}
+  node.data().forEach(node => {
+      let config_node = {}
+
+      if ( node.hasOwnProperty('fx') && node.hasOwnProperty('fy') ) {
+        config_node['fx'] = config_node['x'] = node['fx']
+        config_node['fy'] = config_node['y'] = node['fy']
+      } else {
+        config_node['x'] = node['x']
+        config_node['y'] = node['y']
+      }
+      config[node['name']] = config_node
+    })
+
+  //JSON.stringify(config,undefined,2)
+
+  // https://stackoverflow.com/a/45594892
+  var fileName = 'kmapper-config.json';
+
+  // Create a blob of the data. Blob is native JS api
+  var fileToSave = new Blob([JSON.stringify(config)], {
+      type: 'application/json',
+      name: fileName
+  });
+
+  // function from FileSaver.js
+  saveAs(fileToSave, fileName);
+})
+
+// load config
+var config_file_loader = document.getElementById('config-file-loader');
+
+config_file_loader.addEventListener('change', function(){
+  document.getElementById('load-config').disabled = ( config_file_loader.files.length === 0 )
+})
+
+document.getElementById('load-config').addEventListener('click', function(){
+  const config_file = config_file_loader.files[0];
+  const fr = new FileReader();
+  fr.onload = function(e) {
+    var config = JSON.parse(e.target.result);
+    load_config(config);
+  }
+  fr.readAsText(config_file)
+})
+function load_config(config){
+  node = node.datum(function(d, i){
+    let load_node_config = config[d['name']]
+    d = Object.assign(d, load_node_config);
+    if ( d.hasOwnProperty('fx') && !load_node_config.hasOwnProperty('fx') ) {
+      delete d['fx']
+    }
+    if ( d.hasOwnProperty('fy') && !load_node_config.hasOwnProperty('fy') ) {
+      delete d['fy']
+    }
+    return d;
+  })
+  simulation.restart()
+}
+</script>
+</body>
+
+</html>

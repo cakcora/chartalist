@@ -45,7 +45,7 @@ class BitcoinTransactionNetworkDataset(ChartaListDataset):
             "download_url": "https://chartalist.org/data/pricedBitcoin2009-2018.csv",
             "compressed_size": 90_780,
             "file_name": "pricedBitcoin2009-2018.csv",
-            "labels": ["date", "price", "year", "day", "totaltx"],
+            "labels": ["date", "price", "year", "timeWindow", "totaltx"],
             "sep": ",",
 
         },
@@ -53,7 +53,7 @@ class BitcoinTransactionNetworkDataset(ChartaListDataset):
             "download_url": "https://chartalist.org/files/data_5.zip",
             "compressed_size": 113_384_999,
             "file_name": "BitcoinHeistData.csv",
-            "labels": ["address", "year", "day", "length", "weight", "count", "looped", "neighbors", "income", "label"],
+            "labels": ["address", "year", "timeWindow", "length", "weight", "count", "looped", "neighbors", "income", "label"],
             "sep": ",",
 
         },

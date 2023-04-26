@@ -32,7 +32,7 @@ def main():
     pax = 0
     wluna = 0
 
-    # Track number of transactions per day
+    # Track number of transactions per timeWindow
     dailyTransactions = []
     for i in range(0, 27):
         dailyTransactions.append({
@@ -94,7 +94,7 @@ def main():
     print("wluna " + str(wluna))
 
     # From Thursday, April 28, 2022 to Tuesday, May 24, 2022
-    print("\nNumber of transactions per day")
+    print("\nNumber of transactions per timeWindow")
     dayVal = 0
     for day in dailyTransactions:
         print(str((28 + dayVal) % 30) + ": " + str(dailyTransactions[dayVal]) + " transactions")

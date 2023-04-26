@@ -104,8 +104,8 @@ class GIN(torch.nn.Module):
 
 def read_data():
     data = pd.read_csv("final_data" + ".csv", header=0)
-    date_data = pd.read_csv("final_data_date.csv", header=0)
-    avg_trans_data = pd.read_csv("average_transaction.csv", header=0)
+    date_data = pd.read_csv("GnnResults/final_data_date.csv", header=0)
+    avg_trans_data = pd.read_csv("GnnResults/average_transaction.csv", header=0)
     date_data.columns = ['id', 'network', 'data_duration']
     avg_trans_data.columns = ['id', 'network', 'timeframe', 'avg_daily_trans']
     data.columns = ['id', 'network', 'timeframe', 'start_date', 'node_count',
@@ -146,14 +146,16 @@ def read_torch_data():
     return GraphDataList
 
 
-def read_torch_time_series_data(network):
+def read_torch_time_series_data(network, variable= None):
     file_path = "PygGraphs/TimeSeries/{}/".format(network)
+    file_path_TDA = "PygGraphs/TimeSeries/{}/TDA/".format(network)
+    file_path_different_TDA = "PygGraphs/TimeSeries/{}/TDA/{}/".format(network, variable)
     inx = 1
     GraphDataList = []
-    files = os.listdir(file_path)
+    files = os.listdir(file_path_different_TDA)
     for file in files:
-        with open(file_path + file, 'rb') as f:
-            print("\n Reading Torch Data {} / {}".format(inx, len(files)))
+        with open(file_path_different_TDA + file, 'rb') as f:
+            # print("\n Reading Torch Data {} / {}".format(inx, len(files)))
             data = pickle.load(f)
             GraphDataList.append(data)
             inx += 1
@@ -449,7 +451,7 @@ def GIN_classifier(data, network):
         train_dataset, test_dataset = torch.utils.data.random_split(data, [train_size, test_size])
         train_loader = DataLoader(train_dataset, shuffle=True)
         test_loader = DataLoader(test_dataset)
-        model = GIN(dim_features=4, dim_target=2, config=config)
+        model = GIN(dim_features=1, dim_target=2, config=config)
         optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
         criterion = torch.nn.CrossEntropyLoss()
 
@@ -465,7 +467,7 @@ def GIN_classifier(data, network):
             unseen_acc = scores_unseen[0]
             unseen_auc = scores_unseen[1]
             if epoch % 10 == 0:
-                with open('GIN_TimeSeries_Result.txt', 'a+') as file:
+                with open('GnnResults/GIN_TimeSeries_Result.txt', 'a+') as file:
                     file.write(
                         f"\nNetwork\t{network}\tDuplicate\t{duplication}\tEpoch\t{epoch}\tTrain Accuracy\t{train_acc:.4f}\tTrain AUC Score\t{train_auc:.4f}\tTest Accuracy:{test_acc:.4f}\tTest AUC Score\t{test_auc:.4f}\tunseen AUC Score\t{unseen_auc:.4f}\tNumber of Zero labels\t{count_zero_labels}\tNumber of one labels\t{count_one_labels}")
                     file.close()
@@ -532,8 +534,8 @@ def test(test_loader, model):
 
 
 if __name__ == "__main__":
-    networkList = ["networkcoindash.txt", "networkdgd.txt",
-                   "networkiconomi.txt", "networkaion.txt"]
+    networkList = ["networkadex.txt"]
+    tdaDifferentGraph = ["Overlap_0.1_Ncube_2", "Overlap_0.1_Ncube_5", "Overlap_0.2_Ncube_2", "Overlap_0.2_Ncube_5", "Overlap_0.3_Ncube_2", "Overlap_0.3_Ncube_5", "Overlap_0.5_Ncube_2", "Overlap_0.5_Ncube_5", "Overlap_0.6_Ncube_2", "Overlap_0.6_Ncube_5"]
     # data = read_data()
     # data_by_edge_visualization(data)
     # data_by_node_visualization(data)
@@ -548,6 +550,8 @@ if __name__ == "__main__":
     # data_by_avg_daily_trans_visualization(data)
     # classifier(data)
     for network in networkList:
-        data = read_torch_time_series_data(network)
-        GIN_classifier(data, network)
+        for tdaVariable in tdaDifferentGraph:
+            print("Working on {} in {} \n".format(network, tdaVariable))
+            data = read_torch_time_series_data(network, tdaVariable)
+            GIN_classifier(data, network)
     # GCN_classifier(data)
