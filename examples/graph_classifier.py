@@ -150,11 +150,12 @@ def read_torch_time_series_data(network, variable= None):
     file_path = "PygGraphs/TimeSeries/{}/".format(network)
     file_path_TDA = "PygGraphs/TimeSeries/{}/TDA/".format(network)
     file_path_different_TDA = "PygGraphs/TimeSeries/{}/TDA/{}/".format(network, variable)
+    file_path_temporal_TDA = "PygGraphs/TimeSeries/{}/TemporalVectorizedGraph/".format(network)
     inx = 1
     GraphDataList = []
-    files = os.listdir(file_path_different_TDA)
+    files = os.listdir(file_path_temporal_TDA)
     for file in files:
-        with open(file_path_different_TDA + file, 'rb') as f:
+        with open(file_path_temporal_TDA + file, 'rb') as f:
             # print("\n Reading Torch Data {} / {}".format(inx, len(files)))
             data = pickle.load(f)
             GraphDataList.append(data)
@@ -181,7 +182,6 @@ def data_by_edge_visualization(data):
     plt.savefig('Edge.png', dpi=300)
     plt.show()
 
-
 def data_by_node_visualization(data):
     # Divide node_count into 10 equally sized buckets
     bins = [0, 5, 10, 50, 100, 500, 1000, 2000, 5000, 10000]
@@ -200,7 +200,6 @@ def data_by_node_visualization(data):
     plt.xticks(rotation=45)
     plt.savefig('Node.png', dpi=300)
     plt.show()
-
 
 def data_by_density_visualization(data):
     # Divide node_count into 10 equally sized buckets
@@ -222,7 +221,6 @@ def data_by_density_visualization(data):
     plt.savefig('Density.png', dpi=300)
     plt.show()
 
-
 def data_by_peak_visualization(data):
     # Divide node_count into 10 equally sized buckets
     bins = [0, 5, 10, 50, 100, 500, 1000, 2000, 5000, 10000]
@@ -241,7 +239,6 @@ def data_by_peak_visualization(data):
     plt.xticks(rotation=45)
     plt.savefig('Peak.png', dpi=300)
     plt.show()
-
 
 def data_by_data_duration_visualization(data):
     # Divide node_count into 10 equally sized buckets
@@ -262,7 +259,6 @@ def data_by_data_duration_visualization(data):
     plt.savefig('Duration.png', dpi=300)
     plt.show()
 
-
 def data_by_Avg_shortest_path_length_visualization(data):
     # Divide node_count into 10 equally sized buckets
     bins = [0, 2, 5, 10, 15, 20]
@@ -281,7 +277,6 @@ def data_by_Avg_shortest_path_length_visualization(data):
     ax.legend(title='Label', loc='upper right')
     plt.savefig('Avg_shortest_path_length.png', dpi=300)
     plt.show()
-
 
 def data_by_max_degree_centrality_visualization(data):
     # Divide node_count into 10 equally sized buckets
@@ -303,7 +298,6 @@ def data_by_max_degree_centrality_visualization(data):
     plt.savefig('max_degree_centrality.png', dpi=300)
     plt.show()
 
-
 def data_by_max_closeness_centrality_visualization(data):
     # Divide node_count into 10 equally sized buckets
     bins = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
@@ -323,7 +317,6 @@ def data_by_max_closeness_centrality_visualization(data):
     ax.legend(title='Label', loc='upper left')
     plt.savefig('max_closeness_centrality.png', dpi=300)
     plt.show()
-
 
 def data_by_max_betweenness_centrality_visualization(data):
     # Divide node_count into 10 equally sized buckets
@@ -346,7 +339,6 @@ def data_by_max_betweenness_centrality_visualization(data):
     plt.savefig('max_betweenness_centrality.png', dpi=300)
     plt.show()
 
-
 def data_by_clique_visualization(data):
     # Divide node_count into 10 equally sized buckets
     bins = [0, 1, 2, 3, 4, 5, 6, 7]
@@ -367,7 +359,6 @@ def data_by_clique_visualization(data):
     plt.savefig('clique_number.png', dpi=300)
     plt.show()
 
-
 def data_by_avg_daily_trans_visualization(data):
     # Divide node_count into 10 equally sized buckets
     bins = [0, 5, 10, 20, 50, 100, 150, 200]
@@ -387,7 +378,6 @@ def data_by_avg_daily_trans_visualization(data):
     ax.legend(title='Label', loc='upper right')
     plt.savefig('avg_daily_trans_number.png', dpi=300)
     plt.show()
-
 
 def classifier(data):
     # cleaning features
@@ -451,7 +441,7 @@ def GIN_classifier(data, network):
         train_dataset, test_dataset = torch.utils.data.random_split(data, [train_size, test_size])
         train_loader = DataLoader(train_dataset, shuffle=True)
         test_loader = DataLoader(test_dataset)
-        model = GIN(dim_features=1, dim_target=2, config=config)
+        model = GIN(dim_features=18, dim_target=2, config=config)
         optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
         criterion = torch.nn.CrossEntropyLoss()
 
@@ -534,8 +524,8 @@ def test(test_loader, model):
 
 
 if __name__ == "__main__":
-    networkList = ["networkadex.txt"]
-    tdaDifferentGraph = ["Overlap_0.1_Ncube_2", "Overlap_0.1_Ncube_5", "Overlap_0.2_Ncube_2", "Overlap_0.2_Ncube_5", "Overlap_0.3_Ncube_2", "Overlap_0.3_Ncube_5", "Overlap_0.5_Ncube_2", "Overlap_0.5_Ncube_5", "Overlap_0.6_Ncube_2", "Overlap_0.6_Ncube_5"]
+    networkList = ["networkaeternity.txt", "networkaion.txt", "networkaragon.txt", "networkbancor.txt", "networkcentra.txt", "networkcindicator.txt", "networkcoindash.txt", "networkdgd.txt", "networkiconomi.txt"]
+    #tdaDifferentGraph = ["Overlap_0.1_Ncube_2", "Overlap_0.1_Ncube_5", "Overlap_0.2_Ncube_2", "Overlap_0.2_Ncube_5", "Overlap_0.3_Ncube_2", "Overlap_0.3_Ncube_5", "Overlap_0.5_Ncube_2", "Overlap_0.5_Ncube_5", "Overlap_0.6_Ncube_2", "Overlap_0.6_Ncube_5"]
     # data = read_data()
     # data_by_edge_visualization(data)
     # data_by_node_visualization(data)
@@ -550,8 +540,8 @@ if __name__ == "__main__":
     # data_by_avg_daily_trans_visualization(data)
     # classifier(data)
     for network in networkList:
-        for tdaVariable in tdaDifferentGraph:
-            print("Working on {} in {} \n".format(network, tdaVariable))
-            data = read_torch_time_series_data(network, tdaVariable)
-            GIN_classifier(data, network)
+        # for tdaVariable in tdaDifferentGraph:
+        print("Working on {}\n".format(network))
+        data = read_torch_time_series_data(network)
+        GIN_classifier(data, network)
     # GCN_classifier(data)

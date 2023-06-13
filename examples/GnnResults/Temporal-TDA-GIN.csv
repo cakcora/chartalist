@@ -1,0 +1,10 @@
+Network	networkadex.txt Duplicate	0	Epoch	 0	 Train Accuracy	 0.5214	 Train AUC Score	 0.4803	 Test Accuracy: 0.3729	 test AUC Score	 0.5207	 unseen AUC Score	 0.4552
+Network	networkadex.txt Duplicate	0	Epoch	 10	 Train Accuracy	 0.5897	 Train AUC Score	 0.6202	 Test Accuracy: 0.4576	 test AUC Score	 0.6897	 unseen AUC Score	 0.5713
+Network	networkadex.txt Duplicate	0	Epoch	 20	 Train Accuracy	 0.6154	 Train AUC Score	 0.5897	 Test Accuracy: 0.6102	 test AUC Score	 0.6034	 unseen AUC Score	 0.6264
+Network	networkadex.txt Duplicate	0	Epoch	 30	 Train Accuracy	 0.4701	 Train AUC Score	 0.5942	 Test Accuracy: 0.6102	 test AUC Score	 0.5586	 unseen AUC Score	 0.6241
+Network	networkadex.txt Duplicate	0	Epoch	 40	 Train Accuracy	 0.4359	 Train AUC Score	 0.5959	 Test Accuracy: 0.5763	 test AUC Score	 0.7299	 unseen AUC Score	 0.7437
+Network	networkadex.txt Duplicate	0	Epoch	 50	 Train Accuracy	 0.4017	 Train AUC Score	 0.4549	 Test Accuracy: 0.5085	 test AUC Score	 0.4586	 unseen AUC Score	 0.5575
+Network	networkadex.txt Duplicate	0	Epoch	 60	 Train Accuracy	 0.4701	 Train AUC Score	 0.5777	 Test Accuracy: 0.6441	 test AUC Score	 0.7736	 unseen AUC Score	 0.6023
+Network	networkadex.txt Duplicate	0	Epoch	 70	 Train Accuracy	 0.4573	 Train AUC Score	 0.5248	 Test Accuracy: 0.5932	 test AUC Score	 0.7103	 unseen AUC Score	 0.6345
+Network	networkadex.txt Duplicate	0	Epoch	 80	 Train Accuracy	 0.4872	 Train AUC Score	 0.5498	 Test Accuracy: 0.5763	 test AUC Score	 0.6885	 unseen AUC Score	 0.6552
+Network	networkadex.txt Duplicate	0	Epoch	 90	 Train Accuracy	 0.4316	 Train AUC Score	 0.5802	 Test Accuracy: 0.5763	 test AUC Score	 0.6770	 unseen AUC Score	 0.7310
