@@ -1,4 +1,7 @@
+import csv
 import pickle
+import re
+
 import numpy as np
 from keras.models import Sequential
 from keras.layers import LSTM, Dense, Dropout, GRU
@@ -21,7 +24,7 @@ def read_seq_data(network):
     return seqData
 
 
-def LSTM_classifier(data, labels):
+def LSTM_classifier(data, labels, spec, network):
     data_train, data_test, labels_train, labels_test = train_test_split(data, labels, test_size=0.2, random_state=42)
 
     # Define the LSTM model
@@ -52,18 +55,92 @@ def LSTM_classifier(data, labels):
     print(f"Loss: {loss}")
     print(f"Accuracy: {accuracy}")
     print("AUC: {}".format(roc_LSTM))
+    try:
+        # Attempt to open the file in 'append' mode
+        with open("RnnResults/RNN-Results.txt", 'a') as file:
+            # Append a line to the existing file
+            file.write(
+                "Network={} Spec={} Loss={} Accuracy={} AUC={}".format(network, spec, loss, accuracy, roc_LSTM) + '\n')
+    except FileNotFoundError:
+        # File doesn't exist, so create a new file and write text
+        with open("RnnResults/RNN-Results.txt", 'w') as file:
+            file.write(
+                "Network={} Spec={} Loss={} Accuracy={} AUC={}".format(network, spec, loss, accuracy, roc_LSTM) + '\n')
+
+
+def outputCleaner():
+    input_file = "RnnResults/RNN-Results.txt"
+    output_file = "RnnResults/RNN-Results_cleaned.csv"
+
+    with open(input_file, "r") as file:
+        lines = file.readlines()
+
+    data = []
+    for line in lines:
+        values = line.strip().split()
+        spec_values = values[1].split("-")
+        row = [value.split("=")[1] for value in values[:1]] + spec_values + [value.split("=")[1] for value in
+                                                                             values[2:]]
+        data.append(row)
+
+    with open(output_file, "w", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerows(data)
+        file.close()
+
+    with open(output_file, "r") as file:
+        reader = csv.reader(file)
+        for row in reader:
+            new_row = []
+            for i, value in enumerate(row):
+                if i in (1, 2, 3):
+                    numeric_part = re.findall(r"[-+]?\d*\.?\d+", value)
+                    if numeric_part:
+                        new_row.append(numeric_part[0])
+                    else:
+                        new_row.append("")
+                else:
+                    new_row.append(value)
+            data.append(new_row)
+
+    with open(output_file, "w", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerows(data)
+
+    print("Conversion complete. CSV file created.")
 
 
 if __name__ == "__main__":
-    # networkList = ["networkaeternity.txt", "networkaion.txt", "networkaragon.txt", "networkbancor.txt", "networkcentra.txt", "networkcindicator.txt", "networkcoindash.txt", "networkdgd.txt", "networkiconomi.txt"]
-    networkList = ["networkadex.txt"]
-    # tdaDifferentGraph = ["Overlap_0.1_Ncube_2", "Overlap_0.1_Ncube_5", "Overlap_0.2_Ncube_2", "Overlap_0.2_Ncube_5", "Overlap_0.3_Ncube_2", "Overlap_0.3_Ncube_5", "Overlap_0.5_Ncube_2", "Overlap_0.5_Ncube_5", "Overlap_0.6_Ncube_2", "Overlap_0.6_Ncube_5"]
-    for network in networkList:
-        # for tdaVariable in tdaDifferentGraph:
-        print("Working on {}\n".format(network))
-        data = read_seq_data(network)
-        np_data = np.array(data["sequence"])
-        np_labels = np.array(data["label"])
-        LSTM_classifier(np_data, np_labels)
+    outputCleaner()
+    # # "networkaeternity.txt", "networkaion.txt", "networkaragon.txt", "networkbancor.txt", "networkcentra.txt", "networkcindicator.txt", "networkcoindash.txt" , "networkiconomi.txt", "networkadex.txt"
+    # # "networkdgd.txt","networkcentra.txt","networkcindicator.txt"
+    # networkList = ["networkdgd.txt"]
+    # # networkList = ["networkaion.txt"]
+    # # tdaDifferentGraph = ["Overlap_0.1_Ncube_2", "Overlap_0.1_Ncube_5", "Overlap_0.2_Ncube_2", "Overlap_0.2_Ncube_5", "Overlap_0.3_Ncube_2", "Overlap_0.3_Ncube_5", "Overlap_0.5_Ncube_2", "Overlap_0.5_Ncube_5", "Overlap_0.6_Ncube_2", "Overlap_0.6_Ncube_5"]
+    # for network in networkList:
+    #     # for tdaVariable in tdaDifferentGraph:
+    #     print("Working on {}\n".format(network))
+    #     data = read_seq_data(network)
+    #
+    #     for key, value in data["sequence"].items():
+    #         print("Processing network ({}) - with parameters {}".format(network, key))
+    #         np_labels = np.array(data["label"])
+    #         if (len(value[0]) != 7):
+    #             while (len(value[0]) != 7):
+    #                 del value[0]
+    #                 np_labels = np.delete(np_labels, 0, axis=0)
+    #         indxs = []
+    #         if (network == "networkdgd.txt"):
+    #             for i in range(0, len(value)):
+    #                 if len(value[i]) != 7:
+    #                    indxs.append(i)
+    #
+    #             value = [item for index, item in enumerate(value) if index not in indxs]
+    #             np_labels =  np.delete(np_labels, indxs)
+    #
+    #
+    #         np_data = np.array(value)
+    #
+    #         LSTM_classifier(np_data, np_labels, key, network)
 
     # GCN_classifier(data)
