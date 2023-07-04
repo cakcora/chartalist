@@ -448,130 +448,133 @@ class NetworkParser:
         window_start_date = selectedNetwork['date'].min()
         data_last_date = selectedNetwork['date'].max()
 
+        print(f"{file} -- {window_start_date} -- {data_last_date}")
+
         # print("\n {} Days OF Data -> {} ".format(file, (data_last_date - window_start_date).days ))
         # check if the network has more than 20 days of data
-        if ((data_last_date - window_start_date).days < maxDuration):
-            print(file + "Is not a valid network")
-            shutil.move(self.file_path + file, self.file_path + "Invalid/" + file)
-            return
-
-        # normalize the edge weights for the graph network {0-9}
-        max_transfer = float(selectedNetwork['value'].max())
-        min_transfer = float(selectedNetwork['value'].min())
-
-        selectedNetwork['value'] = selectedNetwork['value'].apply(
-            lambda x: 1 + (9 * ((float(x) - min_transfer) / (max_transfer - min_transfer))))
-
-        # Graph Generation Process and Labeling
-
-        while (data_last_date - window_start_date).days > (windowSize + gap + lableWindowSize):
-            print("\nRemaining Process  {} ".format(
-
-                (data_last_date - window_start_date).days / (windowSize + gap + lableWindowSize)))
-            indx += 1
-            # if (indx == maxIndx):
-            #     break
-            transactionGraph = nx.MultiDiGraph()
-
-            # select window data
-            window_end_date = window_start_date + dt.timedelta(days=windowSize)
-            selectedNetworkInGraphDataWindow = selectedNetwork[
-                (selectedNetwork['date'] >= window_start_date) & (
-                        selectedNetwork['date'] < window_end_date)]
-
-            # select labeling data
-            label_end_date = window_start_date + dt.timedelta(days=windowSize) + dt.timedelta(
-                days=gap) + dt.timedelta(
-                days=lableWindowSize)
-            label_start_date = window_start_date + dt.timedelta(days=windowSize) + dt.timedelta(days=gap)
-            selectedNetworkInLbelingWindow = selectedNetwork[
-                (selectedNetwork['date'] >= label_start_date) & (selectedNetwork['date'] < label_end_date)]
-
-            # generating the label for this window
-            # 1 -> Increading Transactions 0 -> Decreasing Transactions
-            label = 1 if (len(selectedNetworkInLbelingWindow) - len(
-                selectedNetworkInGraphDataWindow)) > 0 else 0
-
-            # group by for extracting node features
-            outgoing_weight_sum = (selectedNetwork.groupby(by=['from'])['value'].sum())
-            incoming_weight_sum = (selectedNetwork.groupby(by=['to'])['value'].sum())
-            outgoing_count = (selectedNetwork.groupby(by=['from'])['value'].count())
-            incoming_count = (selectedNetwork.groupby(by=['to'])['value'].count())
-
-            # Node Features Dictionary for TDA mapper usage
-            node_features = pd.DataFrame()
-
-            # Populate graph with edges
-            for item in selectedNetworkInGraphDataWindow.to_dict(orient="records"):
-                from_node_features = {}
-                to_node_features = {}
-                # calculating node features for each edge
-                # feature 1 -> sum of outgoing edge weights
-                from_node_features["outgoing_edge_weight_sum"] = outgoing_weight_sum[item['from']]
-
-                try:
-                    to_node_features["outgoing_edge_weight_sum"] = outgoing_weight_sum[item['to']]
-                except Exception as e:
-                    to_node_features["outgoing_edge_weight_sum"] = 0
-
-                # feature 2 -> sum of incoming edge weights
-                to_node_features["incoming_edge_weight_sum"] = incoming_weight_sum[item['to']]
-                try:
-                    from_node_features["incoming_edge_weight_sum"] = incoming_weight_sum[item['from']]
-                except Exception as e:
-                    from_node_features["incoming_edge_weight_sum"] = 0
-                # feature 3 -> number of outgoing edges
-                from_node_features["outgoing_edge_count"] = outgoing_count[item['from']]
-                try:
-                    to_node_features["outgoing_edge_count"] = outgoing_count[item['to']]
-                except Exception as e:
-                    to_node_features["outgoing_edge_count"] = 0
-
-                # feature 4 -> number of incoming edges
-                to_node_features["incoming_edge_count"] = incoming_count[item['to']]
-                try:
-                    from_node_features["incoming_edge_count"] = incoming_count[item['from']]
-                except Exception as e:
-                    from_node_features["incoming_edge_count"] = 0
-
-                # add temporal vector to all nodes, populated with -1
-
-                from_node_features_with_daily_temporal_vector = dict(from_node_features)
-                from_node_features_with_daily_temporal_vector["dailyClusterID"] = [-1] * windowSize
-                from_node_features_with_daily_temporal_vector["dailyClusterSize"] = [-1] * windowSize
-
-                to_node_features_with_daily_temporal_vector = dict(to_node_features)
-                to_node_features_with_daily_temporal_vector["dailyClusterID"] = [-1] * windowSize
-                to_node_features_with_daily_temporal_vector["dailyClusterSize"] = [-1] * windowSize
-
-                # Temporal version
-                transactionGraph.add_nodes_from(
-                    [(item["from"], from_node_features_with_daily_temporal_vector)])
-                transactionGraph.add_nodes_from([(item["to"], to_node_features_with_daily_temporal_vector)])
-                transactionGraph.add_edge(item["from"], item["to"], value=item["value"])
-
-                new_row = pd.DataFrame(({**{"nodeID": item["from"]}, **from_node_features}), index=[0])
-                node_features = pd.concat([node_features, new_row], ignore_index=True)
-
-                new_row = pd.DataFrame(({**{"nodeID": item["to"]}, **to_node_features}), index=[0])
-                node_features = pd.concat([node_features, new_row], ignore_index=True)
-
-                node_features = node_features.drop_duplicates(subset=['nodeID'])
-
-            timeWindowSequence = self.processTDAExtractedRnnSequence(selectedNetworkInGraphDataWindow, node_features)
-            totalRnnSequenceData.append(timeWindowSequence)
-            totalRnnLabelData.append(label)
-            window_start_date = window_start_date + dt.timedelta(days=1)
-
-        total_merged_seq = self.merge_dicts(totalRnnSequenceData)
-        finalDict = {"sequence": total_merged_seq, "label": totalRnnLabelData}
-        directory = 'Sequence/' + str(file)
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-        with open(directory + '/seq.txt',
-                  'wb') as file_in:
-            pickle.dump(finalDict, file_in)
-            file_in.close()
+        # if ((data_last_date - window_start_date).days < maxDuration):
+        #     print(file + "Is not a valid network")
+        #     shutil.move(self.file_path + file, self.file_path + "Invalid/" + file)
+        #     return
+        #
+        # # normalize the edge weights for the graph network {0-9}
+        # max_transfer = float(selectedNetwork['value'].max())
+        # min_transfer = float(selectedNetwork['value'].min())
+        #
+        # selectedNetwork['value'] = selectedNetwork['value'].apply(
+        #     lambda x: 1 + (9 * ((float(x) - min_transfer) / (max_transfer - min_transfer))))
+        #
+        # # Graph Generation Process and Labeling
+        #
+        # while (data_last_date - window_start_date).days > (windowSize + gap + lableWindowSize):
+        #     print("\nRemaining Process  {} ".format(
+        #
+        #         (data_last_date - window_start_date).days / (windowSize + gap + lableWindowSize)))
+        #     indx += 1
+        #     # if (indx == maxIndx):
+        #     #     break
+        #     transactionGraph = nx.MultiDiGraph()
+        #
+        #     # select window data
+        #     window_end_date = window_start_date + dt.timedelta(days=windowSize)
+        #     selectedNetworkInGraphDataWindow = selectedNetwork[
+        #         (selectedNetwork['date'] >= window_start_date) & (
+        #                 selectedNetwork['date'] < window_end_date)]
+        #
+        #     # select labeling data
+        #     label_end_date = window_start_date + dt.timedelta(days=windowSize) + dt.timedelta(
+        #         days=gap) + dt.timedelta(
+        #         days=lableWindowSize)
+        #     label_start_date = window_start_date + dt.timedelta(days=windowSize) + dt.timedelta(days=gap)
+        #     selectedNetworkInLbelingWindow = selectedNetwork[
+        #         (selectedNetwork['date'] >= label_start_date) & (selectedNetwork['date'] < label_end_date)]
+        #
+        #     # generating the label for this window
+        #     # 1 -> Increading Transactions 0 -> Decreasing Transactions
+        #     label = 1 if (len(selectedNetworkInLbelingWindow) - len(
+        #         selectedNetworkInGraphDataWindow)) > 0 else 0
+        #
+        #     # group by for extracting node features
+        #     outgoing_weight_sum = (selectedNetwork.groupby(by=['from'])['value'].sum())
+        #     incoming_weight_sum = (selectedNetwork.groupby(by=['to'])['value'].sum())
+        #     outgoing_count = (selectedNetwork.groupby(by=['from'])['value'].count())
+        #     incoming_count = (selectedNetwork.groupby(by=['to'])['value'].count())
+        #
+        #     # Node Features Dictionary for TDA mapper usage
+        #     node_features = pd.DataFrame()
+        #
+        #     # Populate graph with edges
+        #     for item in selectedNetworkInGraphDataWindow.to_dict(orient="records"):
+        #         from_node_features = {}
+        #         to_node_features = {}
+        #         # calculating node features for each edge
+        #         # feature 1 -> sum of outgoing edge weights
+        #         from_node_features["outgoing_edge_weight_sum"] = outgoing_weight_sum[item['from']]
+        #
+        #         try:
+        #             to_node_features["outgoing_edge_weight_sum"] = outgoing_weight_sum[item['to']]
+        #         except Exception as e:
+        #             to_node_features["outgoing_edge_weight_sum"] = 0
+        #
+        #         # feature 2 -> sum of incoming edge weights
+        #         to_node_features["incoming_edge_weight_sum"] = incoming_weight_sum[item['to']]
+        #         try:
+        #             from_node_features["incoming_edge_weight_sum"] = incoming_weight_sum[item['from']]
+        #         except Exception as e:
+        #             from_node_features["incoming_edge_weight_sum"] = 0
+        #         # feature 3 -> number of outgoing edges
+        #         from_node_features["outgoing_edge_count"] = outgoing_count[item['from']]
+        #         try:
+        #             to_node_features["outgoing_edge_count"] = outgoing_count[item['to']]
+        #         except Exception as e:
+        #             to_node_features["outgoing_edge_count"] = 0
+        #
+        #         # feature 4 -> number of incoming edges
+        #         to_node_features["incoming_edge_count"] = incoming_count[item['to']]
+        #         try:
+        #             from_node_features["incoming_edge_count"] = incoming_count[item['from']]
+        #         except Exception as e:
+        #             from_node_features["incoming_edge_count"] = 0
+        #
+        #         # add temporal vector to all nodes, populated with -1
+        #
+        #         from_node_features_with_daily_temporal_vector = dict(from_node_features)
+        #         from_node_features_with_daily_temporal_vector["dailyClusterID"] = [-1] * windowSize
+        #         from_node_features_with_daily_temporal_vector["dailyClusterSize"] = [-1] * windowSize
+        #
+        #         to_node_features_with_daily_temporal_vector = dict(to_node_features)
+        #         to_node_features_with_daily_temporal_vector["dailyClusterID"] = [-1] * windowSize
+        #         to_node_features_with_daily_temporal_vector["dailyClusterSize"] = [-1] * windowSize
+        #
+        #         # Temporal version
+        #         transactionGraph.add_nodes_from(
+        #             [(item["from"], from_node_features_with_daily_temporal_vector)])
+        #         transactionGraph.add_nodes_from([(item["to"], to_node_features_with_daily_temporal_vector)])
+        #         transactionGraph.add_edge(item["from"], item["to"], value=item["value"])
+        #
+        #         new_row = pd.DataFrame(({**{"nodeID": item["from"]}, **from_node_features}), index=[0])
+        #         node_features = pd.concat([node_features, new_row], ignore_index=True)
+        #
+        #         new_row = pd.DataFrame(({**{"nodeID": item["to"]}, **to_node_features}), index=[0])
+        #         node_features = pd.concat([node_features, new_row], ignore_index=True)
+        #
+        #         node_features = node_features.drop_duplicates(subset=['nodeID'])
+        #
+        #     timeWindowSequence = self.processTDAExtractedRnnSequence(selectedNetworkInGraphDataWindow, node_features)
+        #     # timeWindowSequence = self.processRawExtractedRnnSequence(selectedNetworkInGraphDataWindow, node_features)
+        #     totalRnnSequenceData.append(timeWindowSequence)
+        #     totalRnnLabelData.append(label)
+        #     window_start_date = window_start_date + dt.timedelta(days=1)
+        #
+        # total_merged_seq = self.merge_dicts(totalRnnSequenceData)
+        # finalDict = {"sequence": total_merged_seq, "label": totalRnnLabelData}
+        # directory = 'Sequence/' + str(file)
+        # if not os.path.exists(directory):
+        #     os.makedirs(directory)
+        # with open(directory + '/seq_raw.txt',
+        #           'wb') as file_in:
+        #     pickle.dump(finalDict, file_in)
+        #     file_in.close()
 
     def getDailyNodeAvg(self, file):
         selectedNetwork = pd.read_csv((self.timeseries_file_path + file), sep=' ',
@@ -818,35 +821,83 @@ class NetworkParser:
                 lens = mapper.fit_transform(Xfilt, projection=sklearn.manifold.TSNE())
                 # We use cls=5, but this parameter can be further refined.  Its impact on results seems minimal.
 
-                for per_overlap in [0.2, 0.3, 0.5]:
-                    for n_cubes in [2, 5]:
-                        for cls in [2, 5]:
-                            #print("Processing overlap={} , n_cubes={} , cls={}".format(per_overlap, n_cubes, cls))
-                            dailyTdaGraph = mapper.map(
-                                lens,
-                                Xfilt,
-                                clusterer=sklearn.cluster.KMeans(n_clusters=cls, random_state=1618033),
-                                cover=km.Cover(n_cubes=n_cubes, perc_overlap=per_overlap))  # 0.2 0.4
+                # # Create a multiprocessing Queue to store the results
+                # result_queue = multiprocessing.Queue()
+                #
+                # # Create a list to store the processes
+                # processes = []
 
-                            # mapper.visualize(dailyTdaGraph,
-                            #                  path_html= "test-shape.HTML",
-                            #                  title="Mapper graph for network")
+                # Create a multiprocessing Pool with the desired number of processes
+                with multiprocessing.Pool() as pool:
+                    # List to store the result objects
+                    results = []
 
-                            # extract the cluster size and cluster ID vector out of that
+                    # Iterate over the combinations and apply the process_combination function to each combination
+                    for per_overlap_indx in range(1, 11):
+                        for n_cubes in range(2, 11):
+                            for cls in [5]:
+                                per_overlap = round(per_overlap_indx * 0.05, 2)
+                                result = pool.apply_async(self.TDA_Process,
+                                                          (mapper, lens, Xfilt, per_overlap, n_cubes, cls))
+                                results.append(result)
 
-                            numberOfNodes = len(dailyTdaGraph['nodes'])
-                            numberOfEdges = len(dailyTdaGraph['links'])
-                            try:
-                                maxClusterSize = len(
-                                    dailyTdaGraph["nodes"][
-                                        max(dailyTdaGraph["nodes"], key=lambda k: len(dailyTdaGraph["nodes"][k]))])
-                            except Exception as e:
-                                maxClusterSize = 0
+                    # Retrieve the results as they become available
+                    for result in results:
+                        dailyFeatures = result.get()
+                        timeWindowSequence.append(dailyFeatures)
 
-                            dailyFeatures = {"overlap{}-cube{}-cls{}".format(per_overlap, n_cubes, cls): [numberOfNodes,
-                                                                                                          numberOfEdges,
-                                                                                                          maxClusterSize]}
-                            timeWindowSequence.append(dailyFeatures)
+                # for per_overlap in [0.1]:
+                #     for n_cubes in [1, 2, 3, 4, 5, 6]:
+                #         for cls in [1, 2, 3, 4, 5]:
+                #             # print("Processing overlap={} , n_cubes={} , cls={}".format(per_overlap, n_cubes, cls))
+                #
+                #
+                #             process = multiprocessing.Process(target=self.tda_function_wrapper,
+                #                                               args=(mapper, lens, Xfilt, per_overlap, n_cubes, cls,
+                #                                                     result_queue))
+                #             process.start()
+                #             processes.append(process)
+
+                # dailyTdaGraph = mapper.map(
+                #     lens,
+                #     Xfilt,
+                #     clusterer=sklearn.cluster.KMeans(n_clusters=cls, random_state=1618033),
+                #     cover=km.Cover(n_cubes=n_cubes, perc_overlap=per_overlap))  # 0.2 0.4
+                #
+                # # mapper.visualize(dailyTdaGraph,
+                # #                  path_html= "test-shape.HTML",
+                # #                  title="Mapper graph for network")
+                #
+                # # extract the cluster size and cluster ID vector out of that
+                #
+                # numberOfNodes = len(dailyTdaGraph['nodes'])
+                # numberOfEdges = len(dailyTdaGraph['links'])
+                # try:
+                #     maxClusterSize = len(
+                #         dailyTdaGraph["nodes"][
+                #             max(dailyTdaGraph["nodes"], key=lambda k: len(dailyTdaGraph["nodes"][k]))])
+                # except Exception as e:
+                #     maxClusterSize = 0
+                #
+                # dailyFeatures = {"overlap{}-cube{}-cls{}".format(per_overlap, n_cubes, cls): [numberOfNodes,
+                #                                                                               numberOfEdges,
+                #                                                                               maxClusterSize]}
+                # timeWindowSequence.append(dailyFeatures)
+
+                # Wait for all processes to finish
+                # for process in processes:
+                #     process.join()
+                #
+                #     # Collect the results from the queue
+                # timeWindowSequence = []
+                # while not result_queue.empty():
+                #     result = result_queue.get()
+                #     # print("RESUUUUULT --- > \n")
+                #     # print(result)
+                #     timeWindowSequence.append(result)
+
+
+
 
 
 
@@ -860,6 +911,66 @@ class NetworkParser:
         # the graph has been repopulated with daily temporal features
         merged_dict = self.merge_dicts(timeWindowSequence)
         return merged_dict
+
+    def processRawExtractedRnnSequence(self, timeFrameData, nodeFeatures):
+
+        # break the data to daily graphs
+        timeWindowSequence = list()
+        data_first_date = timeFrameData['date'].min()
+        data_last_date = timeFrameData['date'].max()
+        numberOfDays = (data_last_date - data_first_date).days
+        start_date = data_first_date
+        # initiate the graph
+        processingDay = 0
+        while (processingDay <= numberOfDays):
+            # print("Processing TDA RNN sequential Extraction day {}".format(processingDay))
+            daily_end_date = start_date + dt.timedelta(days=1)
+            selectedDailyNetwork = timeFrameData[
+                (timeFrameData['date'] >= start_date) & (timeFrameData['date'] < daily_end_date)]
+            try:
+                number_of_nodes = pd.concat([selectedDailyNetwork['from'], selectedDailyNetwork['to']]).count()
+                number_of_edges = len(selectedDailyNetwork)
+                avg_value = selectedDailyNetwork["value"].mean()
+                dailyFeatures = {"raw": [number_of_nodes, number_of_edges, avg_value]}
+                timeWindowSequence.append(dailyFeatures)
+            except Exception as e:
+                print(str(e))
+            start_date = start_date + dt.timedelta(days=1)
+            processingDay += 1
+
+        merged_dict = self.merge_dicts(timeWindowSequence)
+        return merged_dict
+
+    def TDA_Process(self, mapper, lens, Xfilt, per_overlap, n_cubes, cls):
+        dailyTdaGraph = mapper.map(
+            lens,
+            Xfilt,
+            clusterer=sklearn.cluster.KMeans(n_clusters=cls, random_state=1618033),
+            cover=km.Cover(n_cubes=n_cubes, perc_overlap=per_overlap))  # 0.2 0.4
+
+        # mapper.visualize(dailyTdaGraph,
+        #                  path_html= "test-shape.HTML",
+        #                  title="Mapper graph for network")
+
+        # extract the cluster size and cluster ID vector out of that
+
+        numberOfNodes = len(dailyTdaGraph['nodes'])
+        numberOfEdges = len(dailyTdaGraph['links'])
+        try:
+            maxClusterSize = len(
+                dailyTdaGraph["nodes"][
+                    max(dailyTdaGraph["nodes"], key=lambda k: len(dailyTdaGraph["nodes"][k]))])
+        except Exception as e:
+            maxClusterSize = 0
+
+        dailyFeatures = {"overlap{}-cube{}-cls{}".format(per_overlap, n_cubes, cls): [numberOfNodes,
+                                                                                      numberOfEdges,
+                                                                                      maxClusterSize]}
+        return dailyFeatures
+
+    def tda_function_wrapper(self, mapper, lens, Xfilt, per_overlap, n_cubes, cls, result_queue):
+        result = self.TDA_Process(mapper, lens, Xfilt, per_overlap, n_cubes, cls)
+        result_queue.put(result)
 
     def merge_dicts(self, list_of_dicts):
         merged_dict = {}

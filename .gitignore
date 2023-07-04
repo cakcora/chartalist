@@ -12,3 +12,4 @@ chartalistc.png
 examples/*.csv
 examples/PygGraphs/
 examples/RnnResults/
+examples/Sequence

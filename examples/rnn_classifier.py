@@ -1,7 +1,8 @@
 import csv
+import os
 import pickle
 import re
-
+import pandas as pd
 import numpy as np
 from keras.models import Sequential
 from keras.layers import LSTM, Dense, Dropout, GRU
@@ -23,6 +24,13 @@ def read_seq_data(network):
         seqData = pickle.load(f)
     return seqData
 
+def read_seq_data_by_file_name(network, file):
+    file_path = "Sequence/{}/".format(network)
+    seqData = dict()
+    with open(file_path + file, 'rb') as f:
+        # print("\n Reading Torch Data {} / {}".format(inx, len(files)))
+        seqData = pickle.load(f)
+    return seqData
 
 def LSTM_classifier(data, labels, spec, network):
     data_train, data_test, labels_train, labels_test = train_test_split(data, labels, test_size=0.2, random_state=42)
@@ -67,10 +75,19 @@ def LSTM_classifier(data, labels, spec, network):
             file.write(
                 "Network={} Spec={} Loss={} Accuracy={} AUC={}".format(network, spec, loss, accuracy, roc_LSTM) + '\n')
 
+def merge_dicts(list_of_dicts):
+    merged_dict = {}
+    for dictionary in list_of_dicts:
+        for key, value in dictionary.items():
+            if key in merged_dict:
+                merged_dict[key].append(value)
+            else:
+                merged_dict[key] = [value]
+    return merged_dict
 
 def outputCleaner():
-    input_file = "RnnResults/RNN-Results.txt"
-    output_file = "RnnResults/RNN-Results_cleaned.csv"
+    input_file = "RnnResults/AternityTest.txt"
+    output_file = "RnnResults/Aternity_RNN_Results_cleaned_v2.csv"
 
     with open(input_file, "r") as file:
         lines = file.readlines()
@@ -109,28 +126,86 @@ def outputCleaner():
 
     print("Conversion complete. CSV file created.")
 
+def visualize_time_exp():
+    # Specify the file path of the CSV
+    file_path = "TDA_time_exp.csv"
+
+    # Read the CSV file into a pandas DataFrame
+    df = pd.read_csv(file_path)
+    x = df["Node"]
+    y = df["Time"]
+
+    # Calculate the regression line
+    regression_line = np.polyfit(x, y, 1)
+    regression_y = np.polyval(regression_line, x)
+
+    # Create the scatter plot
+    plt.scatter(x, y, label='Daily Experiment', s=7)
+    plt.plot(x, regression_y, color='red', label='Regression Line')
+
+    # Set the y-axis to logarithmic scale
+    plt.yscale('log')
+
+    # Set axis labels and title
+    plt.xlabel('# Ndoes')
+    plt.ylabel('Time (Sec)')
+    plt.title('TDA costs of daily token networks (log scale)')
+
+
+    # Display the plot
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig('tda_time_exp_plot.png', dpi=300)
+    plt.show()
+
+
+    # Display the DataFrame
+    print(df)
+
 
 if __name__ == "__main__":
-    outputCleaner()
-    # # "networkaeternity.txt", "networkaion.txt", "networkaragon.txt", "networkbancor.txt", "networkcentra.txt", "networkcindicator.txt", "networkcoindash.txt" , "networkiconomi.txt", "networkadex.txt"
-    # # "networkdgd.txt","networkcentra.txt","networkcindicator.txt"
-    # networkList = ["networkdgd.txt"]
-    # # networkList = ["networkaion.txt"]
-    # # tdaDifferentGraph = ["Overlap_0.1_Ncube_2", "Overlap_0.1_Ncube_5", "Overlap_0.2_Ncube_2", "Overlap_0.2_Ncube_5", "Overlap_0.3_Ncube_2", "Overlap_0.3_Ncube_5", "Overlap_0.5_Ncube_2", "Overlap_0.5_Ncube_5", "Overlap_0.6_Ncube_2", "Overlap_0.6_Ncube_5"]
+    visualize_time_exp()
+    #outputCleaner()
+    # # # "networkaeternity.txt", "networkaion.txt", "networkaragon.txt", "networkbancor.txt", "networkcentra.txt", "networkcindicator.txt", "networkcoindash.txt" , "networkiconomi.txt", "networkadex.txt"
+    # # # "networkdgd.txt","networkcentra.txt","networkcindicator.txt"
+    # # networkList = ["networkdgd.txt"]
+    # networkList = ["networkaeternity.txt"]
+    # # # tdaDifferentGraph = ["Overlap_0.1_Ncube_2", "Overlap_0.1_Ncube_5", "Overlap_0.2_Ncube_2", "Overlap_0.2_Ncube_5", "Overlap_0.3_Ncube_2", "Overlap_0.3_Ncube_5", "Overlap_0.5_Ncube_2", "Overlap_0.5_Ncube_5", "Overlap_0.6_Ncube_2", "Overlap_0.6_Ncube_5"]
     # for network in networkList:
     #     # for tdaVariable in tdaDifferentGraph:
     #     print("Working on {}\n".format(network))
-    #     data = read_seq_data(network)
+    #     #data2 = read_seq_data_by_file_name(network, "seq_3.txt")
+    #
+    #
+    #
+    #     files = os.listdir(f"Sequence/{network}/dailySeq/")
+    #     data = []
+    #     result = {}
+    #     for file in files:
+    #         if file.endswith(".txt"):
+    #             data.append(read_seq_data_by_file_name(network,  f"dailySeq/{file}"))
+    #
+    #
+    #
+    #     data = merge_dicts(data)
+    #     for dictionary in data["sequence"]:
+    #         for key, value in dictionary.items():
+    #             if key not in result:
+    #                 result[key] = []
+    #             result[key].append(value)
+    #
+    #     data["sequence"] = result
+    #
     #
     #     for key, value in data["sequence"].items():
     #         print("Processing network ({}) - with parameters {}".format(network, key))
     #         np_labels = np.array(data["label"])
-    #         if (len(value[0]) != 7):
-    #             while (len(value[0]) != 7):
-    #                 del value[0]
-    #                 np_labels = np.delete(np_labels, 0, axis=0)
+    #         # if (len(value[0]) != 7):
+    #         #     while (len(value[0]) != 7):
+    #         #         del value[0]
+    #         #         np_labels = np.delete(np_labels, 0, axis=0)
     #         indxs = []
-    #         if (network == "networkdgd.txt"):
+    #         if (network == "networkaion.txt"):
     #             for i in range(0, len(value)):
     #                 if len(value[i]) != 7:
     #                    indxs.append(i)
@@ -142,5 +217,4 @@ if __name__ == "__main__":
     #         np_data = np.array(value)
     #
     #         LSTM_classifier(np_data, np_labels, key, network)
-
-    # GCN_classifier(data)
+    #
