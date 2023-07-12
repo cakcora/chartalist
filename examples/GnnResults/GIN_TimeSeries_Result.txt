@@ -676,3 +676,119 @@ Network	networkiconomi.txt	Duplicate	0	Epoch	70	Train Accuracy	0.5417	Train AUC 
 Network	networkiconomi.txt	Duplicate	0	Epoch	80	Train Accuracy	0.5741	Train AUC Score	0.5835	Test Accuracy:0.5321	Test AUC Score	0.5923	unseen AUC Score	0.5489	Number of Zero labels	265	Number of one labels	276
 Network	networkiconomi.txt	Duplicate	0	Epoch	90	Train Accuracy	0.4861	Train AUC Score	0.5082	Test Accuracy:0.5138	Test AUC Score	0.5414	unseen AUC Score	0.5846	Number of Zero labels	265	Number of one labels	276
 Network	networkiconomi.txt	Duplicate	0	Epoch	100	Train Accuracy	0.5116	Train AUC Score	0.5426	Test Accuracy:0.4862	Test AUC Score	0.4943	unseen AUC Score	0.5084	Number of Zero labels	265	Number of one labels	276
+
+Temporal TDA
+Network	CollegeMsg.txt	Duplicate	0	Epoch	0	Train Accuracy	0.5816	Train AUC Score	0.5129	Test Accuracy:0.6944	Test AUC Score	0.5615	unseen AUC Score	0.3885	Number of Zero labels	110	Number of one labels	67
+Network	CollegeMsg.txt	Duplicate	0	Epoch	10	Train Accuracy	0.5177	Train AUC Score	0.5303	Test Accuracy:0.4722	Test AUC Score	0.5115	unseen AUC Score	0.4808	Number of Zero labels	110	Number of one labels	67
+Network	CollegeMsg.txt	Duplicate	0	Epoch	20	Train Accuracy	0.4681	Train AUC Score	0.4486	Test Accuracy:0.5000	Test AUC Score	0.4115	unseen AUC Score	0.3808	Number of Zero labels	110	Number of one labels	67
+Network	CollegeMsg.txt	Duplicate	0	Epoch	30	Train Accuracy	0.4326	Train AUC Score	0.3569	Test Accuracy:0.4444	Test AUC Score	0.2962	unseen AUC Score	0.2692	Number of Zero labels	110	Number of one labels	67
+Network	CollegeMsg.txt	Duplicate	0	Epoch	40	Train Accuracy	0.4965	Train AUC Score	0.4361	Test Accuracy:0.5556	Test AUC Score	0.4385	unseen AUC Score	0.3923	Number of Zero labels	110	Number of one labels	67
+Network	CollegeMsg.txt	Duplicate	0	Epoch	50	Train Accuracy	0.5248	Train AUC Score	0.4960	Test Accuracy:0.5833	Test AUC Score	0.3846	unseen AUC Score	0.3654	Number of Zero labels	110	Number of one labels	67
+Network	CollegeMsg.txt	Duplicate	0	Epoch	60	Train Accuracy	0.4823	Train AUC Score	0.6190	Test Accuracy:0.5278	Test AUC Score	0.5654	unseen AUC Score	0.4962	Number of Zero labels	110	Number of one labels	67
+Network	CollegeMsg.txt	Duplicate	0	Epoch	70	Train Accuracy	0.5177	Train AUC Score	0.3874	Test Accuracy:0.5833	Test AUC Score	0.3538	unseen AUC Score	0.3654	Number of Zero labels	110	Number of one labels	67
+Network	CollegeMsg.txt	Duplicate	0	Epoch	80	Train Accuracy	0.4752	Train AUC Score	0.4728	Test Accuracy:0.4167	Test AUC Score	0.4154	unseen AUC Score	0.3769	Number of Zero labels	110	Number of one labels	67
+Network	CollegeMsg.txt	Duplicate	0	Epoch	90	Train Accuracy	0.4610	Train AUC Score	0.4146	Test Accuracy:0.5000	Test AUC Score	0.2923	unseen AUC Score	0.3038	Number of Zero labels	110	Number of one labels	67
+Network	CollegeMsg.txt	Duplicate	0	Epoch	100	Train Accuracy	0.3901	Train AUC Score	0.3221	Test Accuracy:0.4722	Test AUC Score	0.4692	unseen AUC Score	0.4538	Number of Zero labels	110	Number of one labels	67
+
+TDA graph
+Network	CollegeMsg.txt	Duplicate	0	Epoch	0	Train Accuracy	0.5674	Train AUC Score	0.5214	Test Accuracy:0.4444	Test AUC Score	0.6952	unseen AUC Score	0.7048	Number of Zero labels	110	Number of one labels	67
+Network	CollegeMsg.txt	Duplicate	0	Epoch	10	Train Accuracy	0.5887	Train AUC Score	0.5086	Test Accuracy:0.6111	Test AUC Score	0.6825	unseen AUC Score	0.7111	Number of Zero labels	110	Number of one labels	67
+Network	CollegeMsg.txt	Duplicate	0	Epoch	20	Train Accuracy	0.6170	Train AUC Score	0.5130	Test Accuracy:0.6389	Test AUC Score	0.8222	unseen AUC Score	0.8254	Number of Zero labels	110	Number of one labels	67
+Network	CollegeMsg.txt	Duplicate	0	Epoch	30	Train Accuracy	0.4752	Train AUC Score	0.5065	Test Accuracy:0.5000	Test AUC Score	0.7524	unseen AUC Score	0.7524	Number of Zero labels	110	Number of one labels	67
+Network	CollegeMsg.txt	Duplicate	0	Epoch	40	Train Accuracy	0.4184	Train AUC Score	0.4263	Test Accuracy:0.3889	Test AUC Score	0.3873	unseen AUC Score	0.3683	Number of Zero labels	110	Number of one labels	67
+Network	CollegeMsg.txt	Duplicate	0	Epoch	50	Train Accuracy	0.4823	Train AUC Score	0.4613	Test Accuracy:0.5278	Test AUC Score	0.4921	unseen AUC Score	0.4825	Number of Zero labels	110	Number of one labels	67
+Network	CollegeMsg.txt	Duplicate	0	Epoch	60	Train Accuracy	0.4894	Train AUC Score	0.4382	Test Accuracy:0.5000	Test AUC Score	0.5111	unseen AUC Score	0.5016	Number of Zero labels	110	Number of one labels	67
+Network	CollegeMsg.txt	Duplicate	0	Epoch	70	Train Accuracy	0.4823	Train AUC Score	0.4334	Test Accuracy:0.4722	Test AUC Score	0.3968	unseen AUC Score	0.4000	Number of Zero labels	110	Number of one labels	67
+Network	CollegeMsg.txt	Duplicate	0	Epoch	80	Train Accuracy	0.4965	Train AUC Score	0.4386	Test Accuracy:0.2778	Test AUC Score	0.3460	unseen AUC Score	0.3429	Number of Zero labels	110	Number of one labels	67
+Network	CollegeMsg.txt	Duplicate	0	Epoch	90	Train Accuracy	0.5319	Train AUC Score	0.5430	Test Accuracy:0.7500	Test AUC Score	0.8571	unseen AUC Score	0.8508	Number of Zero labels	110	Number of one labels	67
+Network	CollegeMsg.txt	Duplicate	0	Epoch	100	Train Accuracy	0.5106	Train AUC Score	0.4337	Test Accuracy:0.3611	Test AUC Score	0.4381	unseen AUC Score	0.4413	Number of Zero labels	110	Number of one labels	67
+
+Raw graph
+Network	CollegeMsg.txt	Duplicate	0	Epoch	0	Train Accuracy	0.5319	Train AUC Score	0.3804	Test Accuracy:0.3889	Test AUC Score	0.3177	unseen AUC Score	0.2642	Number of Zero labels	110	Number of one labels	67
+Network	CollegeMsg.txt	Duplicate	0	Epoch	10	Train Accuracy	0.5745	Train AUC Score	0.5074	Test Accuracy:0.3611	Test AUC Score	0.1672	unseen AUC Score	0.3043	Number of Zero labels	110	Number of one labels	67
+Network	CollegeMsg.txt	Duplicate	0	Epoch	20	Train Accuracy	0.5248	Train AUC Score	0.5375	Test Accuracy:0.4444	Test AUC Score	0.3880	unseen AUC Score	0.3445	Number of Zero labels	110	Number of one labels	67
+Network	CollegeMsg.txt	Duplicate	0	Epoch	30	Train Accuracy	0.4468	Train AUC Score	0.3444	Test Accuracy:0.3611	Test AUC Score	0.3378	unseen AUC Score	0.3478	Number of Zero labels	110	Number of one labels	67
+Network	CollegeMsg.txt	Duplicate	0	Epoch	40	Train Accuracy	0.5319	Train AUC Score	0.4149	Test Accuracy:0.5278	Test AUC Score	0.6154	unseen AUC Score	0.5886	Number of Zero labels	110	Number of one labels	67
+Network	CollegeMsg.txt	Duplicate	0	Epoch	50	Train Accuracy	0.5745	Train AUC Score	0.4342	Test Accuracy:0.5833	Test AUC Score	0.5719	unseen AUC Score	0.5819	Number of Zero labels	110	Number of one labels	67
+Network	CollegeMsg.txt	Duplicate	0	Epoch	60	Train Accuracy	0.5603	Train AUC Score	0.4613	Test Accuracy:0.5000	Test AUC Score	0.4247	unseen AUC Score	0.4047	Number of Zero labels	110	Number of one labels	67
+Network	CollegeMsg.txt	Duplicate	0	Epoch	70	Train Accuracy	0.4965	Train AUC Score	0.3919	Test Accuracy:0.5278	Test AUC Score	0.4983	unseen AUC Score	0.4615	Number of Zero labels	110	Number of one labels	67
+Network	CollegeMsg.txt	Duplicate	0	Epoch	80	Train Accuracy	0.6170	Train AUC Score	0.4674	Test Accuracy:0.5833	Test AUC Score	0.4047	unseen AUC Score	0.4348	Number of Zero labels	110	Number of one labels	67
+Network	CollegeMsg.txt	Duplicate	0	Epoch	90	Train Accuracy	0.5248	Train AUC Score	0.4896	Test Accuracy:0.5556	Test AUC Score	0.6722	unseen AUC Score	0.6823	Number of Zero labels	110	Number of one labels	67
+Network	CollegeMsg.txt	Duplicate	0	Epoch	100	Train Accuracy	0.5816	Train AUC Score	0.4840	Test Accuracy:0.5556	Test AUC Score	0.5819	unseen AUC Score	0.5853	Number of Zero labels	110	Number of one labels	67
+
+Temporal TDA
+Network	Reddit_B.tsv	Duplicate	0	Epoch	0	Train Accuracy	0.4828	Train AUC Score	0.4516	Test Accuracy:0.4750	Test AUC Score	0.5739	unseen AUC Score	0.5595	Number of Zero labels	189	Number of one labels	210
+Network	Reddit_B.tsv	Duplicate	0	Epoch	10	Train Accuracy	0.4953	Train AUC Score	0.4607	Test Accuracy:0.4875	Test AUC Score	0.4511	unseen AUC Score	0.4330	Number of Zero labels	189	Number of one labels	210
+Network	Reddit_B.tsv	Duplicate	0	Epoch	20	Train Accuracy	0.4514	Train AUC Score	0.4481	Test Accuracy:0.5500	Test AUC Score	0.5658	unseen AUC Score	0.5664	Number of Zero labels	189	Number of one labels	210
+Network	Reddit_B.tsv	Duplicate	0	Epoch	30	Train Accuracy	0.5172	Train AUC Score	0.4547	Test Accuracy:0.5500	Test AUC Score	0.6266	unseen AUC Score	0.6122	Number of Zero labels	189	Number of one labels	210
+Network	Reddit_B.tsv	Duplicate	0	Epoch	40	Train Accuracy	0.4608	Train AUC Score	0.4201	Test Accuracy:0.5375	Test AUC Score	0.5069	unseen AUC Score	0.4931	Number of Zero labels	189	Number of one labels	210
+Network	Reddit_B.tsv	Duplicate	0	Epoch	50	Train Accuracy	0.3793	Train AUC Score	0.3877	Test Accuracy:0.4250	Test AUC Score	0.4731	unseen AUC Score	0.4330	Number of Zero labels	189	Number of one labels	210
+Network	Reddit_B.tsv	Duplicate	0	Epoch	60	Train Accuracy	0.5266	Train AUC Score	0.4666	Test Accuracy:0.5500	Test AUC Score	0.5107	unseen AUC Score	0.5351	Number of Zero labels	189	Number of one labels	210
+Network	Reddit_B.tsv	Duplicate	0	Epoch	70	Train Accuracy	0.4044	Train AUC Score	0.3955	Test Accuracy:0.5000	Test AUC Score	0.4994	unseen AUC Score	0.4831	Number of Zero labels	189	Number of one labels	210
+Network	Reddit_B.tsv	Duplicate	0	Epoch	80	Train Accuracy	0.4671	Train AUC Score	0.4456	Test Accuracy:0.5000	Test AUC Score	0.4937	unseen AUC Score	0.5081	Number of Zero labels	189	Number of one labels	210
+Network	Reddit_B.tsv	Duplicate	0	Epoch	90	Train Accuracy	0.4357	Train AUC Score	0.4102	Test Accuracy:0.5125	Test AUC Score	0.4568	unseen AUC Score	0.4593	Number of Zero labels	189	Number of one labels	210
+Network	Reddit_B.tsv	Duplicate	0	Epoch	100	Train Accuracy	0.4608	Train AUC Score	0.3925	Test Accuracy:0.4750	Test AUC Score	0.4229	unseen AUC Score	0.4254	Number of Zero labels	189	Number of one labels	210
+
+Raw TDA
+Network	Reddit_B.tsv	Duplicate	0	Epoch	0	Train Accuracy	0.4922	Train AUC Score	0.5061	Test Accuracy:0.4875	Test AUC Score	0.5662	unseen AUC Score	0.5188	Number of Zero labels	189	Number of one labels	210
+Network	Reddit_B.tsv	Duplicate	0	Epoch	10	Train Accuracy	0.5078	Train AUC Score	0.5589	Test Accuracy:0.5625	Test AUC Score	0.5161	unseen AUC Score	0.5332	Number of Zero labels	189	Number of one labels	210
+Network	Reddit_B.tsv	Duplicate	0	Epoch	20	Train Accuracy	0.5266	Train AUC Score	0.5594	Test Accuracy:0.6125	Test AUC Score	0.6129	unseen AUC Score	0.6307	Number of Zero labels	189	Number of one labels	210
+Network	Reddit_B.tsv	Duplicate	0	Epoch	30	Train Accuracy	0.5266	Train AUC Score	0.4897	Test Accuracy:0.4250	Test AUC Score	0.3700	unseen AUC Score	0.3641	Number of Zero labels	189	Number of one labels	210
+Network	Reddit_B.tsv	Duplicate	0	Epoch	40	Train Accuracy	0.5047	Train AUC Score	0.5333	Test Accuracy:0.6125	Test AUC Score	0.4299	unseen AUC Score	0.4279	Number of Zero labels	189	Number of one labels	210
+Network	Reddit_B.tsv	Duplicate	0	Epoch	50	Train Accuracy	0.5329	Train AUC Score	0.4926	Test Accuracy:0.5500	Test AUC Score	0.5688	unseen AUC Score	0.5648	Number of Zero labels	189	Number of one labels	210
+Network	Reddit_B.tsv	Duplicate	0	Epoch	60	Train Accuracy	0.5329	Train AUC Score	0.4910	Test Accuracy:0.4500	Test AUC Score	0.4470	unseen AUC Score	0.4523	Number of Zero labels	189	Number of one labels	210
+Network	Reddit_B.tsv	Duplicate	0	Epoch	70	Train Accuracy	0.5141	Train AUC Score	0.5150	Test Accuracy:0.5875	Test AUC Score	0.3904	unseen AUC Score	0.3943	Number of Zero labels	189	Number of one labels	210
+Network	Reddit_B.tsv	Duplicate	0	Epoch	80	Train Accuracy	0.5141	Train AUC Score	0.5120	Test Accuracy:0.4750	Test AUC Score	0.4055	unseen AUC Score	0.4088	Number of Zero labels	189	Number of one labels	210
+Network	Reddit_B.tsv	Duplicate	0	Epoch	90	Train Accuracy	0.5016	Train AUC Score	0.5220	Test Accuracy:0.4875	Test AUC Score	0.4470	unseen AUC Score	0.4569	Number of Zero labels	189	Number of one labels	210
+Network	Reddit_B.tsv	Duplicate	0	Epoch	100	Train Accuracy	0.5392	Train AUC Score	0.5204	Test Accuracy:0.5750	Test AUC Score	0.4049	unseen AUC Score	0.4036	Number of Zero labels	189	Number of one labels	210
+
+Raw Graph
+Network	Reddit_B.tsv	Duplicate	0	Epoch	0	Train Accuracy	0.4744	Train AUC Score	0.4769	Test Accuracy:0.5513	Test AUC Score	0.6170	unseen AUC Score	0.5643	Number of Zero labels	189	Number of one labels	201
+Network	Reddit_B.tsv	Duplicate	0	Epoch	10	Train Accuracy	0.5801	Train AUC Score	0.5251	Test Accuracy:0.5000	Test AUC Score	0.4265	unseen AUC Score	0.4581	Number of Zero labels	189	Number of one labels	201
+Network	Reddit_B.tsv	Duplicate	0	Epoch	20	Train Accuracy	0.5064	Train AUC Score	0.5013	Test Accuracy:0.4231	Test AUC Score	0.4595	unseen AUC Score	0.4384	Number of Zero labels	189	Number of one labels	201
+Network	Reddit_B.tsv	Duplicate	0	Epoch	30	Train Accuracy	0.5321	Train AUC Score	0.5101	Test Accuracy:0.4615	Test AUC Score	0.4740	unseen AUC Score	0.4779	Number of Zero labels	189	Number of one labels	201
+Network	Reddit_B.tsv	Duplicate	0	Epoch	40	Train Accuracy	0.5288	Train AUC Score	0.4344	Test Accuracy:0.4487	Test AUC Score	0.3731	unseen AUC Score	0.3454	Number of Zero labels	189	Number of one labels	201
+Network	Reddit_B.tsv	Duplicate	0	Epoch	50	Train Accuracy	0.5256	Train AUC Score	0.4630	Test Accuracy:0.4103	Test AUC Score	0.3771	unseen AUC Score	0.3942	Number of Zero labels	189	Number of one labels	201
+Network	Reddit_B.tsv	Duplicate	0	Epoch	60	Train Accuracy	0.4808	Train AUC Score	0.4910	Test Accuracy:0.3974	Test AUC Score	0.3757	unseen AUC Score	0.4298	Number of Zero labels	189	Number of one labels	201
+Network	Reddit_B.tsv	Duplicate	0	Epoch	70	Train Accuracy	0.4936	Train AUC Score	0.4794	Test Accuracy:0.4487	Test AUC Score	0.5003	unseen AUC Score	0.4838	Number of Zero labels	189	Number of one labels	201
+Network	Reddit_B.tsv	Duplicate	0	Epoch	80	Train Accuracy	0.5128	Train AUC Score	0.4293	Test Accuracy:0.4231	Test AUC Score	0.4186	unseen AUC Score	0.4074	Number of Zero labels	189	Number of one labels	201
+Network	Reddit_B.tsv	Duplicate	0	Epoch	90	Train Accuracy	0.5417	Train AUC Score	0.4039	Test Accuracy:0.4615	Test AUC Score	0.3560	unseen AUC Score	0.3441	Number of Zero labels	189	Number of one labels	201
+Network	Reddit_B.tsv	Duplicate	0	Epoch	100	Train Accuracy	0.4840	Train AUC Score	0.5040	Test Accuracy:0.6154	Test AUC Score	0.5076	unseen AUC Score	0.5181	Number of Zero labels	189	Number of one labels	201
+
+Temporal TDA
+Network	mathoverflow.txt	Duplicate	0	Epoch	0	Train Accuracy	0.5205	Train AUC Score	0.5314	Test Accuracy:0.4054	Test AUC Score	0.6121	unseen AUC Score	0.5788	Number of Zero labels	95	Number of one labels	88
+Network	mathoverflow.txt	Duplicate	0	Epoch	10	Train Accuracy	0.4384	Train AUC Score	0.3188	Test Accuracy:0.5135	Test AUC Score	0.4667	unseen AUC Score	0.4788	Number of Zero labels	95	Number of one labels	88
+Network	mathoverflow.txt	Duplicate	0	Epoch	20	Train Accuracy	0.3356	Train AUC Score	0.2763	Test Accuracy:0.4865	Test AUC Score	0.3333	unseen AUC Score	0.3364	Number of Zero labels	95	Number of one labels	88
+Network	mathoverflow.txt	Duplicate	0	Epoch	30	Train Accuracy	0.3904	Train AUC Score	0.3902	Test Accuracy:0.4324	Test AUC Score	0.4152	unseen AUC Score	0.4485	Number of Zero labels	95	Number of one labels	88
+Network	mathoverflow.txt	Duplicate	0	Epoch	40	Train Accuracy	0.4110	Train AUC Score	0.1850	Test Accuracy:0.5676	Test AUC Score	0.4121	unseen AUC Score	0.4303	Number of Zero labels	95	Number of one labels	88
+Network	mathoverflow.txt	Duplicate	0	Epoch	50	Train Accuracy	0.3767	Train AUC Score	0.2737	Test Accuracy:0.5135	Test AUC Score	0.5152	unseen AUC Score	0.4636	Number of Zero labels	95	Number of one labels	88
+Network	mathoverflow.txt	Duplicate	0	Epoch	60	Train Accuracy	0.3630	Train AUC Score	0.2419	Test Accuracy:0.4865	Test AUC Score	0.3939	unseen AUC Score	0.4152	Number of Zero labels	95	Number of one labels	88
+Network	mathoverflow.txt	Duplicate	0	Epoch	70	Train Accuracy	0.3288	Train AUC Score	0.1873	Test Accuracy:0.4324	Test AUC Score	0.4242	unseen AUC Score	0.4182	Number of Zero labels	95	Number of one labels	88
+Network	mathoverflow.txt	Duplicate	0	Epoch	80	Train Accuracy	0.3699	Train AUC Score	0.1992	Test Accuracy:0.4865	Test AUC Score	0.3697	unseen AUC Score	0.4424	Number of Zero labels	95	Number of one labels	88
+Network	mathoverflow.txt	Duplicate	0	Epoch	90	Train Accuracy	0.3904	Train AUC Score	0.1475	Test Accuracy:0.5405	Test AUC Score	0.4091	unseen AUC Score	0.3939	Number of Zero labels	95	Number of one labels	88
+Network	mathoverflow.txt	Duplicate	0	Epoch	100	Train Accuracy	0.3973	Train AUC Score	0.2623	Test Accuracy:0.5676	Test AUC Score	0.3394	unseen AUC Score	0.3788	Number of Zero labels	95	Number of one labels	88
+
+Raw TDA
+Network	mathoverflow.txt	Duplicate	0	Epoch	0	Train Accuracy	0.5137	Train AUC Score	0.5507	Test Accuracy:0.4054	Test AUC Score	0.5863	unseen AUC Score	0.5506	Number of Zero labels	95	Number of one labels	88
+Network	mathoverflow.txt	Duplicate	0	Epoch	10	Train Accuracy	0.5068	Train AUC Score	0.6278	Test Accuracy:0.5946	Test AUC Score	0.4762	unseen AUC Score	0.4821	Number of Zero labels	95	Number of one labels	88
+Network	mathoverflow.txt	Duplicate	0	Epoch	20	Train Accuracy	0.5479	Train AUC Score	0.6042	Test Accuracy:0.4595	Test AUC Score	0.4167	unseen AUC Score	0.4315	Number of Zero labels	95	Number of one labels	88
+Network	mathoverflow.txt	Duplicate	0	Epoch	30	Train Accuracy	0.5274	Train AUC Score	0.5678	Test Accuracy:0.4865	Test AUC Score	0.4851	unseen AUC Score	0.4435	Number of Zero labels	95	Number of one labels	88
+Network	mathoverflow.txt	Duplicate	0	Epoch	40	Train Accuracy	0.5342	Train AUC Score	0.5758	Test Accuracy:0.4054	Test AUC Score	0.4345	unseen AUC Score	0.4286	Number of Zero labels	95	Number of one labels	88
+Network	mathoverflow.txt	Duplicate	0	Epoch	50	Train Accuracy	0.4726	Train AUC Score	0.4715	Test Accuracy:0.2973	Test AUC Score	0.3652	unseen AUC Score	0.3393	Number of Zero labels	95	Number of one labels	88
+Network	mathoverflow.txt	Duplicate	0	Epoch	60	Train Accuracy	0.4384	Train AUC Score	0.4349	Test Accuracy:0.4054	Test AUC Score	0.3869	unseen AUC Score	0.3452	Number of Zero labels	95	Number of one labels	88
+Network	mathoverflow.txt	Duplicate	0	Epoch	70	Train Accuracy	0.4452	Train AUC Score	0.3941	Test Accuracy:0.2973	Test AUC Score	0.4107	unseen AUC Score	0.4077	Number of Zero labels	95	Number of one labels	88
+Network	mathoverflow.txt	Duplicate	0	Epoch	80	Train Accuracy	0.4589	Train AUC Score	0.4125	Test Accuracy:0.4054	Test AUC Score	0.3842	unseen AUC Score	0.3780	Number of Zero labels	95	Number of one labels	88
+Network	mathoverflow.txt	Duplicate	0	Epoch	90	Train Accuracy	0.3973	Train AUC Score	0.3801	Test Accuracy:0.4054	Test AUC Score	0.3810	unseen AUC Score	0.3869	Number of Zero labels	95	Number of one labels	88
+Network	mathoverflow.txt	Duplicate	0	Epoch	100	Train Accuracy	0.5000	Train AUC Score	0.4215	Test Accuracy:0.3784	Test AUC Score	0.4199	unseen AUC Score	0.4137	Number of Zero labels	95	Number of one labels	88
+
+Network	mathoverflow.txt Duplicate	0	Epoch	 0	 Train Accuracy	 0.4795	 Train AUC Score	 0.4547	 Test Accuracy: 0.5135	 test AUC Score	 0.5146	 unseen AUC Score	 0.3772
+Network	mathoverflow.txt Duplicate	0	Epoch	 10	 Train Accuracy	 0.4521	 Train AUC Score	 0.3983	 Test Accuracy: 0.6216	 test AUC Score	 0.5585	 unseen AUC Score	 0.4854
+Network	mathoverflow.txt Duplicate	0	Epoch	 20	 Train Accuracy	 0.4110	 Train AUC Score	 0.3538	 Test Accuracy: 0.5405	 test AUC Score	 0.5117	 unseen AUC Score	 0.5146
+Network	mathoverflow.txt Duplicate	0	Epoch	 30	 Train Accuracy	 0.3904	 Train AUC Score	 0.3203	 Test Accuracy: 0.3514	 test AUC Score	 0.3713	 unseen AUC Score	 0.3129
+Network	mathoverflow.txt Duplicate	0	Epoch	 40	 Train Accuracy	 0.3356	 Train AUC Score	 0.2801	 Test Accuracy: 0.5135	 test AUC Score	 0.3977	 unseen AUC Score	 0.3772
+Network	mathoverflow.txt Duplicate	0	Epoch	 50	 Train Accuracy	 0.2945	 Train AUC Score	 0.2590	 Test Accuracy: 0.4324	 test AUC Score	 0.3772	 unseen AUC Score	 0.3772
+Network	mathoverflow.txt Duplicate	0	Epoch	 60	 Train Accuracy	 0.4178	 Train AUC Score	 0.2978	 Test Accuracy: 0.4865	 test AUC Score	 0.3187	 unseen AUC Score	 0.2924
+Network	mathoverflow.txt Duplicate	0	Epoch	 70	 Train Accuracy	 0.3699	 Train AUC Score	 0.2530	 Test Accuracy: 0.5135	 test AUC Score	 0.3509	 unseen AUC Score	 0.3538
+Network	mathoverflow.txt Duplicate	0	Epoch	 80	 Train Accuracy	 0.3836	 Train AUC Score	 0.3151	 Test Accuracy: 0.4865	 test AUC Score	 0.4357	 unseen AUC Score	 0.3655
+Network	mathoverflow.txt Duplicate	0	Epoch	 90	 Train Accuracy	 0.3904	 Train AUC Score	 0.2750	 Test Accuracy: 0.5135	 test AUC Score	 0.4240	 unseen AUC Score	 0.4035
+Network	mathoverflow.txt Duplicate	0	Epoch	 100	 Train Accuracy	 0.3425	 Train AUC Score	 0.2110	 Test Accuracy: 0.4595	 test AUC Score	 0.3509	 unseen AUC Score	 0.3509

@@ -30,6 +30,7 @@ class NetworkParser:
     # Path of the dataset folder
     file_path = "../data/all_network/"
     timeseries_file_path = "../data/all_network/TimeSeries/"
+    timeseries_file_path_other = "../data/all_network/TimeSeries/Other/"
     timeWindow = [7]
     # Validation duration condition
     networkValidationDuration = 20
@@ -245,17 +246,107 @@ class NetworkParser:
                 except Exception as e:
                     from_node_features["incoming_edge_count"] = 0
 
-                # # feature 5 -> max outgoing edge weight
-                # from_node_features["outgoing_edge_weight_max"] = selectedNetwork.groupby(by=['from'])['value'].max
-                # # feature 6 -> max incoming edge weight
-                # from_node_features["incoming_edge_weight_max"] = selectedNetwork.groupby(by=['from'])['value'].max
-                # to_node_features["incoming_edge_weight_max"] = selectedNetwork.groupby(by=['from'])['value'].max
-                # # feature 7 -> min outgoing edge weight
-                # from_node_features["outgoing_edge_weight_min"] = selectedNetwork.groupby(by=['from'])['value'].min
-                # to_node_features["outgoing_edge_weight_min"] = selectedNetwork.groupby(by=['from'])['value'].min
-                # # feature 8 -> min incoming edge weight
-                # from_node_features["incoming_edge_weight_min"] = selectedNetwork.groupby(by=['from'])['value'].min
-                # to_node_features["incoming_edge_weight_min"] = selectedNetwork.groupby(by=['from'])['value'].min
+                transactionGraph.add_nodes_from([(item["from"], from_node_features)])
+                transactionGraph.add_nodes_from([(item["to"], to_node_features)])
+                transactionGraph.add_edge(item["from"], item["to"], value=item["value"])
+
+            featureNames = ["outgoing_edge_weight_sum", "incoming_edge_weight_sum", "outgoing_edge_count",
+                            "incoming_edge_count"]
+            pygData = self.from_networkx(transactionGraph, label=label, group_node_attrs=featureNames)
+            with open('PygGraphs/' + file, 'wb') as f:
+                pickle.dump(pygData, f)
+
+    def creatNetworkGraphsOther(self, file):
+        print("Processing {}".format(file))
+        allOneNodeFeatures = {}
+        sizeOfNodeFeatures = 5
+        featureNames = []
+        selectedNetwork = pd.read_csv((self.timeseries_file_path_other + file), sep=' ', names=["from", "to", "date"])
+        selectedNetwork['value'] = 1
+        selectedNetwork['date'] = pd.to_datetime(selectedNetwork['date'], unit='s').dt.date
+        selectedNetwork['value'] = selectedNetwork['value'].astype(float)
+
+        # generate the label for this network
+        date_counts = selectedNetwork.groupby(['date']).count()
+        peak_count = date_counts['value'].max()
+
+        # Calculate the sum of the value column for the last two dates
+        last_date_sum = date_counts['value'].tail(self.finalDataDuration).sum()
+        if (last_date_sum / peak_count) * 100 > self.labelTreshholdPercentage:
+            # live
+            label = 1
+        else:
+            # dead
+            label = 0
+
+        # normalize the edge weights for the graph network {0-9}
+        max_transfer = float(selectedNetwork['value'].max())
+        min_transfer = float(selectedNetwork['value'].min())
+
+        if max_transfer == min_transfer:
+            max_transfer = min_transfer + 1
+
+        selectedNetwork['value'] = selectedNetwork['value'].apply(
+            lambda x: 1 + (9 * ((float(x) - min_transfer) / (max_transfer - min_transfer))))
+
+        for timeFrame in self.timeWindow:
+            print("\nProcessing Timeframe {} ".format(timeFrame))
+            transactionGraph = nx.MultiDiGraph()
+            start_date = selectedNetwork['date'].min()
+            last_date_of_data = selectedNetwork['date'].max()
+            # check if the network has more than 20 days of data
+            if ((last_date_of_data - start_date).days < self.networkValidationDuration):
+                print(file + "Is not a valid network")
+                shutil.move(self.file_path + file, self.file_path + "Invalid/" + file)
+                continue
+
+            # select only the rows that fall within the first timeframe days
+            end_date = start_date + dt.timedelta(days=timeFrame)
+            selectedNetworkInTimeFrame = selectedNetwork[
+                (selectedNetwork['date'] >= start_date) & (selectedNetwork['date'] < end_date)]
+
+            # for i in range(sizeOfNodeFeatures):
+            #     allOneNodeFeatures["feature{}".format(i)] = 1.0
+            #     featureNames.append("feature{}".format(i))
+
+            # group by for extracting node features
+            outgoing_weight_sum = (selectedNetwork.groupby(by=['from'])['value'].sum())
+            incoming_weight_sum = (selectedNetwork.groupby(by=['to'])['value'].sum())
+            outgoing_count = (selectedNetwork.groupby(by=['from'])['value'].count())
+            incoming_count = (selectedNetwork.groupby(by=['to'])['value'].count())
+
+            # Populate graph with edges
+            for item in selectedNetworkInTimeFrame.to_dict(orient="records"):
+                from_node_features = {}
+                to_node_features = {}
+                # calculating node features for each edge
+                # feature 1 -> sum of outgoing edge weights
+                from_node_features["outgoing_edge_weight_sum"] = outgoing_weight_sum[item['from']]
+
+                try:
+                    to_node_features["outgoing_edge_weight_sum"] = outgoing_weight_sum[item['to']]
+                except Exception as e:
+                    to_node_features["outgoing_edge_weight_sum"] = 0
+
+                # feature 2 -> sum of incoming edge weights
+                to_node_features["incoming_edge_weight_sum"] = incoming_weight_sum[item['to']]
+                try:
+                    from_node_features["incoming_edge_weight_sum"] = incoming_weight_sum[item['from']]
+                except Exception as e:
+                    from_node_features["incoming_edge_weight_sum"] = 0
+                # feature 3 -> number of outgoing edges
+                from_node_features["outgoing_edge_count"] = outgoing_count[item['from']]
+                try:
+                    to_node_features["outgoing_edge_count"] = outgoing_count[item['to']]
+                except Exception as e:
+                    to_node_features["outgoing_edge_count"] = 0
+
+                # feature 4 -> number of incoming edges
+                to_node_features["incoming_edge_count"] = incoming_count[item['to']]
+                try:
+                    from_node_features["incoming_edge_count"] = incoming_count[item['from']]
+                except Exception as e:
+                    from_node_features["incoming_edge_count"] = 0
 
                 transactionGraph.add_nodes_from([(item["from"], from_node_features)])
                 transactionGraph.add_nodes_from([(item["to"], to_node_features)])
@@ -429,6 +520,352 @@ class NetworkParser:
             with open(directory + "/TemporalVectorizedGraph/" + file + "_" + "graph_" + str(indx), 'wb') as f:
                 pickle.dump(pygData, f)
 
+    def creatTimeSeriesOtherGraphs(self, file):
+        print("Processing {}".format(file))
+        windowSize = 7  # Day
+        gap = 3
+        lableWindowSize = 7  # Day
+        maxDuration = 180  # Day
+        indx = 0
+        maxIndx = 2
+
+        selectedNetwork = pd.read_csv((self.timeseries_file_path_other + file), sep=' ', names=["from", "to", "date"])
+        selectedNetwork['value'] = 1
+        selectedNetwork['date'] = pd.to_datetime(selectedNetwork['date'], unit='s').dt.date
+        selectedNetwork['value'] = selectedNetwork['value'].astype(float)
+        selectedNetwork = selectedNetwork.sort_values(by='date')
+        window_start_date = selectedNetwork['date'].min() + dt.timedelta(days=2150)
+        data_last_date = selectedNetwork['date'].max()
+
+        # print("\n {} Days OF Data -> {} ".format(file, (data_last_date - window_start_date).days ))
+        # check if the network has more than 20 days of data
+        if ((data_last_date - window_start_date).days < maxDuration):
+            print(file + "Is not a valid network")
+            shutil.move(self.file_path + file, self.file_path + "Invalid/" + file)
+            return
+
+        # normalize the edge weights for the graph network {0-9}
+        max_transfer = float(selectedNetwork['value'].max())
+        min_transfer = float(selectedNetwork['value'].min())
+        if max_transfer == min_transfer:
+            max_transfer = min_transfer + 1
+        # Calculate mean and standard deviation
+        # mean = np.mean(selectedNetwork['value'])
+        # std = np.std(selectedNetwork['value'])
+
+        # selectedNetwork['value'] = selectedNetwork['value'].apply(lambda x: (x - mean) / std)
+
+        selectedNetwork['value'] = selectedNetwork['value'].apply(
+            lambda x: 1 + (9 * ((float(x) - min_transfer) / (max_transfer - min_transfer))))
+
+        # Graph Generation Process and Labeling
+        while (data_last_date - window_start_date).days > (windowSize + gap + lableWindowSize):
+            print("\nRemaining Process {} ".format(
+                (data_last_date - window_start_date).days / (windowSize + gap + lableWindowSize)))
+            indx += 1
+            # if (indx == maxIndx):
+            #     break
+            transactionGraph = nx.MultiDiGraph()
+
+            # select window data
+            window_end_date = window_start_date + dt.timedelta(days=windowSize)
+            selectedNetworkInGraphDataWindow = selectedNetwork[
+                (selectedNetwork['date'] >= window_start_date) & (selectedNetwork['date'] < window_end_date)]
+
+            # select labeling data
+            label_end_date = window_start_date + dt.timedelta(days=windowSize) + dt.timedelta(days=gap) + dt.timedelta(
+                days=lableWindowSize)
+            label_start_date = window_start_date + dt.timedelta(days=windowSize) + dt.timedelta(days=gap)
+            selectedNetworkInLbelingWindow = selectedNetwork[
+                (selectedNetwork['date'] >= label_start_date) & (selectedNetwork['date'] < label_end_date)]
+
+            # generating the label for this window
+            # 1 -> Increading Transactions 0 -> Decreasing Transactions
+            label = 1 if (len(selectedNetworkInLbelingWindow) - len(selectedNetworkInGraphDataWindow)) > 0 else 0
+
+            # group by for extracting node features
+            outgoing_weight_sum = (selectedNetwork.groupby(by=['from'])['value'].sum())
+            incoming_weight_sum = (selectedNetwork.groupby(by=['to'])['value'].sum())
+            outgoing_count = (selectedNetwork.groupby(by=['from'])['value'].count())
+            incoming_count = (selectedNetwork.groupby(by=['to'])['value'].count())
+
+            # Node Features Dictionary for TDA mapper usage
+            node_features = pd.DataFrame()
+
+            # Populate graph with edges
+            for item in selectedNetworkInGraphDataWindow.to_dict(orient="records"):
+                from_node_features = {}
+                to_node_features = {}
+                # calculating node features for each edge
+                # feature 1 -> sum of outgoing edge weights
+                from_node_features["outgoing_edge_weight_sum"] = outgoing_weight_sum[item['from']]
+
+                try:
+                    to_node_features["outgoing_edge_weight_sum"] = outgoing_weight_sum[item['to']]
+                except Exception as e:
+                    to_node_features["outgoing_edge_weight_sum"] = 0
+
+                # feature 2 -> sum of incoming edge weights
+                to_node_features["incoming_edge_weight_sum"] = incoming_weight_sum[item['to']]
+                try:
+                    from_node_features["incoming_edge_weight_sum"] = incoming_weight_sum[item['from']]
+                except Exception as e:
+                    from_node_features["incoming_edge_weight_sum"] = 0
+                # feature 3 -> number of outgoing edges
+                from_node_features["outgoing_edge_count"] = outgoing_count[item['from']]
+                try:
+                    to_node_features["outgoing_edge_count"] = outgoing_count[item['to']]
+                except Exception as e:
+                    to_node_features["outgoing_edge_count"] = 0
+
+                # feature 4 -> number of incoming edges
+                to_node_features["incoming_edge_count"] = incoming_count[item['to']]
+                try:
+                    from_node_features["incoming_edge_count"] = incoming_count[item['from']]
+                except Exception as e:
+                    from_node_features["incoming_edge_count"] = 0
+
+                # add temporal vector to all nodes, populated with -1
+
+                from_node_features_with_daily_temporal_vector = dict(from_node_features)
+                from_node_features_with_daily_temporal_vector["dailyClusterID"] = [-1] * windowSize
+                from_node_features_with_daily_temporal_vector["dailyClusterSize"] = [-1] * windowSize
+
+                to_node_features_with_daily_temporal_vector = dict(to_node_features)
+                to_node_features_with_daily_temporal_vector["dailyClusterID"] = [-1] * windowSize
+                to_node_features_with_daily_temporal_vector["dailyClusterSize"] = [-1] * windowSize
+
+                # # feature 5 -> max outgoing edge weight
+                # from_node_features["outgoing_edge_weight_max"] = selectedNetwork.groupby(by=['from'])['value'].max
+                # # feature 6 -> max incoming edge weight
+                # from_node_features["incoming_edge_weight_max"] = selectedNetwork.groupby(by=['from'])['value'].max
+                # to_node_features["incoming_edge_weight_max"] = selectedNetwork.groupby(by=['from'])['value'].max
+                # # feature 7 -> min outgoing edge weight
+                # from_node_features["outgoing_edge_weight_min"] = selectedNetwork.groupby(by=['from'])['value'].min
+                # to_node_features["outgoing_edge_weight_min"] = selectedNetwork.groupby(by=['from'])['value'].min
+                # # feature 8 -> min incoming edge weight
+                # from_node_features["incoming_edge_weight_min"] = selectedNetwork.groupby(by=['from'])['value'].min
+                # to_node_features["incoming_edge_weight_min"] = selectedNetwork.groupby(by=['from'])['value'].min
+
+                # transactionGraph.add_nodes_from([(item["from"], from_node_features)])
+                # transactionGraph.add_nodes_from([(item["to"], to_node_features)])
+                # transactionGraph.add_edge(item["from"], item["to"], value=item["value"])
+
+                # Temporal version
+                transactionGraph.add_nodes_from([(item["from"], from_node_features_with_daily_temporal_vector)])
+                transactionGraph.add_nodes_from([(item["to"], to_node_features_with_daily_temporal_vector)])
+                transactionGraph.add_edge(item["from"], item["to"], value=item["value"])
+
+                new_row = pd.DataFrame(({**{"nodeID": item["from"]}, **from_node_features}), index=[0])
+                node_features = pd.concat([node_features, new_row], ignore_index=True)
+
+                new_row = pd.DataFrame(({**{"nodeID": item["to"]}, **to_node_features}), index=[0])
+                node_features = pd.concat([node_features, new_row], ignore_index=True)
+
+                node_features = node_features.drop_duplicates(subset=['nodeID'])
+
+            directory = 'PygGraphs/TimeSeries/' + file
+
+            # Extracting TDA temporal features and adding to the graph
+            print("Generating TDA temporal graph \n")
+            # transactionGraph = self.processTDAExtractedTemporalFeatures(selectedNetworkInGraphDataWindow,transactionGraph, node_features)
+            #
+            # # Generating TDA graphs
+            # print("Generating TDA raw graph \n")
+            # self.createTDAGraph(node_features, label, directory, network=file, timeWindow=indx)
+            #
+            # featureNames = ["outgoing_edge_weight_sum", "incoming_edge_weight_sum", "outgoing_edge_count",
+            #                  "incoming_edge_count", "dailyClusterID", "dailyClusterSize"]
+
+            featureNames = ["outgoing_edge_weight_sum", "incoming_edge_weight_sum", "outgoing_edge_count",
+                            "incoming_edge_count"]
+            window_start_date = window_start_date + dt.timedelta(days=1)
+            #
+            # Generating PyGraphs for timeseries data
+            print("Generating raw graph \n")
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+            pygData = self.from_networkx(transactionGraph, label=label, group_node_attrs=featureNames)
+            with open(directory + "/RawGraph/" + file + "_" + "graph_" + str(indx), 'wb') as f:
+                pickle.dump(pygData, f)
+
+    def creatTimeSeriesRedditGraphs(self, file):
+        print("Processing {}".format(file))
+        windowSize = 7  # Day
+        gap = 3
+        lableWindowSize = 7  # Day
+        maxDuration = 180  # Day
+        indx = 0
+        maxIndx = 2
+
+        selectedNetwork = pd.read_csv((self.timeseries_file_path_other + file), sep='\t')
+        selectedNetwork = selectedNetwork[["SOURCE_SUBREDDIT", "TARGET_SUBREDDIT", "TIMESTAMP", "LINK_SENTIMENT"]]
+        column_mapping = {
+            'SOURCE_SUBREDDIT': 'from',
+            'TARGET_SUBREDDIT': 'to',
+            'TIMESTAMP': 'date',
+            'LINK_SENTIMENT': 'value'
+        }
+        selectedNetwork.rename(columns=column_mapping, inplace=True)
+        selectedNetwork['date'] = pd.to_datetime(selectedNetwork['date']).dt.date
+        selectedNetwork['value'] = selectedNetwork['value'].astype(float)
+        selectedNetwork = selectedNetwork.sort_values(by='date')
+        # reddit 800
+        window_start_date = selectedNetwork['date'].min() + dt.timedelta(days=800)
+        data_last_date = selectedNetwork['date'].max()
+
+        # print("\n {} Days OF Data -> {} ".format(file, (data_last_date - window_start_date).days ))
+        # check if the network has more than 20 days of data
+        if ((data_last_date - window_start_date).days < maxDuration):
+            print(file + "Is not a valid network")
+            shutil.move(self.file_path + file, self.file_path + "Invalid/" + file)
+            return
+
+        # normalize the edge weights for the graph network {0-9}
+        max_transfer = float(selectedNetwork['value'].max())
+        min_transfer = float(selectedNetwork['value'].min())
+        if max_transfer == min_transfer:
+            max_transfer = min_transfer + 1
+        # Calculate mean and standard deviation
+        # mean = np.mean(selectedNetwork['value'])
+        # std = np.std(selectedNetwork['value'])
+
+        # selectedNetwork['value'] = selectedNetwork['value'].apply(lambda x: (x - mean) / std)
+
+        selectedNetwork['value'] = selectedNetwork['value'].apply(
+            lambda x: 1 + (9 * ((float(x) - min_transfer) / (max_transfer - min_transfer))))
+
+        # Graph Generation Process and Labeling
+        while (data_last_date - window_start_date).days > (windowSize + gap + lableWindowSize):
+            print("\nRemaining Process {} ".format(
+                (data_last_date - window_start_date).days / (windowSize + gap + lableWindowSize)))
+            indx += 1
+            # if (indx == maxIndx):
+            #     break
+            transactionGraph = nx.MultiDiGraph()
+
+            # select window data
+            window_end_date = window_start_date + dt.timedelta(days=windowSize)
+            selectedNetworkInGraphDataWindow = selectedNetwork[
+                (selectedNetwork['date'] >= window_start_date) & (selectedNetwork['date'] < window_end_date)]
+
+            # select labeling data
+            label_end_date = window_start_date + dt.timedelta(days=windowSize) + dt.timedelta(days=gap) + dt.timedelta(
+                days=lableWindowSize)
+            label_start_date = window_start_date + dt.timedelta(days=windowSize) + dt.timedelta(days=gap)
+            selectedNetworkInLbelingWindow = selectedNetwork[
+                (selectedNetwork['date'] >= label_start_date) & (selectedNetwork['date'] < label_end_date)]
+
+            # generating the label for this window
+            # 1 -> Increading Transactions 0 -> Decreasing Transactions
+            label = 1 if (len(selectedNetworkInLbelingWindow) - len(selectedNetworkInGraphDataWindow)) > 0 else 0
+
+            # group by for extracting node features
+            outgoing_weight_sum = (selectedNetwork.groupby(by=['from'])['value'].sum())
+            incoming_weight_sum = (selectedNetwork.groupby(by=['to'])['value'].sum())
+            outgoing_count = (selectedNetwork.groupby(by=['from'])['value'].count())
+            incoming_count = (selectedNetwork.groupby(by=['to'])['value'].count())
+
+            # Node Features Dictionary for TDA mapper usage
+            node_features = pd.DataFrame()
+
+            # Populate graph with edges
+            for item in selectedNetworkInGraphDataWindow.to_dict(orient="records"):
+                from_node_features = {}
+                to_node_features = {}
+                # calculating node features for each edge
+                # feature 1 -> sum of outgoing edge weights
+                from_node_features["outgoing_edge_weight_sum"] = outgoing_weight_sum[item['from']]
+
+                try:
+                    to_node_features["outgoing_edge_weight_sum"] = outgoing_weight_sum[item['to']]
+                except Exception as e:
+                    to_node_features["outgoing_edge_weight_sum"] = 0
+
+                # feature 2 -> sum of incoming edge weights
+                to_node_features["incoming_edge_weight_sum"] = incoming_weight_sum[item['to']]
+                try:
+                    from_node_features["incoming_edge_weight_sum"] = incoming_weight_sum[item['from']]
+                except Exception as e:
+                    from_node_features["incoming_edge_weight_sum"] = 0
+                # feature 3 -> number of outgoing edges
+                from_node_features["outgoing_edge_count"] = outgoing_count[item['from']]
+                try:
+                    to_node_features["outgoing_edge_count"] = outgoing_count[item['to']]
+                except Exception as e:
+                    to_node_features["outgoing_edge_count"] = 0
+
+                # feature 4 -> number of incoming edges
+                to_node_features["incoming_edge_count"] = incoming_count[item['to']]
+                try:
+                    from_node_features["incoming_edge_count"] = incoming_count[item['from']]
+                except Exception as e:
+                    from_node_features["incoming_edge_count"] = 0
+
+                # add temporal vector to all nodes, populated with -1
+
+                from_node_features_with_daily_temporal_vector = dict(from_node_features)
+                from_node_features_with_daily_temporal_vector["dailyClusterID"] = [-1] * windowSize
+                from_node_features_with_daily_temporal_vector["dailyClusterSize"] = [-1] * windowSize
+
+                to_node_features_with_daily_temporal_vector = dict(to_node_features)
+                to_node_features_with_daily_temporal_vector["dailyClusterID"] = [-1] * windowSize
+                to_node_features_with_daily_temporal_vector["dailyClusterSize"] = [-1] * windowSize
+
+                # # feature 5 -> max outgoing edge weight
+                # from_node_features["outgoing_edge_weight_max"] = selectedNetwork.groupby(by=['from'])['value'].max
+                # # feature 6 -> max incoming edge weight
+                # from_node_features["incoming_edge_weight_max"] = selectedNetwork.groupby(by=['from'])['value'].max
+                # to_node_features["incoming_edge_weight_max"] = selectedNetwork.groupby(by=['from'])['value'].max
+                # # feature 7 -> min outgoing edge weight
+                # from_node_features["outgoing_edge_weight_min"] = selectedNetwork.groupby(by=['from'])['value'].min
+                # to_node_features["outgoing_edge_weight_min"] = selectedNetwork.groupby(by=['from'])['value'].min
+                # # feature 8 -> min incoming edge weight
+                # from_node_features["incoming_edge_weight_min"] = selectedNetwork.groupby(by=['from'])['value'].min
+                # to_node_features["incoming_edge_weight_min"] = selectedNetwork.groupby(by=['from'])['value'].min
+
+                # transactionGraph.add_nodes_from([(item["from"], from_node_features)])
+                # transactionGraph.add_nodes_from([(item["to"], to_node_features)])
+                # transactionGraph.add_edge(item["from"], item["to"], value=item["value"])
+
+                # Temporal version
+                transactionGraph.add_nodes_from([(item["from"], from_node_features_with_daily_temporal_vector)])
+                transactionGraph.add_nodes_from([(item["to"], to_node_features_with_daily_temporal_vector)])
+                transactionGraph.add_edge(item["from"], item["to"], value=item["value"])
+
+                new_row = pd.DataFrame(({**{"nodeID": item["from"]}, **from_node_features}), index=[0])
+                node_features = pd.concat([node_features, new_row], ignore_index=True)
+
+                new_row = pd.DataFrame(({**{"nodeID": item["to"]}, **to_node_features}), index=[0])
+                node_features = pd.concat([node_features, new_row], ignore_index=True)
+
+                node_features = node_features.drop_duplicates(subset=['nodeID'])
+
+            directory = 'PygGraphs/TimeSeries/' + file
+
+            # Extracting TDA temporal features and adding to the graph
+            # print("Generating TDA temporal graph \n")
+            # transactionGraph = self.processTDAExtractedTemporalFeatures(selectedNetworkInGraphDataWindow,transactionGraph, node_features)
+            #
+            # # Generating TDA graphs
+            # print("Generating TDA raw graph \n")
+            # self.createTDAGraph(node_features, label, directory, network=file, timeWindow=indx)
+
+            # featureNames = ["outgoing_edge_weight_sum", "incoming_edge_weight_sum", "outgoing_edge_count",
+            #                  "incoming_edge_count", "dailyClusterID", "dailyClusterSize"]
+
+            featureNames = ["outgoing_edge_weight_sum", "incoming_edge_weight_sum", "outgoing_edge_count",
+                            "incoming_edge_count"]
+            window_start_date = window_start_date + dt.timedelta(days=1)
+            #
+            # Generating PyGraphs for timeseries data
+            print("Generating raw graph \n")
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+            pygData = self.from_networkx(transactionGraph, label=label, group_node_attrs=featureNames)
+            with open(directory + "/RawGraph/" + file + "_" + "graph_" + str(indx), 'wb') as f:
+                pickle.dump(pygData, f)
+
     def creatTimeSeriesRnnSequence(self, file):
         totalRnnSequenceData = list()
         totalRnnLabelData = list()
@@ -571,10 +1008,574 @@ class NetworkParser:
         # directory = 'Sequence/' + str(file)
         # if not os.path.exists(directory):
         #     os.makedirs(directory)
-        # with open(directory + '/seq_raw.txt',
+        # with open(directory + '/seq.txt',
         #           'wb') as file_in:
         #     pickle.dump(finalDict, file_in)
         #     file_in.close()
+
+    def creatTimeSeriesForOtherDatasetRnnSequence(self, file, raw=False):
+        totalRnnSequenceData = list()
+        totalRnnLabelData = list()
+        print("Processing {}".format(file))
+        windowSize = 7  # Day
+        gap = 3
+        lableWindowSize = 7  # Day
+        maxDuration = 20  # Day
+        indx = 0
+        maxIndx = 2
+
+        selectedNetwork = pd.read_csv((self.timeseries_file_path_other + file), sep=' ', names=["from", "to", "date"])
+        selectedNetwork['value'] = 1
+        selectedNetwork['date'] = pd.to_datetime(selectedNetwork['date'], unit='s').dt.date
+        selectedNetwork['value'] = selectedNetwork['value'].astype(float)
+        selectedNetwork = selectedNetwork.sort_values(by='date')
+        # math stack 2150
+        if "math" in file:
+            window_start_date = selectedNetwork['date'].min() + dt.timedelta(2150)
+        else:
+            window_start_date = selectedNetwork['date'].min()
+        data_last_date = selectedNetwork['date'].max()
+
+        print(f"{file} -- {window_start_date} -- {data_last_date}")
+
+        print("\n {} Days OF Data -> {} ".format(file, (data_last_date - window_start_date).days))
+        # check if the network has more than 20 days of data
+        if ((data_last_date - window_start_date).days < maxDuration):
+            print(file + "Is not a valid network")
+            shutil.move(self.file_path + file, self.file_path + "Invalid/" + file)
+            return
+
+        # normalize the edge weights for the graph network {0-9}
+        max_transfer = float(selectedNetwork['value'].max())
+        min_transfer = float(selectedNetwork['value'].min())
+        if max_transfer == min_transfer:
+            max_transfer = min_transfer + 1
+
+        selectedNetwork['value'] = selectedNetwork['value'].apply(
+            lambda x: 1 + (9 * ((float(x) - min_transfer) / (max_transfer - min_transfer))))
+
+        # Graph Generation Process and Labeling
+
+        while (data_last_date - window_start_date).days > (windowSize + gap + lableWindowSize):
+            print("\nRemaining Process  {} ".format(
+
+                (data_last_date - window_start_date).days / (windowSize + gap + lableWindowSize)))
+            indx += 1
+            # if (indx == maxIndx):
+            #     break
+            transactionGraph = nx.MultiDiGraph()
+
+            # select window data
+            window_end_date = window_start_date + dt.timedelta(days=windowSize)
+            selectedNetworkInGraphDataWindow = selectedNetwork[
+                (selectedNetwork['date'] >= window_start_date) & (
+                        selectedNetwork['date'] < window_end_date)]
+
+            # select labeling data
+            label_end_date = window_start_date + dt.timedelta(days=windowSize) + dt.timedelta(
+                days=gap) + dt.timedelta(
+                days=lableWindowSize)
+            label_start_date = window_start_date + dt.timedelta(days=windowSize) + dt.timedelta(days=gap)
+            selectedNetworkInLbelingWindow = selectedNetwork[
+                (selectedNetwork['date'] >= label_start_date) & (selectedNetwork['date'] < label_end_date)]
+
+            # generating the label for this window
+            # 1 -> Increading Transactions 0 -> Decreasing Transactions
+            label = 1 if (len(selectedNetworkInLbelingWindow) - len(
+                selectedNetworkInGraphDataWindow)) > 0 else 0
+
+            # group by for extracting node features
+            outgoing_weight_sum = (selectedNetwork.groupby(by=['from'])['value'].sum())
+            incoming_weight_sum = (selectedNetwork.groupby(by=['to'])['value'].sum())
+            outgoing_count = (selectedNetwork.groupby(by=['from'])['value'].count())
+            incoming_count = (selectedNetwork.groupby(by=['to'])['value'].count())
+
+            # Node Features Dictionary for TDA mapper usage
+            node_features = pd.DataFrame()
+
+            # Populate graph with edges
+            for item in selectedNetworkInGraphDataWindow.to_dict(orient="records"):
+                from_node_features = {}
+                to_node_features = {}
+                # calculating node features for each edge
+                # feature 1 -> sum of outgoing edge weights
+                from_node_features["outgoing_edge_weight_sum"] = outgoing_weight_sum[item['from']]
+
+                try:
+                    to_node_features["outgoing_edge_weight_sum"] = outgoing_weight_sum[item['to']]
+                except Exception as e:
+                    to_node_features["outgoing_edge_weight_sum"] = 0
+
+                # feature 2 -> sum of incoming edge weights
+                to_node_features["incoming_edge_weight_sum"] = incoming_weight_sum[item['to']]
+                try:
+                    from_node_features["incoming_edge_weight_sum"] = incoming_weight_sum[item['from']]
+                except Exception as e:
+                    from_node_features["incoming_edge_weight_sum"] = 0
+                # feature 3 -> number of outgoing edges
+                from_node_features["outgoing_edge_count"] = outgoing_count[item['from']]
+                try:
+                    to_node_features["outgoing_edge_count"] = outgoing_count[item['to']]
+                except Exception as e:
+                    to_node_features["outgoing_edge_count"] = 0
+
+                # feature 4 -> number of incoming edges
+                to_node_features["incoming_edge_count"] = incoming_count[item['to']]
+                try:
+                    from_node_features["incoming_edge_count"] = incoming_count[item['from']]
+                except Exception as e:
+                    from_node_features["incoming_edge_count"] = 0
+
+                # add temporal vector to all nodes, populated with -1
+
+                from_node_features_with_daily_temporal_vector = dict(from_node_features)
+                from_node_features_with_daily_temporal_vector["dailyClusterID"] = [-1] * windowSize
+                from_node_features_with_daily_temporal_vector["dailyClusterSize"] = [-1] * windowSize
+
+                to_node_features_with_daily_temporal_vector = dict(to_node_features)
+                to_node_features_with_daily_temporal_vector["dailyClusterID"] = [-1] * windowSize
+                to_node_features_with_daily_temporal_vector["dailyClusterSize"] = [-1] * windowSize
+
+                # Temporal version
+                transactionGraph.add_nodes_from(
+                    [(item["from"], from_node_features_with_daily_temporal_vector)])
+                transactionGraph.add_nodes_from([(item["to"], to_node_features_with_daily_temporal_vector)])
+                transactionGraph.add_edge(item["from"], item["to"], value=item["value"])
+
+                new_row = pd.DataFrame(({**{"nodeID": item["from"]}, **from_node_features}), index=[0])
+                node_features = pd.concat([node_features, new_row], ignore_index=True)
+
+                new_row = pd.DataFrame(({**{"nodeID": item["to"]}, **to_node_features}), index=[0])
+                node_features = pd.concat([node_features, new_row], ignore_index=True)
+
+                node_features = node_features.drop_duplicates(subset=['nodeID'])
+
+            file_name = "/seq_cls.txt"
+            if (raw):
+                timeWindowSequence = self.processRawExtractedRnnSequence(selectedNetworkInGraphDataWindow,
+                                                                         node_features)
+                file_name = "/seq_raw.txt"
+            else:
+                timeWindowSequence = self.processTDAExtractedRnnSequence(selectedNetworkInGraphDataWindow,
+                                                                         node_features)
+
+            totalRnnSequenceData.append(timeWindowSequence)
+            totalRnnLabelData.append(label)
+            window_start_date = window_start_date + dt.timedelta(days=1)
+
+        total_merged_seq = self.merge_dicts(totalRnnSequenceData)
+        finalDict = {"sequence": total_merged_seq, "label": totalRnnLabelData}
+        directory = 'Sequence/' + str(file)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        with open(directory + file_name,
+                  'wb') as file_in:
+            pickle.dump(finalDict, file_in)
+            file_in.close()
+
+    def creatTimeSeriesForRedditDatasetRnnSequence(self, file, raw=False):
+        totalRnnSequenceData = list()
+        totalRnnLabelData = list()
+        print("Processing {}".format(file))
+        windowSize = 7  # Day
+        gap = 3
+        lableWindowSize = 7  # Day
+        maxDuration = 20  # Day
+        indx = 0
+        maxIndx = 2
+
+        selectedNetwork = pd.read_csv((self.timeseries_file_path_other + file), sep='\t')
+        selectedNetwork = selectedNetwork[["SOURCE_SUBREDDIT", "TARGET_SUBREDDIT", "TIMESTAMP", "LINK_SENTIMENT"]]
+        column_mapping = {
+            'SOURCE_SUBREDDIT': 'from',
+            'TARGET_SUBREDDIT': 'to',
+            'TIMESTAMP': 'date',
+            'LINK_SENTIMENT': 'value'
+        }
+        selectedNetwork.rename(columns=column_mapping, inplace=True)
+        selectedNetwork['date'] = pd.to_datetime(selectedNetwork['date']).dt.date
+        selectedNetwork['value'] = selectedNetwork['value'].astype(float)
+        selectedNetwork = selectedNetwork.sort_values(by='date')
+        # reddit 800
+        window_start_date = selectedNetwork['date'].min() + dt.timedelta(days=800)
+        data_last_date = selectedNetwork['date'].max()
+
+        print(f"{file} -- {window_start_date} -- {data_last_date}")
+
+        print("\n {} Days OF Data -> {} ".format(file, (data_last_date - window_start_date).days))
+        # check if the network has more than 20 days of data
+        if ((data_last_date - window_start_date).days < maxDuration):
+            print(file + "Is not a valid network")
+            shutil.move(self.file_path + file, self.file_path + "Invalid/" + file)
+            return
+
+        # normalize the edge weights for the graph network {0-9}
+        max_transfer = float(selectedNetwork['value'].max())
+        min_transfer = float(selectedNetwork['value'].min())
+        if max_transfer == min_transfer:
+            max_transfer = min_transfer + 1
+
+        selectedNetwork['value'] = selectedNetwork['value'].apply(
+            lambda x: 1 + (9 * ((float(x) - min_transfer) / (max_transfer - min_transfer))))
+
+        # Graph Generation Process and Labeling
+
+        while (data_last_date - window_start_date).days > (windowSize + gap + lableWindowSize):
+            print("\nRemaining Process  {} ".format(
+
+                (data_last_date - window_start_date).days / (windowSize + gap + lableWindowSize)))
+            indx += 1
+            # if (indx == maxIndx):
+            #     break
+            transactionGraph = nx.MultiDiGraph()
+
+            # select window data
+            window_end_date = window_start_date + dt.timedelta(days=windowSize)
+            selectedNetworkInGraphDataWindow = selectedNetwork[
+                (selectedNetwork['date'] >= window_start_date) & (
+                        selectedNetwork['date'] < window_end_date)]
+
+            # select labeling data
+            label_end_date = window_start_date + dt.timedelta(days=windowSize) + dt.timedelta(
+                days=gap) + dt.timedelta(
+                days=lableWindowSize)
+            label_start_date = window_start_date + dt.timedelta(days=windowSize) + dt.timedelta(days=gap)
+            selectedNetworkInLbelingWindow = selectedNetwork[
+                (selectedNetwork['date'] >= label_start_date) & (selectedNetwork['date'] < label_end_date)]
+
+            # generating the label for this window
+            # 1 -> Increading Transactions 0 -> Decreasing Transactions
+            label = 1 if (len(selectedNetworkInLbelingWindow) - len(
+                selectedNetworkInGraphDataWindow)) > 0 else 0
+
+            # group by for extracting node features
+            outgoing_weight_sum = (selectedNetwork.groupby(by=['from'])['value'].sum())
+            incoming_weight_sum = (selectedNetwork.groupby(by=['to'])['value'].sum())
+            outgoing_count = (selectedNetwork.groupby(by=['from'])['value'].count())
+            incoming_count = (selectedNetwork.groupby(by=['to'])['value'].count())
+
+            # Node Features Dictionary for TDA mapper usage
+            node_features = pd.DataFrame()
+
+            # Populate graph with edges
+            for item in selectedNetworkInGraphDataWindow.to_dict(orient="records"):
+                from_node_features = {}
+                to_node_features = {}
+                # calculating node features for each edge
+                # feature 1 -> sum of outgoing edge weights
+                from_node_features["outgoing_edge_weight_sum"] = outgoing_weight_sum[item['from']]
+
+                try:
+                    to_node_features["outgoing_edge_weight_sum"] = outgoing_weight_sum[item['to']]
+                except Exception as e:
+                    to_node_features["outgoing_edge_weight_sum"] = 0
+
+                # feature 2 -> sum of incoming edge weights
+                to_node_features["incoming_edge_weight_sum"] = incoming_weight_sum[item['to']]
+                try:
+                    from_node_features["incoming_edge_weight_sum"] = incoming_weight_sum[item['from']]
+                except Exception as e:
+                    from_node_features["incoming_edge_weight_sum"] = 0
+                # feature 3 -> number of outgoing edges
+                from_node_features["outgoing_edge_count"] = outgoing_count[item['from']]
+                try:
+                    to_node_features["outgoing_edge_count"] = outgoing_count[item['to']]
+                except Exception as e:
+                    to_node_features["outgoing_edge_count"] = 0
+
+                # feature 4 -> number of incoming edges
+                to_node_features["incoming_edge_count"] = incoming_count[item['to']]
+                try:
+                    from_node_features["incoming_edge_count"] = incoming_count[item['from']]
+                except Exception as e:
+                    from_node_features["incoming_edge_count"] = 0
+
+                # add temporal vector to all nodes, populated with -1
+
+                from_node_features_with_daily_temporal_vector = dict(from_node_features)
+                from_node_features_with_daily_temporal_vector["dailyClusterID"] = [-1] * windowSize
+                from_node_features_with_daily_temporal_vector["dailyClusterSize"] = [-1] * windowSize
+
+                to_node_features_with_daily_temporal_vector = dict(to_node_features)
+                to_node_features_with_daily_temporal_vector["dailyClusterID"] = [-1] * windowSize
+                to_node_features_with_daily_temporal_vector["dailyClusterSize"] = [-1] * windowSize
+
+                # Temporal version
+                transactionGraph.add_nodes_from(
+                    [(item["from"], from_node_features_with_daily_temporal_vector)])
+                transactionGraph.add_nodes_from([(item["to"], to_node_features_with_daily_temporal_vector)])
+                transactionGraph.add_edge(item["from"], item["to"], value=item["value"])
+
+                new_row = pd.DataFrame(({**{"nodeID": item["from"]}, **from_node_features}), index=[0])
+                node_features = pd.concat([node_features, new_row], ignore_index=True)
+
+                new_row = pd.DataFrame(({**{"nodeID": item["to"]}, **to_node_features}), index=[0])
+                node_features = pd.concat([node_features, new_row], ignore_index=True)
+
+                node_features = node_features.drop_duplicates(subset=['nodeID'])
+
+            file_name = "/seq.txt"
+            if (raw):
+                timeWindowSequence = self.processRawExtractedRnnSequence(selectedNetworkInGraphDataWindow,
+                                                                         node_features)
+                file_name = "/seq_raw.txt"
+            else:
+                timeWindowSequence = self.processTDAExtractedRnnSequence(selectedNetworkInGraphDataWindow,
+                                                                         node_features)
+
+            totalRnnSequenceData.append(timeWindowSequence)
+            totalRnnLabelData.append(label)
+            window_start_date = window_start_date + dt.timedelta(days=1)
+
+        total_merged_seq = self.merge_dicts(totalRnnSequenceData)
+        finalDict = {"sequence": total_merged_seq, "label": totalRnnLabelData}
+        directory = 'Sequence/' + str(file)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        with open(directory + file_name,
+                  'wb') as file_in:
+            pickle.dump(finalDict, file_in)
+            file_in.close()
+
+    def creatBaselineDatasets(self, file):
+        print("Processing {}".format(file))
+        windowSize = 7  # Day
+        gap = 3
+        lableWindowSize = 7  # Day
+        maxDuration = 20  # Day
+        indx = 0
+        maxIndx = 2
+
+        selectedNetwork = pd.read_csv((self.timeseries_file_path + file), sep=' ',
+                                      names=["from", "to", "date", "value"])
+        selectedNetwork['date'] = pd.to_datetime(selectedNetwork['date'], unit='s').dt.date
+        selectedNetwork['value'] = selectedNetwork['value'].astype(float)
+        selectedNetwork = selectedNetwork.sort_values(by='date')
+        window_start_date = selectedNetwork['date'].min()
+        data_last_date = selectedNetwork['date'].max()
+
+        print(f"{file} -- {window_start_date} -- {data_last_date}")
+
+        print("\n {} Days OF Data -> {} ".format(file, (data_last_date - window_start_date).days))
+        # check if the network has more than 20 days of data
+        if ((data_last_date - window_start_date).days < maxDuration):
+            print(file + "Is not a valid network")
+            shutil.move(self.file_path + file, self.file_path + "Invalid/" + file)
+            return
+
+        # normalize the edge weights for the graph network {0-9}
+        max_transfer = float(selectedNetwork['value'].max())
+        min_transfer = float(selectedNetwork['value'].min())
+        if max_transfer == min_transfer:
+            max_transfer = min_transfer + 1
+
+        # selectedNetwork['value'] = selectedNetwork['value'].apply(
+        #     lambda x: 1 + (9 * ((float(x) - min_transfer) / (max_transfer - min_transfer))))
+
+        # Graph Generation Process and Labeling
+
+        while (data_last_date - window_start_date).days > (windowSize + gap + lableWindowSize):
+            print("\nRemaining Process  {} ".format(
+
+                (data_last_date - window_start_date).days / (windowSize + gap + lableWindowSize)))
+            indx += 1
+
+            # select window data
+            window_end_date = window_start_date + dt.timedelta(days=windowSize)
+            selectedNetworkInGraphDataWindow = selectedNetwork[
+                (selectedNetwork['date'] >= window_start_date) & (
+                        selectedNetwork['date'] < window_end_date)]
+
+            # select labeling data
+            label_end_date = window_start_date + dt.timedelta(days=windowSize) + dt.timedelta(
+                days=gap) + dt.timedelta(
+                days=lableWindowSize)
+            label_start_date = window_start_date + dt.timedelta(days=windowSize) + dt.timedelta(days=gap)
+            selectedNetworkInLbelingWindow = selectedNetwork[
+                (selectedNetwork['date'] >= label_start_date) & (selectedNetwork['date'] < label_end_date)]
+
+            # generating the label for this window
+            # 1 -> Increading Transactions 0 -> Decreasing Transactions
+            label = 1 if (len(selectedNetworkInLbelingWindow) - len(
+                selectedNetworkInGraphDataWindow)) > 0 else 0
+
+            selectedNetworkInGraphDataWindow = selectedNetworkInGraphDataWindow.assign(Snapshot=indx)
+            csv_file_path = "../data/all_network/TimeSeries/Baseline/" + file
+            if os.path.exists(csv_file_path):
+                existing_df = pd.read_csv(csv_file_path)
+            else:
+                existing_df = pd.DataFrame()
+
+            appended_df = existing_df.append(selectedNetworkInGraphDataWindow, ignore_index=True)
+            appended_df.to_csv(csv_file_path, index=False)
+
+            window_start_date = window_start_date + dt.timedelta(days=1)
+
+        print(f"f{file} Processing has been completed!")
+
+    def creatBaselineDatasetsOther(self, file):
+        print("Processing {}".format(file))
+        windowSize = 7  # Day
+        gap = 3
+        lableWindowSize = 7  # Day
+        maxDuration = 20  # Day
+        indx = 0
+        maxIndx = 2
+
+        selectedNetwork = pd.read_csv((self.timeseries_file_path_other + file), sep=' ', names=["from", "to", "date"])
+        selectedNetwork['value'] = 1
+        selectedNetwork['date'] = pd.to_datetime(selectedNetwork['date'], unit='s').dt.date
+        selectedNetwork['value'] = selectedNetwork['value'].astype(float)
+        selectedNetwork = selectedNetwork.sort_values(by='date')
+        # math stack 2150
+        if "math" in file:
+            window_start_date = selectedNetwork['date'].min() + dt.timedelta(2150)
+        else:
+            window_start_date = selectedNetwork['date'].min()
+        data_last_date = selectedNetwork['date'].max()
+
+        print(f"{file} -- {window_start_date} -- {data_last_date}")
+
+        print("\n {} Days OF Data -> {} ".format(file, (data_last_date - window_start_date).days))
+        # check if the network has more than 20 days of data
+        if ((data_last_date - window_start_date).days < maxDuration):
+            print(file + "Is not a valid network")
+            shutil.move(self.file_path + file, self.file_path + "Invalid/" + file)
+            return
+
+        # normalize the edge weights for the graph network {0-9}
+        max_transfer = float(selectedNetwork['value'].max())
+        min_transfer = float(selectedNetwork['value'].min())
+        if max_transfer == min_transfer:
+            max_transfer = min_transfer + 1
+
+        # selectedNetwork['value'] = selectedNetwork['value'].apply(
+        #     lambda x: 1 + (9 * ((float(x) - min_transfer) / (max_transfer - min_transfer))))
+
+        # Graph Generation Process and Labeling
+
+        while (data_last_date - window_start_date).days > (windowSize + gap + lableWindowSize):
+            print("\nRemaining Process  {} ".format(
+
+                (data_last_date - window_start_date).days / (windowSize + gap + lableWindowSize)))
+            indx += 1
+
+            # select window data
+            window_end_date = window_start_date + dt.timedelta(days=windowSize)
+            selectedNetworkInGraphDataWindow = selectedNetwork[
+                (selectedNetwork['date'] >= window_start_date) & (
+                        selectedNetwork['date'] < window_end_date)]
+
+            # select labeling data
+            label_end_date = window_start_date + dt.timedelta(days=windowSize) + dt.timedelta(
+                days=gap) + dt.timedelta(
+                days=lableWindowSize)
+            label_start_date = window_start_date + dt.timedelta(days=windowSize) + dt.timedelta(days=gap)
+            selectedNetworkInLbelingWindow = selectedNetwork[
+                (selectedNetwork['date'] >= label_start_date) & (selectedNetwork['date'] < label_end_date)]
+
+            # generating the label for this window
+            # 1 -> Increading Transactions 0 -> Decreasing Transactions
+            label = 1 if (len(selectedNetworkInLbelingWindow) - len(
+                selectedNetworkInGraphDataWindow)) > 0 else 0
+
+            selectedNetworkInGraphDataWindow = selectedNetworkInGraphDataWindow.assign(Snapshot=indx)
+            csv_file_path = "../data/all_network/TimeSeries/Baseline/" + file
+            if os.path.exists(csv_file_path):
+                existing_df = pd.read_csv(csv_file_path)
+            else:
+                existing_df = pd.DataFrame()
+
+            appended_df = existing_df.append(selectedNetworkInGraphDataWindow, ignore_index=True)
+            appended_df.to_csv(csv_file_path, index=False)
+
+            window_start_date = window_start_date + dt.timedelta(days=1)
+
+        print(f"f{file} Processing has been completed!")
+
+    def creatBaselineDatasetsReddit(self, file):
+        print("Processing {}".format(file))
+        windowSize = 7  # Day
+        gap = 3
+        lableWindowSize = 7  # Day
+        maxDuration = 20  # Day
+        indx = 0
+        maxIndx = 2
+
+        selectedNetwork = pd.read_csv((self.timeseries_file_path_other + file), sep='\t')
+        selectedNetwork = selectedNetwork[["SOURCE_SUBREDDIT", "TARGET_SUBREDDIT", "TIMESTAMP", "LINK_SENTIMENT"]]
+        column_mapping = {
+            'SOURCE_SUBREDDIT': 'from',
+            'TARGET_SUBREDDIT': 'to',
+            'TIMESTAMP': 'date',
+            'LINK_SENTIMENT': 'value'
+        }
+        selectedNetwork.rename(columns=column_mapping, inplace=True)
+        selectedNetwork['date'] = pd.to_datetime(selectedNetwork['date']).dt.date
+        selectedNetwork['value'] = selectedNetwork['value'].astype(float)
+        selectedNetwork = selectedNetwork.sort_values(by='date')
+        # reddit 800
+        window_start_date = selectedNetwork['date'].min() + dt.timedelta(days=800)
+        data_last_date = selectedNetwork['date'].max()
+
+        print(f"{file} -- {window_start_date} -- {data_last_date}")
+
+        print("\n {} Days OF Data -> {} ".format(file, (data_last_date - window_start_date).days))
+        # check if the network has more than 20 days of data
+        if ((data_last_date - window_start_date).days < maxDuration):
+            print(file + "Is not a valid network")
+            shutil.move(self.file_path + file, self.file_path + "Invalid/" + file)
+            return
+
+        # normalize the edge weights for the graph network {0-9}
+        max_transfer = float(selectedNetwork['value'].max())
+        min_transfer = float(selectedNetwork['value'].min())
+        if max_transfer == min_transfer:
+            max_transfer = min_transfer + 1
+
+        # selectedNetwork['value'] = selectedNetwork['value'].apply(
+        #     lambda x: 1 + (9 * ((float(x) - min_transfer) / (max_transfer - min_transfer))))
+
+        # Graph Generation Process and Labeling
+
+        while (data_last_date - window_start_date).days > (windowSize + gap + lableWindowSize):
+            print("\nRemaining Process  {} ".format(
+
+                (data_last_date - window_start_date).days / (windowSize + gap + lableWindowSize)))
+            indx += 1
+
+            # select window data
+            window_end_date = window_start_date + dt.timedelta(days=windowSize)
+            selectedNetworkInGraphDataWindow = selectedNetwork[
+                (selectedNetwork['date'] >= window_start_date) & (
+                        selectedNetwork['date'] < window_end_date)]
+
+            # select labeling data
+            label_end_date = window_start_date + dt.timedelta(days=windowSize) + dt.timedelta(
+                days=gap) + dt.timedelta(
+                days=lableWindowSize)
+            label_start_date = window_start_date + dt.timedelta(days=windowSize) + dt.timedelta(days=gap)
+            selectedNetworkInLbelingWindow = selectedNetwork[
+                (selectedNetwork['date'] >= label_start_date) & (selectedNetwork['date'] < label_end_date)]
+
+            # generating the label for this window
+            # 1 -> Increading Transactions 0 -> Decreasing Transactions
+            label = 1 if (len(selectedNetworkInLbelingWindow) - len(
+                selectedNetworkInGraphDataWindow)) > 0 else 0
+
+            selectedNetworkInGraphDataWindow = selectedNetworkInGraphDataWindow.assign(Snapshot=indx)
+            csv_file_path = "../data/all_network/TimeSeries/Baseline/" + file
+            if os.path.exists(csv_file_path):
+                existing_df = pd.read_csv(csv_file_path)
+            else:
+                existing_df = pd.DataFrame()
+
+            appended_df = existing_df.append(selectedNetworkInGraphDataWindow, ignore_index=True)
+            appended_df.to_csv(csv_file_path, index=False)
+
+            window_start_date = window_start_date + dt.timedelta(days=1)
+
+        print(f"f{file} Processing has been completed!")
 
     def getDailyNodeAvg(self, file):
         selectedNetwork = pd.read_csv((self.timeseries_file_path + file), sep=' ',
@@ -588,13 +1589,31 @@ class NetworkParser:
         selectedNetworkInTimeFrame = selectedNetwork[
             (selectedNetwork['date'] >= window_start_date) & (selectedNetwork['date'] < end_date)]
         print("Daily node avg of {} is {} \n".format(file, (
-            (len(set(selectedNetworkInTimeFrame['from'].unique() + selectedNetworkInTimeFrame['from'].unique())) / 7))))
+            (len(set(selectedNetworkInTimeFrame['from'].unique() + selectedNetworkInTimeFrame['to'].unique())) / 7))))
 
-    def createTDAGraph(self, data, label, htmlPath, timeWindow=0, network=""):
+    def getDailyAvg(self, file):
+        selectedNetwork = pd.read_csv((self.timeseries_file_path + file), sep=' ',
+                                      names=["from", "to", "date", "value"])
+        selectedNetwork['date'] = pd.to_datetime(selectedNetwork['date'], unit='s').dt.date
+        selectedNetwork['value'] = selectedNetwork['value'].astype(float)
+        selectedNetwork = selectedNetwork.sort_values(by='date')
+        window_start_date = selectedNetwork['date'].min()
+        data_last_date = selectedNetwork['date'].max()
+        days_of_data = (data_last_date - window_start_date).days
+        avg_daily_trans = len(selectedNetwork) / days_of_data
+        avg_daily_nodes = len(selectedNetwork['from'].unique()) + len(selectedNetwork['to'].unique()) / days_of_data
+        print(f"AVG daily stat -> nodes = {avg_daily_nodes} , edges = {avg_daily_trans}")
+        # end_date = window_start_date + dt.timedelta(days=7)
+        # selectedNetworkInTimeFrame = selectedNetwork[
+        #     (selectedNetwork['date'] >= window_start_date) & (selectedNetwork['date'] < end_date)]
+        # print("Daily node avg of {} is {} \n".format(file, (
+        #     (len(set(selectedNetworkInTimeFrame['from'].unique() + selectedNetworkInTimeFrame['to'].unique())) / 7))))
+
+    def createTDAGraph(self, data, label, htmlPath="", timeWindow=0, network=""):
         try:
-            per_overlap = [0.1, 0.2, 0.3, 0.5, 0.6]
-            n_cubes = [2, 5]
-            cls = [2, 5, 10]
+            per_overlap = [0.05]
+            n_cubes = [10]
+            # cls = [2, 5, 10]
             Xfilt = data
             Xfilt = Xfilt.drop(columns=['nodeID'])
             mapper = km.KeplerMapper()
@@ -612,11 +1631,11 @@ class NetworkParser:
                         clusterer=sklearn.cluster.KMeans(n_clusters=cls, random_state=1618033),
                         cover=km.Cover(n_cubes=n_cube, perc_overlap=overlap))  # 0.2 0.4
 
-                    mapper.visualize(graph,
-                                     path_html=htmlPath + "/mapper_output_{}_day_{}_cubes_{}_overlap_{}.html".format(
-                                         network.split(".")[0], timeWindow, n_cube, overlap),
-                                     title="Mapper graph for network {} in Day {}".format(network.split(".")[0],
-                                                                                          timeWindow))
+                    # mapper.visualize(graph,
+                    #                  path_html=htmlPath + "/mapper_output_{}_day_{}_cubes_{}_overlap_{}.html".format(
+                    #                      network.split(".")[0], timeWindow, n_cube, overlap),
+                    #                  title="Mapper graph for network {} in Day {}".format(network.split(".")[0],
+                    #                                                                       timeWindow))
 
                     # Creat a networkX graph for TDA mapper graph, in this graph nodes will be the clusters and the node featre would be the cluster size
 
@@ -710,8 +1729,8 @@ class NetworkParser:
 
             # creat the TDA for each day
             try:
-                per_overlap = 0.3
-                n_cubes = 2
+                per_overlap = 0.05
+                n_cubes = 10
                 cls = 5
                 Xfilt = daily_node_features
                 Xfilt = Xfilt.drop(columns=['nodeID'])
@@ -833,13 +1852,15 @@ class NetworkParser:
                     results = []
 
                     # Iterate over the combinations and apply the process_combination function to each combination
-                    for per_overlap_indx in range(1, 11):
-                        for n_cubes in range(2, 11):
-                            for cls in [5]:
-                                per_overlap = round(per_overlap_indx * 0.05, 2)
-                                result = pool.apply_async(self.TDA_Process,
-                                                          (mapper, lens, Xfilt, per_overlap, n_cubes, cls))
-                                results.append(result)
+                    # for per_overlap_indx in range(1, 11):
+                    #     for n_cubes in range(2, 11):
+                    per_overlap = 0.4
+                    n_cubes = 5
+                    for cls in [2, 3, 4, 5, 6, 7, 8, 9, 10]:
+                        # per_overlap = round(per_overlap_indx * 0.05, 2)
+                        result = pool.apply_async(self.TDA_Process,
+                                                  (mapper, lens, Xfilt, per_overlap, n_cubes, cls))
+                        results.append(result)
 
                     # Retrieve the results as they become available
                     for result in results:
@@ -1106,7 +2127,7 @@ class NetworkParser:
             if file.endswith(".txt"):
                 self.processingIndx += 1
                 print("Processing {} / {} \n".format(self.processingIndx, len(files) - 3))
-                p = Process(target=self.creatTimeSeriesGraphs, args=(file,))  # make process
+                p = Process(target=self.processRawExtractedRnnSequence, args=(file,))  # make process
                 p.start()  # start function
                 p.join(timeout=240)
 
@@ -1128,11 +2149,11 @@ class NetworkParser:
         # stat_data.to_csv("final_data.csv")
 
     def graphCreationHandlerTimeSeries(self):
-        files = os.listdir(self.timeseries_file_path)
+        files = os.listdir(self.timeseries_file_path_other)
         for file in files:
             if file.endswith(".txt"):
-                print("Processing {} / {} \n".format(self.processingIndx, len(files) - 2))
-                p = Process(target=self.creatTimeSeriesRnnSequence, args=(file,))  # make process
+                print("Processing {} / {} \n".format(self.processingIndx, len(files) - 4))
+                p = Process(target=self.creatTimeSeriesForOtherDatasetRnnSequence, args=(file,))  # make process
                 p.start()  # start function
                 p.join(timeout=68000000000)
 

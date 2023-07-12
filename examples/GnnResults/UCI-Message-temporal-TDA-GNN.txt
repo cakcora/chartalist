@@ -1,0 +1,11 @@
+Network	CollegeMsg.txt Duplicate	0	Epoch	 0	 Train Accuracy	 0.5816	 Train AUC Score	 0.5129	 Test Accuracy: 0.6944	 test AUC Score	 0.5615	 unseen AUC Score	 0.3885
+Network	CollegeMsg.txt Duplicate	0	Epoch	 10	 Train Accuracy	 0.5177	 Train AUC Score	 0.5303	 Test Accuracy: 0.4722	 test AUC Score	 0.5115	 unseen AUC Score	 0.4808
+Network	CollegeMsg.txt Duplicate	0	Epoch	 20	 Train Accuracy	 0.4681	 Train AUC Score	 0.4486	 Test Accuracy: 0.5000	 test AUC Score	 0.4115	 unseen AUC Score	 0.3808
+Network	CollegeMsg.txt Duplicate	0	Epoch	 30	 Train Accuracy	 0.4326	 Train AUC Score	 0.3569	 Test Accuracy: 0.4444	 test AUC Score	 0.2962	 unseen AUC Score	 0.2692
+Network	CollegeMsg.txt Duplicate	0	Epoch	 40	 Train Accuracy	 0.4965	 Train AUC Score	 0.4361	 Test Accuracy: 0.5556	 test AUC Score	 0.4385	 unseen AUC Score	 0.3923
+Network	CollegeMsg.txt Duplicate	0	Epoch	 50	 Train Accuracy	 0.5248	 Train AUC Score	 0.4960	 Test Accuracy: 0.5833	 test AUC Score	 0.3846	 unseen AUC Score	 0.3654
+Network	CollegeMsg.txt Duplicate	0	Epoch	 60	 Train Accuracy	 0.4823	 Train AUC Score	 0.6190	 Test Accuracy: 0.5278	 test AUC Score	 0.5654	 unseen AUC Score	 0.4962
+Network	CollegeMsg.txt Duplicate	0	Epoch	 70	 Train Accuracy	 0.5177	 Train AUC Score	 0.3874	 Test Accuracy: 0.5833	 test AUC Score	 0.3538	 unseen AUC Score	 0.3654
+Network	CollegeMsg.txt Duplicate	0	Epoch	 80	 Train Accuracy	 0.4752	 Train AUC Score	 0.4728	 Test Accuracy: 0.4167	 test AUC Score	 0.4154	 unseen AUC Score	 0.3769
+Network	CollegeMsg.txt Duplicate	0	Epoch	 90	 Train Accuracy	 0.4610	 Train AUC Score	 0.4146	 Test Accuracy: 0.5000	 test AUC Score	 0.2923	 unseen AUC Score	 0.3038
+Network	CollegeMsg.txt Duplicate	0	Epoch	 100	 Train Accuracy	 0.3901	 Train AUC Score	 0.3221	 Test Accuracy: 0.4722	 test AUC Score	 0.4692	 unseen AUC Score	 0.4538

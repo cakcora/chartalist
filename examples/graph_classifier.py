@@ -1,11 +1,11 @@
 import os
 import pickle
 import random
-
+import datetime as dt
 import pandas as pd
 import yaml
 from matplotlib import pyplot as plt
-from pycaret.classification import *
+# from pycaret.classification import *
 from torch_geometric.data import Data
 from sklearn.metrics import roc_auc_score
 from torch_geometric.loader import DataLoader
@@ -148,19 +148,22 @@ def read_torch_data():
 
 def read_torch_time_series_data(network, variable= None):
     file_path = "PygGraphs/TimeSeries/{}/".format(network)
+    file_path_raw_graph = "PygGraphs/TimeSeries/{}/RawGraph/".format(network)
     file_path_TDA = "PygGraphs/TimeSeries/{}/TDA/".format(network)
     file_path_different_TDA = "PygGraphs/TimeSeries/{}/TDA/{}/".format(network, variable)
     file_path_temporal_TDA = "PygGraphs/TimeSeries/{}/TemporalVectorizedGraph/".format(network)
     inx = 1
     GraphDataList = []
-    files = os.listdir(file_path_temporal_TDA)
+    files = os.listdir(file_path_raw_graph)
     for file in files:
-        with open(file_path_temporal_TDA + file, 'rb') as f:
+        with open(file_path_raw_graph + file, 'rb') as f:
             # print("\n Reading Torch Data {} / {}".format(inx, len(files)))
             data = pickle.load(f)
             GraphDataList.append(data)
             inx += 1
     return GraphDataList
+
+
 
 
 def data_by_edge_visualization(data):
@@ -379,30 +382,30 @@ def data_by_avg_daily_trans_visualization(data):
     plt.savefig('avg_daily_trans_number.png', dpi=300)
     plt.show()
 
-def classifier(data):
-    # cleaning features
-    data = data.drop('network', axis=1)
-    data = data.drop('timeframe', axis=1)
-    data = data.drop('start_date', axis=1)
-    data = data.drop('label_factor_percentage', axis=1)
-    data = data.drop('last_dates_trans', axis=1)
-    data = data.drop('data_duration', axis=1)
-    data = data.drop('peak', axis=1)
-
-    # 791 dead, 824 live
-    # des = data.groupby("label")
-
-    train = data.sample(frac=0.7, random_state=200)
-    test = data.drop(train.index)
-    # Setting up the Environment
-    clf = setup(data=train, target='label')
-
-    # Comparing All Models
-    best_model = compare_models()
-    # evaluate_model(best_model)
-    plot_model(best_model, plot='feature', save=True)
-    predictions = predict_model(best_model, data=test)
-    pred_acc = (pull().set_index('Model'))['Accuracy'].iloc[0]
+# def classifier(data):
+#     # cleaning features
+#     data = data.drop('network', axis=1)
+#     data = data.drop('timeframe', axis=1)
+#     data = data.drop('start_date', axis=1)
+#     data = data.drop('label_factor_percentage', axis=1)
+#     data = data.drop('last_dates_trans', axis=1)
+#     data = data.drop('data_duration', axis=1)
+#     data = data.drop('peak', axis=1)
+#
+#     # 791 dead, 824 live
+#     # des = data.groupby("label")
+#
+#     train = data.sample(frac=0.7, random_state=200)
+#     test = data.drop(train.index)
+#     # Setting up the Environment
+#     clf = setup(data=train, target='label')
+#
+#     # Comparing All Models
+#     best_model = compare_models()
+#     # evaluate_model(best_model)
+#     plot_model(best_model, plot='feature', save=True)
+#     predictions = predict_model(best_model, data=test)
+#     pred_acc = (pull().set_index('Model'))['Accuracy'].iloc[0]
 
 
 def GCN_classifier(data):
@@ -441,7 +444,8 @@ def GIN_classifier(data, network):
         train_dataset, test_dataset = torch.utils.data.random_split(data, [train_size, test_size])
         train_loader = DataLoader(train_dataset, shuffle=True)
         test_loader = DataLoader(test_dataset)
-        model = GIN(dim_features=18, dim_target=2, config=config)
+        # for temporal static GNN the input dim is 18 (2x7 temporal + 4 ta static)
+        model = GIN(dim_features=4, dim_target=2, config=config)
         optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
         criterion = torch.nn.CrossEntropyLoss()
 
@@ -476,7 +480,7 @@ def train(train_loader, model, criterion, optimizer):
             optimizer.step()  # Update parameters based on gradients.
             optimizer.zero_grad()  # Clear gradients.
         except Exception as e:
-            # print(str(e) + "In train")
+            print(str(e) + "In train")
             continue
 
 
@@ -503,7 +507,7 @@ def test(test_loader, model):
             arr1 = data.y.detach().numpy()
             y_true_list.append(arr1[0])
         except Exception as e:
-            # print(str(e) + "In Test")
+            print(str(e) + "In Test")
             continue
 
     try:
@@ -522,9 +526,37 @@ def test(test_loader, model):
 
 # def GNN_classifier(data):
 
+def getDailyAvg(file):
+    timeseries_file_path = "../data/all_network/TimeSeries/"
+    timeseries_file_path_other = "../data/all_network/TimeSeries/Other/"
+    selectedNetwork = pd.read_csv((timeseries_file_path_other + file), sep=' ', names=["from", "to", "date"])
+    selectedNetwork['value'] = 1
+    selectedNetwork['date'] = pd.to_datetime(selectedNetwork['date'], unit='s').dt.date
+    selectedNetwork['value'] = selectedNetwork['value'].astype(float)
+    selectedNetwork = selectedNetwork.sort_values(by='date')
+    window_start_date = selectedNetwork['date'].min()  + dt.timedelta(2150)
+    data_last_date = selectedNetwork['date'].max()
+    days_of_data = (data_last_date - window_start_date).days
+    avg_daily_trans = len(selectedNetwork) / days_of_data
+    # Concatenate the two columns
+    combined = pd.concat([selectedNetwork['from'], selectedNetwork['to']], ignore_index=True)
+    # Get the number of unique items
+    num_unique = combined.nunique()
+    avg_daily_nodes = num_unique /days_of_data
+    print(f"AVG daily stat for {file} -> nodes = {avg_daily_nodes} , edges = {avg_daily_trans} , days = {days_of_data} , total trans = {len(selectedNetwork)}, Range {window_start_date} {data_last_date}")
 
 if __name__ == "__main__":
-    networkList = ["networkaeternity.txt", "networkaion.txt", "networkaragon.txt", "networkbancor.txt", "networkcentra.txt", "networkcindicator.txt", "networkcoindash.txt", "networkdgd.txt", "networkiconomi.txt"]
+    # processingIndx = 0
+    # timeseries_file_path_other = "../data/all_network/TimeSeries/Other/"
+    # files = os.listdir(timeseries_file_path_other)
+    # for file in files:
+    #     if file.endswith(".txt"):
+    #         print("Processing {} / {} \n".format(processingIndx, len(files) - 4))
+    #         getDailyAvg(file)
+    #         processingIndx += 1
+
+    #networkList = ["networkaeternity.txt", "networkaion.txt", "networkaragon.txt", "networkbancor.txt", "networkcentra.txt", "networkcindicator.txt", "networkcoindash.txt", "networkdgd.txt", "networkiconomi.txt"]
+    networkList = ["mathoverflow.txt"]
     #tdaDifferentGraph = ["Overlap_0.1_Ncube_2", "Overlap_0.1_Ncube_5", "Overlap_0.2_Ncube_2", "Overlap_0.2_Ncube_5", "Overlap_0.3_Ncube_2", "Overlap_0.3_Ncube_5", "Overlap_0.5_Ncube_2", "Overlap_0.5_Ncube_5", "Overlap_0.6_Ncube_2", "Overlap_0.6_Ncube_5"]
     # data = read_data()
     # data_by_edge_visualization(data)
@@ -542,6 +574,7 @@ if __name__ == "__main__":
     for network in networkList:
         # for tdaVariable in tdaDifferentGraph:
         print("Working on {}\n".format(network))
-        data = read_torch_time_series_data(network)
+        data = read_torch_time_series_data(network, "Overlap_0.05_Ncube_10")
+        # data2 = read_torch_time_series_data_2(network, "Overlap_0.4_Ncube_5")
         GIN_classifier(data, network)
-    # GCN_classifier(data)
+    # # GCN_classifier(data)

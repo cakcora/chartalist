@@ -13,3 +13,5 @@ examples/*.csv
 examples/PygGraphs/
 examples/RnnResults/
 examples/Sequence
+examples/cred4.json
+LAD
