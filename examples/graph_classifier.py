@@ -152,11 +152,14 @@ def read_torch_time_series_data(network, variable= None):
     file_path_TDA = "PygGraphs/TimeSeries/{}/TDA/".format(network)
     file_path_different_TDA = "PygGraphs/TimeSeries/{}/TDA/{}/".format(network, variable)
     file_path_temporal_TDA = "PygGraphs/TimeSeries/{}/TemporalVectorizedGraph/".format(network)
+
+    file_path_different_TDA_Tuned = "PygGraphs/TimeSeries/{}/TDA_Tuned/{}/".format(network, variable)
+    file_path_temporal_TDA_Tuned = "PygGraphs/TimeSeries/{}/TemporalVectorizedGraph_Tuned/".format(network)
     inx = 1
     GraphDataList = []
-    files = os.listdir(file_path_raw_graph)
+    files = os.listdir(file_path_different_TDA_Tuned)
     for file in files:
-        with open(file_path_raw_graph + file, 'rb') as f:
+        with open(file_path_different_TDA_Tuned + file, 'rb') as f:
             # print("\n Reading Torch Data {} / {}".format(inx, len(files)))
             data = pickle.load(f)
             GraphDataList.append(data)
@@ -437,16 +440,19 @@ def GIN_classifier(data, network):
     count_one_labels = sum(1 for item in data if item['y'] == 1)
     count_zero_labels = sum(1 for item in data if item['y'] == 0)
     with open("config_GIN.yml", "r") as f:
-        config = yaml.load(f)
+        config = yaml.load(f, Loader=yaml.SafeLoader)
     for duplication in range(0, 1):
         train_size = int(0.8 * len(data))
         test_size = len(data) - train_size
-        train_dataset, test_dataset = torch.utils.data.random_split(data, [train_size, test_size])
-        train_loader = DataLoader(train_dataset, shuffle=True)
+        # chronological order
+        train_dataset = data[:train_size]
+        test_dataset = data[train_size:]
+        # train_dataset, test_dataset = torch.utils.data.random_split(data, [train_size, test_size])
+        train_loader = DataLoader(train_dataset)
         test_loader = DataLoader(test_dataset)
         # for temporal static GNN the input dim is 18 (2x7 temporal + 4 ta static)
-        model = GIN(dim_features=4, dim_target=2, config=config)
-        optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+        model = GIN(dim_features=1, dim_target=2, config=config)
+        optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
         criterion = torch.nn.CrossEntropyLoss()
 
         for epoch in range(0, 101):
@@ -461,12 +467,14 @@ def GIN_classifier(data, network):
             unseen_acc = scores_unseen[0]
             unseen_auc = scores_unseen[1]
             if epoch % 10 == 0:
+                print(
+                    f"Network\t{network} Duplicate\t{duplication}\tEpoch\t {epoch}\t Train Accuracy\t {train_acc:.4f}\t Train AUC Score\t {train_auc:.4f}\t Test Accuracy: {test_acc:.4f}\t test AUC Score\t {test_auc:.4f}\t unseen AUC Score\t {unseen_auc:.4f}")
+
+            if epoch % 100 == 0:
                 with open('GnnResults/GIN_TimeSeries_Result.txt', 'a+') as file:
                     file.write(
                         f"\nNetwork\t{network}\tDuplicate\t{duplication}\tEpoch\t{epoch}\tTrain Accuracy\t{train_acc:.4f}\tTrain AUC Score\t{train_auc:.4f}\tTest Accuracy:{test_acc:.4f}\tTest AUC Score\t{test_auc:.4f}\tunseen AUC Score\t{unseen_auc:.4f}\tNumber of Zero labels\t{count_zero_labels}\tNumber of one labels\t{count_one_labels}")
                     file.close()
-                print(
-                    f"Network\t{network} Duplicate\t{duplication}\tEpoch\t {epoch}\t Train Accuracy\t {train_acc:.4f}\t Train AUC Score\t {train_auc:.4f}\t Test Accuracy: {test_acc:.4f}\t test AUC Score\t {test_auc:.4f}\t unseen AUC Score\t {unseen_auc:.4f}")
 
 
 def train(train_loader, model, criterion, optimizer):
@@ -556,7 +564,7 @@ if __name__ == "__main__":
     #         processingIndx += 1
 
     #networkList = ["networkaeternity.txt", "networkaion.txt", "networkaragon.txt", "networkbancor.txt", "networkcentra.txt", "networkcindicator.txt", "networkcoindash.txt", "networkdgd.txt", "networkiconomi.txt"]
-    networkList = ["mathoverflow.txt"]
+    networkList = ["networkiconomi.txt"]
     #tdaDifferentGraph = ["Overlap_0.1_Ncube_2", "Overlap_0.1_Ncube_5", "Overlap_0.2_Ncube_2", "Overlap_0.2_Ncube_5", "Overlap_0.3_Ncube_2", "Overlap_0.3_Ncube_5", "Overlap_0.5_Ncube_2", "Overlap_0.5_Ncube_5", "Overlap_0.6_Ncube_2", "Overlap_0.6_Ncube_5"]
     # data = read_data()
     # data_by_edge_visualization(data)
@@ -574,7 +582,9 @@ if __name__ == "__main__":
     for network in networkList:
         # for tdaVariable in tdaDifferentGraph:
         print("Working on {}\n".format(network))
-        data = read_torch_time_series_data(network, "Overlap_0.05_Ncube_10")
+        data = read_torch_time_series_data(network, "Overlap_0.3_Ncube_2")
         # data2 = read_torch_time_series_data_2(network, "Overlap_0.4_Ncube_5")
-        GIN_classifier(data, network)
+        for i in range(1,6):
+            print(f"RUN {i}")
+            GIN_classifier(data, network)
     # # GCN_classifier(data)

@@ -3,9 +3,12 @@ import os
 import pickle
 import re
 import time
+from random import random
+from keras.callbacks import Callback
 import pandas as pd
 import datetime as dt
 import numpy as np
+import tensorflow as tf
 from keras.models import Sequential
 from keras.layers import LSTM, Dense, Dropout, GRU
 from matplotlib import pyplot as plt
@@ -35,9 +38,49 @@ def read_seq_data_by_file_name(network, file):
     return seqData
 
 
+def train_test_split_sequential(*arrays, train_size=None):
+    if train_size is None:
+        raise ValueError("train_size must be specified.")
+
+    total_samples = len(arrays[0])
+    train_samples = int(train_size * total_samples)
+    train_data = [array[:train_samples] for array in arrays]
+    test_data = [array[train_samples:] for array in arrays]
+
+    return train_data[0], test_data[0]
+
+
+def reset_random_seeds():
+    os.environ['PYTHONHASHSEED'] = str(1)
+    tf.random.set_seed(1)
+    np.random.seed(1)
+
+
+class AUCCallback(Callback):
+    def __init__(self, validation_data):
+        self.validation_data = validation_data
+        self.auc_scores = []
+
+    def on_epoch_end(self, epoch, logs=None):
+        x_val, y_val = self.validation_data
+        y_pred = self.model.predict(x_val)
+        auc_score = roc_auc_score(y_val, y_pred)
+        self.auc_scores.append(auc_score)
+        print(f"Epoch {epoch + 1} - Validation AUC: {auc_score:.4f}")
+
+    def get_auc_std(self):
+        return np.std(self.auc_scores)
+
+    def get_auc_avg(self):
+        return np.average(self.auc_scores)
+
+
 def LSTM_classifier(data, labels, spec, network):
+    reset_random_seeds()
     start_Rnn_training_time = time.time()
-    data_train, data_test, labels_train, labels_test = train_test_split(data, labels, test_size=0.2, random_state=42)
+    # data_train, data_test, labels_train, labels_test = train_test_split(data, labels, test_size=0.2, random_state=42)
+    data_train, data_test = train_test_split_sequential(data, train_size=0.8)
+    labels_train, labels_test = train_test_split_sequential(labels, train_size=0.8)
 
     # Define the LSTM model
     model_LSTM = Sequential()
@@ -47,43 +90,63 @@ def LSTM_classifier(data, labels, spec, network):
     model_LSTM.add(GRU(32, activation='relu', return_sequences=True))
     model_LSTM.add(GRU(32, activation='relu', return_sequences=False))
     model_LSTM.add((Dense(100, activation='relu')))
-
     model_LSTM.add(Dense(1, activation="sigmoid"))
 
+    from tensorflow.python.keras.optimizers import adam_v2
+    # Iconomi 0.00001
+    # Centra 0.00004
+    # bancor 0.00005
+    # Aragon 0.00001
+    # UCI 0.00008 (0.00004 - epoch 250 )
+    # Reddit-b 0.00005
+    # Aternity 0.00008
+
+    learning_rate = 0.0001
+
+    opt = adam_v2.Adam(learning_rate=learning_rate)
+
     # Compile the model
-    model_LSTM.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+    model_LSTM.compile(loss='binary_crossentropy', optimizer=opt, metrics=['AUC', 'accuracy'])
 
     # Train the model
-    model_LSTM.fit(data_train, labels_train, epochs=100, batch_size=32,
-                   validation_data=(data_test, labels_test))  # Adjust the epochs and batch_size as needed
+    # Create the AUCCallback and specify the validation data
+    auc_callback = AUCCallback(validation_data=(data_test, labels_test))
+    model_LSTM.fit(data_train, labels_train, epochs=100, validation_data=(data_test, labels_test),
+                   callbacks=[auc_callback])  # Adjust the epochs and batch_size as needed
 
     # Make predictions on the test set
 
     start_Rnn_training_time = time.time() - start_Rnn_training_time
     y_pred_LSTM = model_LSTM.predict(data_test)
-    y_pred_LSTM = np.where(y_pred_LSTM > 0.5, 1, 0)
     roc_LSTM = roc_auc_score(labels_test, y_pred_LSTM)
 
     # Evaluate the model on the test set
-    loss, accuracy = model_LSTM.evaluate(data_test, labels_test)
+    loss, auc, accuracy = model_LSTM.evaluate(data_test, labels_test)
     print(f"Loss: {loss}")
     print(f"Accuracy: {accuracy}")
-    print("AUC: {}".format(roc_LSTM))
+    print("AUC: {}".format(auc))
+    print(f"AUC-test : {roc_LSTM}")
+    print(f"STD : {auc_callback.get_auc_std()}")
+    print(f"AVG AUC : {auc_callback.get_auc_avg()}")
+
     try:
         # Attempt to open the file in 'append' mode
         with open("RnnResults/RNN-Results.txt", 'a') as file:
             # Append a line to the existing file
             file.write(
-                "{},{},{},{},{},{},{}".format(network, spec, loss, accuracy, roc_LSTM, start_Rnn_training_time,
-                                              len(data)) + '\n')
+                "{},{},{},{},{},{},{},{},{},{},{}".format(network, spec, loss, accuracy, auc, roc_LSTM,
+                                                          auc_callback.get_auc_avg(), auc_callback.get_auc_std(),
+                                                          start_Rnn_training_time,
+                                                          len(data), learning_rate) + '\n')
     except FileNotFoundError:
         # File doesn't exist, so create a new file and write text
         with open("RnnResults/RNN-Results.txt", 'w') as file:
             file.write(
                 "Network={} Spec={} Loss={} Accuracy={} AUC={} time={} data={}".format(network, spec, loss, accuracy,
-                                                                                       roc_LSTM,
+                                                                                       auc,
                                                                                        start_Rnn_training_time,
                                                                                        len(data)) + '\n')
+    return max(auc, roc_LSTM)
 
 
 def merge_dicts(list_of_dicts):
@@ -249,6 +312,29 @@ def visualize_time_exp_scatter():
     print(df)
 
 
+def visualize_labels(file):
+    labels_file_path = "../data/all_network/TimeSeries/Baseline/labels/"
+    with open(labels_file_path + file, "r") as file_r:
+        lines = file_r.readlines()
+
+    # Convert the list of strings to a list of floats
+    data = [float(line.strip()) for line in lines]
+    start_date = dt.datetime(2017, 7, 25)
+    end_date = start_date + dt.timedelta(days=len(data) - 1)
+    dates = [start_date + dt.timedelta(days=i) for i in range(len(data))]
+    plt.figure(figsize=(10, 6))
+    plt.plot(dates, data, marker='o', linestyle='-')
+    plt.xlabel("Time")
+    plt.ylabel("Value")
+    plt.title("Time Series Plot " + file.split("_")[0].split("network")[1])
+    plt.grid(True)
+    plt.xticks(rotation=45)
+    plt.yticks([0, 1])  # Set y-axis ticks to [0, 1] only
+    plt.tight_layout()
+    plt.savefig(labels_file_path + file + '_label_graph.png', dpi=300)
+    plt.show()
+
+
 def getDailyAvg(file):
     timeseries_file_path = "../data/all_network/TimeSeries/"
     timeseries_file_path_other = "../data/all_network/TimeSeries/Other/"
@@ -299,13 +385,16 @@ def getDailyAvgReddit(file):
     print(
         f"AVG daily stat for {file} -> nodes = {avg_daily_nodes} , edges = {avg_daily_trans} , days = {days_of_data} , total trans = {len(selectedNetwork)}, Range {window_start_date} {data_last_date}")
 
+
 def write_list_to_csv(filename, data_list):
     with open(filename, 'w', newline='') as file:
         writer = csv.writer(file)
         for item in data_list:
             writer.writerow([item])
 
+
 if __name__ == "__main__":
+    # visualize_labels("networkcoindash_Label.csv")
     # for generating daily stats
     # processingIndx = 0
     # timeseries_file_path_other = "../data/all_network/TimeSeries/Other/"
@@ -320,18 +409,27 @@ if __name__ == "__main__":
     # #outputCleaner()
     # # "networkaeternity.txt", "networkaion.txt", "networkaragon.txt", "networkbancor.txt", "networkcentra.txt", "networkcindicator.txt", "networkcoindash.txt" , "networkiconomi.txt", "networkadex.txt"
     # # "networkdgd.txt","networkcentra.txt","networkcindicator.txt"
-    networkList = ["Reddit_B.tsv"]
+
+    # Iconomi 0.00001
+    # Centra 0.00004
+    # bancor 0.00005
+    # Aragon 0.00001
+    # UCI 0.00008 (0.00004 - epoch 250 )
+    # Reddit-b 0.00005
+    # Aternity 0.00008
+
+    networkList = ["networkcentra.txt"]
     # networkList = ["mathoverflow.txt", "networkcoindash.txt", "networkiconomi.txt", "networkadex.txt", "networkdgd.txt",
     #                "networkbancor.txt", "networkcentra.txt", "networkcindicator.txt", "networkaeternity.txt",
     #                "networkaion.txt", "networkaragon.txt", "CollegeMsg.txt", "Reddit_B.tsv"]
     # # tdaDifferentGraph = ["Overlap_0.1_Ncube_2", "Overlap_0.1_Ncube_5", "Overlap_0.2_Ncube_2", "Overlap_0.2_Ncube_5", "Overlap_0.3_Ncube_2", "Overlap_0.3_Ncube_5", "Overlap_0.5_Ncube_2", "Overlap_0.5_Ncube_5", "Overlap_0.6_Ncube_2", "Overlap_0.6_Ncube_5"]
-    for network in networkList:
-        # for tdaVariable in tdaDifferentGraph:
-        print("Working on {}\n".format(network))
-        data2 = read_seq_data_by_file_name(network, "seq.txt")
-        labels = data2["label"]
-        write_list_to_csv(network.split(".")[0]+"_Label.csv", labels)
-        print(labels)
+    # for network in networkList:
+    #     # for tdaVariable in tdaDifferentGraph:
+    #     print("Working on {}\n".format(network))
+    #     data2 = read_seq_data_by_file_name(network, "seq.txt")
+    #     labels = data2["label"]
+    #     write_list_to_csv(network.split(".")[0]+"_Label.csv", labels)
+    #     print(labels)
 
     #
     #
@@ -378,32 +476,87 @@ if __name__ == "__main__":
     #         LSTM_classifier(np_data, np_labels, key, network)
 
     # for seq files
-    # for network in networkList:
-    #     # for tdaVariable in tdaDifferentGraph:
-    #     print("Working on {}\n".format(network))
-    #     data = read_seq_data_by_file_name(network, "seq_raw.txt")
-    #
-    #     # indx = 0
-    #     for key, value in data["sequence"].items():
-    #         # if (indx == 1):
-    #         #     break
-    #         print("Processing network ({}) - with parameters {}".format(network, key))
-    #
-    #         np_labels = np.array(data["label"])
-    #         if (len(value[0]) != 7):
-    #             while (len(value[0]) != 7):
-    #                 del value[0]
-    #                 np_labels = np.delete(np_labels, 0, axis=0)
-    #         indxs = []
-    #         if (network == "networkdgd.txt"):
-    #             for i in range(0, len(value)):
-    #                 if len(value[i]) != 7:
-    #                     indxs.append(i)
-    #
-    #             value = [item for index, item in enumerate(value) if index not in indxs]
-    #             np_labels = np.delete(np_labels, indxs)
-    #
-    #         np_data = np.array(value)
-    #         LSTM_classifier(np_data, np_labels, key, network)
-            # indx += 1
+    auc_scores = []
+
+
+    # for combined version
+    for network in networkList:
+        for run in range(1, 6):
+            print(f"RUN {run}")
+            # for tdaVariable in tdaDifferentGraph:
+            print("Working on {}\n".format(network))
+            data = read_seq_data_by_file_name(network, "seq.txt")
+            data_raw = read_seq_data_by_file_name(network, "seq_raw.txt")
+            np_data = []
+            np_data_raw = []
+            np_labels = []
+            # indx = 0
+            for key, value in data["sequence"].items():
+                # if (indx == 1):
+                #     break
+
+                if ("overlap0.3-cube5-cls2" in key):
+                    print("Processing network ({}) - with parameters {}".format(network, key))
+                    np_labels = np.array(data["label"][4:])
+                    # if (len(value[0]) != 7):
+                    #     while (len(value[0]) != 7):
+                    #         del value[0]
+                    #         np_labels = np.delete(np_labels, 0, axis=0)
+                    indxs = [163, 164, 165, 166, 167, 168, 169, 170]
+                    # indxs = []
+                    if (network == "networkdgd.txt"):
+                        for i in range(0, len(value)):
+                            if len(value[i]) != 7:
+                                indxs.append(i)
+
+                        value = [item for index, item in enumerate(value) if index not in indxs]
+                        np_labels = np.delete(np_labels, indxs)
+
+                    np_data = np.array(value[4:])
+                    # auc_scores.append(LSTM_classifier(np_data, np_labels, key, network))
+
+            # for raw data conbination
+            for key_raw, value_raw in data_raw["sequence"].items():
+                # if (indx == 1):
+                #     break
+
+                if ("raw" in key_raw):
+                    print("Processing network ({}) - with parameters {}".format(network, key_raw))
+                    np_labels_raw = np.array(data["label"][4:])
+                    if (len(value_raw[0]) != 7):
+                        while (len(value_raw[0]) != 7):
+                            del value_raw[0]
+                            np_labels_raw = np.delete(np_labels_raw, 0, axis=0)
+                    indxs = [163, 164, 165, 166, 167, 168, 169, 170]
+                    # indxs = []
+                    if (network == "networkdgd.txt"):
+                        for i in range(0, len(value_raw)):
+                            if len(value_raw[i]) != 7:
+                                indxs.append(i)
+
+                        value_raw = [item for index, item in enumerate(value_raw) if index not in indxs]
+                        np_labels_raw = np.delete(np_labels_raw, indxs)
+
+                    np_data_raw = np.array(value_raw[4:])
+                    auc_scores.append(LSTM_classifier(np_data_raw, np_labels, key_raw, network))
+
+            min_value = np_data.min()
+            max_value = np_data.max()
+
+            # Normalize the entire array using Min-Max normalization formula
+            normalized_data_arr = (np_data - min_value) / (max_value - min_value)
+
+            min_value = np_data_raw.min()
+            max_value = np_data_raw.max()
+
+            # Normalize the entire array using Min-Max normalization formula
+            normalized_raw_data_arr = (np_data_raw - min_value) / (max_value - min_value)
+            # Concatenate the two arrays along the third axis (axis=2)
+            concatenated_arr = np.concatenate((normalized_data_arr, normalized_raw_data_arr), axis=2)
+            # auc_scores.append(LSTM_classifier(concatenated_arr, np_labels, "Combined", network))
+
+
+
+    print(f"Test Avg_AUC= {np.average(auc_scores)}  and std={np.std(auc_scores)}")
+    # indx += 1
     #
